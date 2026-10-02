@@ -88,11 +88,9 @@ var _ = Describe("Channels outside the registry", func() {
 		}
 		data := h.run(dt.WithPermissions(dt.Command(user, command, opts), discordgo.PermissionManageGuild))
 		if edits := h.rec.Edits(); len(edits) > before {
-			s, _ := edits[len(edits)-1].Body["content"].(string)
-			return s
+			return replyText(edits[len(edits)-1].Body)
 		}
-		s, _ := data["content"].(string)
-		return s
+		return replyText(data)
 	}
 
 	It("adds channels Holodex tracks as user channels", func() {

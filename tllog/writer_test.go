@@ -29,6 +29,10 @@ type fakeSender struct {
 
 func (f *fakeSender) Send(m sender.Message) bool {
 	p := posted{channel: m.ChannelID, content: m.Send.Content}
+	if len(m.Send.Embeds) > 0 {
+		e := m.Send.Embeds[0]
+		p.content = e.Title + " | " + e.Description
+	}
 	if len(m.Send.Files) > 0 {
 		body, _ := io.ReadAll(m.Send.Files[0].Reader)
 		p.file, p.body = m.Send.Files[0].Name, string(body)
@@ -77,6 +81,7 @@ var _ = Describe("Writer", func() {
 			Sender:     snd,
 			Moderation: func(id string) *relay.Moderation { return rules[id] },
 			Delay:      time.Millisecond,
+			Now:        func() time.Time { return start.Add(90 * time.Minute) },
 		})
 		DeferCleanup(w.Close)
 		return w
@@ -102,9 +107,9 @@ var _ = Describe("Writer", func() {
 		Eventually(snd.all).Should(HaveLen(2))
 		Consistently(snd.all, 50*time.Millisecond).Should(HaveLen(2))
 		Expect(snd.all()).To(ConsistOf(
-			posted{"c1", "Log for [Title](<https://youtu.be/vid>)", "vid.txt",
+			posted{"c1", "Title | Stream log · 1 h 30 min · 1 line", "vid.txt",
 				"Title\nhttps://youtu.be/vid\nStarted 2026-10-02 12:00 UTC\n\n[0:00:01] @tl: [EN] one\n"},
-			posted{"c2", "Log for [Title](<https://youtu.be/vid>)", "vid.txt",
+			posted{"c2", "Title | Stream log · 1 h 30 min · 1 line", "vid.txt",
 				"Title\nhttps://youtu.be/vid\nStarted 2026-10-02 12:00 UTC\n\n[0:00:02] @tl: [EN] two\n"},
 		))
 	})

@@ -38,11 +38,7 @@ var _ = Describe("Subscription commands", func() {
 		return choices(h.run(dt.WithPermissions(dt.Autocomplete(user, command, dt.Sub(sub, focused)), discordgo.PermissionManageGuild)))
 	}
 
-	content := func(data map[string]any) string {
-		GinkgoHelper()
-		s, _ := data["content"].(string)
-		return s
-	}
+	content := replyText
 
 	relays := func() []store.Subscription {
 		GinkgoHelper()
@@ -72,8 +68,11 @@ var _ = Describe("Subscription commands", func() {
 	It("relays a streamer here with a role, without pinging it", func() {
 		data := run("relay", "add", dt.String("target", "calli"), dt.Role("role", "123"))
 
-		Expect(content(data)).To(Equal("Now relaying **Mori Calliope** in <#channel>. Relay notices ping <@&123>."))
+		Expect(content(data)).To(Equal("Now relaying **Mori Calliope** in <#channel>.\nRelay notices ping <@&123>."))
 		Expect(data["allowed_mentions"]).To(HaveKeyWithValue("parse", BeNil()))
+		e := embed(data)
+		Expect(e["description"]).To(HavePrefix("✅ Now relaying"))
+		Expect(e["color"]).To(BeEquivalentTo(0x4C9A2A))
 		Expect(relays()).To(ConsistOf(And(
 			HaveField("Target", store.Target{Kind: store.TargetChannel, ID: calliID}),
 			HaveField("ChannelID", "channel"),
@@ -87,7 +86,7 @@ var _ = Describe("Subscription commands", func() {
 		run("relay", "add", dt.String("target", calliID), dt.Role("role", "123"))
 		data := run("relay", "add", dt.String("target", calliID))
 
-		Expect(content(data)).To(Equal("Already relaying **Mori Calliope** in <#channel>. Relay notices don't ping anyone."))
+		Expect(content(data)).To(Equal("Already relaying **Mori Calliope** in <#channel>.\nRelay notices don't ping anyone."))
 		Expect(relays()[0].RoleID).To(BeEmpty())
 	})
 
@@ -164,14 +163,11 @@ var _ = Describe("Subscription commands", func() {
 		notify := func(group, sub string, opts ...*discordgo.ApplicationCommandInteractionDataOption) string {
 			GinkgoHelper()
 			data := h.run(dt.WithPermissions(dt.Command(user, "notify", dt.Group(group, dt.Sub(sub, opts...))), discordgo.PermissionManageGuild))
-			if s, _ := data["content"].(string); s != "" {
-				return s
-			}
-			return embed(data)["description"].(string)
+			return replyText(data)
 		}
 
 		Expect(notify("youtube", "add", dt.String("target", "calli"), dt.Role("role", "123"))).
-			To(Equal("Now posting live notifications for **Mori Calliope** in <#channel>. Notifications ping <@&123>."))
+			To(Equal("Now posting live notifications for **Mori Calliope** in <#channel>.\nNotifications ping <@&123>."))
 		Expect(notify("posts", "add", dt.String("target", "group:hololive-en"))).
 			To(Equal("Now posting new posts by everyone in **Hololive EN** in <#channel>."))
 		Expect(notify("posts", "list")).To(Equal("<#channel>\n- everyone in **Hololive EN**"))

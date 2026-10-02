@@ -2,6 +2,7 @@ package tllog
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"strings"
 	"sync"
@@ -34,7 +35,11 @@ type Config struct {
 	Moderation func(guildID string) *relay.Moderation
 	// How long after a stream ends its logs are posted.
 	Delay time.Duration
-	Log   *slog.Logger
+	// Looks up the streamer for the message. Optional.
+	Streamer func(channelID string) (*store.Streamer, bool)
+	Color    int
+	Now      func() time.Time
+	Log      *slog.Logger
 }
 
 // Writer posts a log to every guild that relayed a stream once it ends:
@@ -56,6 +61,9 @@ func NewWriter(cfg Config) *Writer {
 	if cfg.Delay <= 0 {
 		cfg.Delay = defaultDelay
 	}
+	if cfg.Now == nil {
+		cfg.Now = time.Now
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Writer{cfg: cfg, ctx: ctx, cancel: cancel}
@@ -68,6 +76,16 @@ func (w *Writer) StreamEnded(s stream.Stream) {
 		return
 	}
 
+	meta := Meta{VideoID: s.VideoID, Title: s.Title, Start: s.StartedAt, Author: s.ChannelName}
+	if !s.StartedAt.IsZero() {
+		meta.Duration = w.cfg.Now().Sub(s.StartedAt)
+	}
+	if w.cfg.Streamer != nil {
+		if st, ok := w.cfg.Streamer(s.ChannelID); ok {
+			meta.Author, meta.AuthorIcon = st.Name, st.AvatarURL
+		}
+	}
+
 	w.wg.Go(func() {
 		select {
 		case <-w.ctx.Done():
@@ -77,7 +95,7 @@ func (w *Writer) StreamEnded(s stream.Stream) {
 
 		ctx, cancel := context.WithTimeout(w.ctx, storeTimeout)
 		defer cancel()
-		if err := w.post(ctx, s); err != nil {
+		if err := w.post(ctx, meta); err != nil {
 			w.cfg.Log.Error("failed to post TL logs", slog.String("video_id", s.VideoID), slog.Any("error", err))
 		}
 	})
@@ -88,8 +106,8 @@ func (w *Writer) Close() {
 	w.wg.Wait()
 }
 
-func (w *Writer) post(ctx context.Context, s stream.Stream) error {
-	channels, err := w.cfg.Store.VideoChannels(ctx, s.VideoID)
+func (w *Writer) post(ctx context.Context, meta Meta) error {
+	channels, err := w.cfg.Store.VideoChannels(ctx, meta.VideoID)
 	if err != nil {
 		return err
 	}
@@ -103,10 +121,9 @@ func (w *Writer) post(ctx context.Context, s stream.Stream) error {
 		byGuild[vc.GuildID] = append(byGuild[vc.GuildID], vc.ChannelID)
 	}
 
-	meta := Meta{VideoID: s.VideoID, Title: s.Title, Start: s.StartedAt}
 	for _, guildID := range guilds {
 		if err := w.postGuild(ctx, meta, guildID, byGuild[guildID]); err != nil {
-			w.cfg.Log.Error("failed to post a TL log", slog.String("video_id", s.VideoID),
+			w.cfg.Log.Error("failed to post a TL log", slog.String("video_id", meta.VideoID),
 				slog.String("guild_id", guildID), slog.Any("error", err))
 		}
 	}
@@ -149,8 +166,8 @@ func (w *Writer) postGuild(ctx context.Context, meta Meta, guildID string, relay
 }
 
 func (w *Writer) send(ctx context.Context, meta Meta, guildID, channelID string, lines []store.Line, mod *relay.Moderation) error {
-	text, ok := Build(meta, lines, mod)
-	if !ok {
+	text, n := Build(meta, lines, mod)
+	if n == 0 {
 		return nil
 	}
 
@@ -159,20 +176,50 @@ func (w *Writer) send(ctx context.Context, meta Meta, guildID, channelID string,
 		return err
 	}
 
-	w.cfg.Sender.Send(sender.Message{ChannelID: channelID, Send: Message(meta, text)})
+	w.cfg.Sender.Send(sender.Message{ChannelID: channelID, Send: Message(meta, text, n, w.cfg.Color)})
 	return nil
 }
 
-// Message is the log as a .txt attachment.
-func Message(meta Meta, text string) *discordgo.MessageSend {
+// Message is a short summary with the log attached as a .txt file.
+func Message(meta Meta, text string, lines int, color int) *discordgo.MessageSend {
 	title := meta.Title
 	if title == "" {
 		title = meta.VideoID
 	}
 
+	desc := []string{"Stream log"}
+	if meta.Duration >= time.Minute {
+		desc = append(desc, length(meta.Duration))
+	}
+	if lines == 1 {
+		desc = append(desc, "1 line")
+	} else {
+		desc = append(desc, fmt.Sprintf("%d lines", lines))
+	}
+
+	e := &discordgo.MessageEmbed{
+		Title:       title,
+		URL:         meta.URL(),
+		Description: strings.Join(desc, " · "),
+		Color:       color,
+	}
+	if meta.Author != "" {
+		e.Author = &discordgo.MessageEmbedAuthor{Name: meta.Author, IconURL: meta.AuthorIcon}
+	}
+
 	return &discordgo.MessageSend{
-		Content:         "Log for [" + relay.EscapeMarkdown(title) + "](<" + meta.URL() + ">)",
+		Embeds:          []*discordgo.MessageEmbed{e},
 		Files:           []*discordgo.File{{Name: meta.VideoID + ".txt", ContentType: "text/plain", Reader: strings.NewReader(text)}},
 		AllowedMentions: &discordgo.MessageAllowedMentions{},
 	}
+}
+
+// Like "2 h 14 min" or "45 min".
+func length(d time.Duration) string {
+	h := int(d / time.Hour)
+	m := int(d % time.Hour / time.Minute)
+	if h == 0 {
+		return fmt.Sprintf("%d min", m)
+	}
+	return fmt.Sprintf("%d h %d min", h, m)
 }

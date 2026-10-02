@@ -13,10 +13,10 @@ import (
 // roleID if set, and nobody else.
 func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string) *discordgo.MessageSend {
 	e := &discordgo.MessageEmbed{
-		Title:     s.Title,
-		URL:       s.URL(),
-		Color:     f.Color,
-		Thumbnail: &discordgo.MessageEmbedThumbnail{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/mqdefault.jpg"},
+		Title: s.Title,
+		URL:   s.URL(),
+		Color: f.Color,
+		Image: &discordgo.MessageEmbedImage{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"},
 		Author: &discordgo.MessageEmbedAuthor{
 			Name: s.ChannelName,
 			URL:  "https://www.youtube.com/channel/" + s.ChannelID,

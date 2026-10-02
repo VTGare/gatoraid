@@ -1,9 +1,11 @@
 package commands
 
 import (
+	"cmp"
 	"log/slog"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/VTGare/gumi"
 
@@ -36,6 +38,9 @@ func logCommand(b *bot.Bot) *gumi.Command {
 					b.Log.Warn("couldn't get a video for /log", slog.String("video_id", videoID), slog.Any("error", err))
 				} else {
 					meta.Title = v.Title
+					meta.Author = cmp.Or(v.Channel.EnglishName, v.Channel.Name)
+					meta.AuthorIcon = v.Channel.Photo
+					meta.Duration = time.Duration(v.Duration) * time.Second
 					// Before a stream starts, available_at is only the schedule.
 					if v.Status == holodex.StatusLive || v.Status == holodex.StatusPast {
 						meta.Start = v.AvailableAt
@@ -43,23 +48,23 @@ func logCommand(b *bot.Bot) *gumi.Command {
 				}
 			}
 
-			text, ok, err := buildLog(b, ctx, meta)
+			text, n, err := buildLog(b, ctx, meta)
 			if err != nil {
 				return err
 			}
-			if !ok {
+			if n == 0 {
 				return gumi.NewUserError("I have no lines from that stream. I keep this server's relays for 7 days and every chat I read for 24 hours.")
 			}
 
-			msg := tllog.Message(meta, text)
-			return ctx.Reply(&gumi.Response{Content: msg.Content, Files: msg.Files, AllowedMentions: msg.AllowedMentions})
+			msg := tllog.Message(meta, text, n, Color)
+			return ctx.Reply(&gumi.Response{Embeds: msg.Embeds, Files: msg.Files, AllowedMentions: msg.AllowedMentions})
 		},
 	}
 }
 
 // The server's own relays come first. Without any, it's the archive of
 // every chat the bot read, which only goes back a day.
-func buildLog(b *bot.Bot, ctx *gumi.Context, meta tllog.Meta) (string, bool, error) {
+func buildLog(b *bot.Bot, ctx *gumi.Context, meta tllog.Meta) (string, int, error) {
 	mod := b.Moderation.For(ctx.GuildID())
 
 	var sources []string
@@ -71,14 +76,14 @@ func buildLog(b *bot.Bot, ctx *gumi.Context, meta tllog.Meta) (string, bool, err
 	for _, guildID := range sources {
 		lines, err := b.Store.VideoLines(ctx.Context(), meta.VideoID, guildID)
 		if err != nil {
-			return "", false, err
+			return "", 0, err
 		}
-		if text, ok := tllog.Build(meta, lines, mod); ok {
-			return text, true, nil
+		if text, n := tllog.Build(meta, lines, mod); n > 0 {
+			return text, n, nil
 		}
 	}
 
-	return "", false, nil
+	return "", 0, nil
 }
 
 func parseVideoID(input string) string {

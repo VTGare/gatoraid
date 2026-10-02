@@ -69,6 +69,19 @@ func embed(data map[string]any) map[string]any {
 	return embeds[0].(map[string]any)
 }
 
+// replyText is what a reply says: its content, or the text of a success
+// embed without the check mark.
+func replyText(data map[string]any) string {
+	if s, _ := data["content"].(string); s != "" {
+		return s
+	}
+	if embeds, _ := data["embeds"].([]any); len(embeds) > 0 {
+		d, _ := embeds[0].(map[string]any)["description"].(string)
+		return strings.TrimPrefix(d, "✅ ")
+	}
+	return ""
+}
+
 func ephemeral(data map[string]any) bool {
 	flags, _ := data["flags"].(float64)
 	return int(flags)&int(discordgo.MessageFlagsEphemeral) != 0

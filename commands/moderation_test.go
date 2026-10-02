@@ -54,8 +54,7 @@ var _ = Describe("Moderation commands", func() {
 		GinkgoHelper()
 		data := h.run(asMod(dt.Command(user, command, dt.Sub(sub, opts...))))
 		Expect(ephemeral(data)).To(BeTrue())
-		s, _ := data["content"].(string)
-		return s
+		return replyText(data)
 	}
 
 	// Deferred replies arrive as an edit of the original response.
@@ -65,13 +64,12 @@ var _ = Describe("Moderation commands", func() {
 		h.run(asMod(dt.Command(user, command, dt.Sub(sub, opts...))))
 		edits := h.rec.Edits()
 		Expect(edits).To(HaveLen(before + 1))
-		s, _ := edits[len(edits)-1].Body["content"].(string)
-		return s
+		return replyText(edits[len(edits)-1].Body)
 	}
 
 	It("needs Manage Messages", func() {
 		data := h.run(dt.Command(user, "filter", dt.Sub("list")))
-		Expect(data["content"]).To(ContainSubstring("You need Manage Messages, or a Blacklister or Manager role"))
+		Expect(replyText(data)).To(ContainSubstring("You need Manage Messages, or a Blacklister or Manager role"))
 	})
 
 	It("lets Blacklister and Manager roles in", func() {
@@ -84,19 +82,19 @@ var _ = Describe("Moderation commands", func() {
 		}
 
 		data := h.run(dt.WithRoles(dt.Command(user, "filter", dt.Sub("list")), "other"))
-		Expect(data["content"]).To(ContainSubstring("You need Manage Messages"))
+		Expect(replyText(data)).To(ContainSubstring("You need Manage Messages"))
 	})
 
 	It("blacklists a channel by handle and lists it", func() {
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "@spammer"), dt.String("reason", "ads"))).
-			To(Equal("Blacklisted **@spammer**. Their messages won't be relayed here. `/blacklist remove` undoes it."))
+			To(Equal("Blacklisted **@spammer**. Their messages won't be relayed here.\n`/blacklist remove` undoes it."))
 		Expect(h.b.Moderation.Blacklisted("guild", "UCspamspamspamspamspamsp")).To(BeTrue())
 
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "https://youtube.com/channel/UCspamspamspamspamspamsp"))).
 			To(ContainSubstring("**@spammer** is already blacklisted."))
 
 		data := h.run(asMod(dt.Command(user, "blacklist", dt.Sub("list"))))
-		Expect(data["content"]).To(Equal("1 blacklisted channel."))
+		Expect(replyText(data)).To(Equal("1 blacklisted channel."))
 		last := h.rec.Requests()[len(h.rec.Requests())-1]
 		Expect(last.Files["blacklist.txt"]).To(MatchRegexp(`^UCspamspamspamspamspamsp\t@spammer\t\d{4}-\d\d-\d\d\tads\n$`))
 	})
@@ -115,11 +113,11 @@ var _ = Describe("Moderation commands", func() {
 
 		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
 		Expect(ephemeral(data)).To(BeTrue())
-		Expect(data["content"]).To(Equal(`Blacklisted **@some\_author**. Their messages won't be relayed here. ` + "`/blacklist remove` undoes it."))
+		Expect(replyText(data)).To(Equal(`Blacklisted **@some\_author**. Their messages won't be relayed here.` + "\n`/blacklist remove` undoes it."))
 		Expect(h.b.Moderation.Blacklisted("guild", "UCauthorauthorauthorauth")).To(BeTrue())
 
 		data = h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m2")))
-		Expect(data["content"]).To(ContainSubstring("That's not a line I relayed"))
+		Expect(replyText(data)).To(ContainSubstring("That's not a line I relayed"))
 	})
 
 	It("blacklists MChad authors by name, not every MChad line", func() {
@@ -129,7 +127,7 @@ var _ = Describe("Moderation commands", func() {
 		}})).To(Succeed())
 
 		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
-		Expect(data["content"]).To(HavePrefix("Blacklisted **Some TLer**."))
+		Expect(replyText(data)).To(HavePrefix("Blacklisted **Some TLer**."))
 		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Some TLer")).To(BeTrue())
 		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Someone Else")).To(BeFalse())
 		Expect(h.b.Moderation.Blacklisted("guild", "")).To(BeFalse())
@@ -142,7 +140,7 @@ var _ = Describe("Moderation commands", func() {
 		}})).To(Succeed())
 
 		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
-		Expect(data["content"]).To(ContainSubstring("only stops their cameos and gossip"))
+		Expect(replyText(data)).To(ContainSubstring("only stops their cameos and gossip"))
 	})
 
 	It("removes by suggestion, by name, or the last one added", func() {
@@ -208,7 +206,7 @@ var _ = Describe("Moderation commands", func() {
 		}
 
 		data := h.run(asMod(dt.Command(user, "filter", dt.Sub("list"))))
-		Expect(data["content"]).To(ContainSubstring("here's a file"))
+		Expect(replyText(data)).To(ContainSubstring("here's a file"))
 		last := h.rec.Requests()[len(h.rec.Requests())-1]
 		Expect(last.Files["filters.txt"]).To(ContainSubstring("a fairly long banned phrase number 29\n"))
 	})

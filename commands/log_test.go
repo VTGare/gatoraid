@@ -46,8 +46,15 @@ var _ = Describe("/log", func() {
 		edits := h.rec.Edits()
 		Expect(edits).NotTo(BeEmpty())
 		last := edits[len(edits)-1]
-		content, _ := last.Body["content"].(string)
-		return content, last.Files[videoID+".txt"]
+		summary := ""
+		if embeds, _ := last.Body["embeds"].([]any); len(embeds) > 0 {
+			e := embeds[0].(map[string]any)
+			summary, _ = e["title"].(string)
+			if d, ok := e["description"].(string); ok {
+				summary += " | " + d
+			}
+		}
+		return summary, last.Files[videoID+".txt"]
 	}
 
 	It("sends the server's lines, with its blacklist applied", func() {
@@ -59,7 +66,7 @@ var _ = Describe("/log", func() {
 
 		content, file := logFile("https://www.youtube.com/watch?v=" + videoID + "&t=10")
 
-		Expect(content).To(Equal("Log for [" + videoID + "](<https://youtu.be/" + videoID + ">)"))
+		Expect(content).To(Equal(videoID + " | Stream log · 1 line"))
 		Expect(file).To(Equal("https://youtu.be/" + videoID + "\nTimes count from the first line.\n\n[0:00:00] @a: [EN] one\n"))
 	})
 
@@ -72,14 +79,15 @@ var _ = Describe("/log", func() {
 
 	It("takes the title and start from Holodex", func() {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, _ = w.Write([]byte(`{"id":"` + videoID + `","title":"Karaoke","status":"past","available_at":"2026-10-02T12:00:00.000Z"}`))
+			_, _ = w.Write([]byte(`{"id":"` + videoID + `","title":"Karaoke","status":"past","available_at":"2026-10-02T12:00:00.000Z",` +
+				`"duration":3700,"channel":{"name":"Calli Ch.","english_name":"Mori Calliope"}}`))
 		}))
 		DeferCleanup(srv.Close)
 		h.b.Holodex = holodex.New("key", holodex.WithBaseURL(srv.URL))
 		save("guild", 90*time.Second, "a", "[EN] one")
 
 		content, file := logFile(videoID)
-		Expect(content).To(HavePrefix("Log for [Karaoke]"))
+		Expect(content).To(Equal("Karaoke | Stream log · 1 h 1 min · 1 line"))
 		Expect(file).To(Equal("Karaoke\nhttps://youtu.be/" + videoID + "\nStarted 2026-10-02 12:00 UTC\n\n[0:01:30] @a: [EN] one\n"))
 	})
 

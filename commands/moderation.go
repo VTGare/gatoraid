@@ -90,9 +90,9 @@ func blacklistAuthorCommand(b *bot.Bot) *gumi.Command {
 			}
 
 			if line.Kind == store.LineOwner {
-				msg += " Streamers' lines in their own chat are always relayed, so this only stops their cameos and gossip."
+				msg += "\nStreamers' lines in their own chat are always relayed, so this only stops their cameos and gossip."
 			}
-			return ctx.ReplyText(msg)
+			return success(ctx, msg)
 		},
 	}
 }
@@ -127,7 +127,7 @@ func blacklistAdd(b *bot.Bot, ctx *gumi.Context) error {
 		return err
 	}
 
-	return ctx.ReplyText(msg)
+	return success(ctx, msg)
 }
 
 func addToBlacklist(b *bot.Bot, ctx *gumi.Context, e store.BlacklistEntry) (string, error) {
@@ -144,7 +144,7 @@ func addToBlacklist(b *bot.Bot, ctx *gumi.Context, e store.BlacklistEntry) (stri
 		return "", err
 	}
 
-	return fmt.Sprintf("Blacklisted %s. Their messages won't be relayed here. `/blacklist remove` undoes it.", who), nil
+	return fmt.Sprintf("Blacklisted %s. Their messages won't be relayed here.\n`/blacklist remove` undoes it.", who), nil
 }
 
 func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
@@ -166,7 +166,7 @@ func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
 		return err
 	}
 
-	return ctx.ReplyText("Took " + blacklistName(*e) + " off the blacklist.")
+	return success(ctx, "Took "+blacklistName(*e)+" off the blacklist.")
 }
 
 // Suggestions send the channel ID. Typed input can also be a name on the
@@ -323,9 +323,9 @@ func filterAdd(b *bot.Bot, ctx *gumi.Context) error {
 	}
 
 	if f.Kind == store.FilterBanned {
-		return ctx.ReplyText("Lines containing " + inlineCode(f.Pattern) + " won't be relayed, except the streamer's own.")
+		return success(ctx, "Lines containing "+inlineCode(f.Pattern)+" won't be relayed, except the streamer's own.")
 	}
-	return ctx.ReplyText("Lines starting with " + inlineCode(f.Pattern) + " now count as translations.")
+	return success(ctx, "Lines starting with "+inlineCode(f.Pattern)+" now count as translations.")
 }
 
 func filterRemove(b *bot.Bot, ctx *gumi.Context) error {
@@ -340,7 +340,7 @@ func filterRemove(b *bot.Bot, ctx *gumi.Context) error {
 		return err
 	}
 
-	return ctx.ReplyText(fmt.Sprintf("Removed the %s filter %s.", kind, inlineCode(pattern)))
+	return success(ctx, fmt.Sprintf("Removed the %s filter %s.", kind, inlineCode(pattern)))
 }
 
 // Discord caps embed fields at 1024 characters, so long lists go out as a

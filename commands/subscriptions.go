@@ -240,12 +240,12 @@ func subscriptionAdd(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		msg = "Already " + doing + " in <#" + sub.ChannelID + ">."
 	}
 	if sub.RoleID != "" {
-		msg += " " + f.pings + " ping <@&" + sub.RoleID + ">."
+		msg += "\n" + f.pings + " ping <@&" + sub.RoleID + ">."
 	} else if !created && f.pings != "" {
-		msg += " " + f.pings + " don't ping anyone."
+		msg += "\n" + f.pings + " don't ping anyone."
 	}
 
-	return reply(ctx, msg)
+	return success(ctx, msg)
 }
 
 func subscriptionRemove(b *bot.Bot, f feature, ctx *gumi.Context) error {
@@ -268,7 +268,7 @@ func subscriptionRemove(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		return err
 	}
 
-	return reply(ctx, "Stopped "+doing+" in <#"+channelID+">.")
+	return success(ctx, "Stopped "+doing+" in <#"+channelID+">.")
 }
 
 func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {
@@ -290,7 +290,7 @@ func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		return gumi.Errorf("<#%s> has no %s.", channelID, noun)
 	}
 
-	return reply(ctx, fmt.Sprintf("Removed %d %s from <#%s>.", n, noun, channelID))
+	return success(ctx, fmt.Sprintf("Removed %d %s from <#%s>.", n, noun, channelID))
 }
 
 func subscriptionList(b *bot.Bot, f feature, ctx *gumi.Context) error {
@@ -338,9 +338,13 @@ func subscriptionList(b *bot.Bot, f feature, ctx *gumi.Context) error {
 	return ctx.ReplyEmbed(e)
 }
 
-// Replies mention channels and roles, which mustn't ping anyone.
-func reply(ctx *gumi.Context, msg string) error {
-	return ctx.Reply(&gumi.Response{Content: msg, AllowedMentions: &discordgo.MessageAllowedMentions{}})
+// success confirms a change in a small embed, which stands apart from
+// relayed lines in the same channel. Mentions in it never ping anyone.
+func success(ctx *gumi.Context, msg string) error {
+	return ctx.Reply(&gumi.Response{
+		Embeds:          []*discordgo.MessageEmbed{{Description: "✅ " + msg, Color: Color}},
+		AllowedMentions: &discordgo.MessageAllowedMentions{},
+	})
 }
 
 // A channel link, handle or ID that isn't a registry streamer's ID. Links

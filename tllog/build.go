@@ -18,15 +18,19 @@ type Meta struct {
 	Title   string
 	// Zero means times count from the first line.
 	Start time.Time
+	// The streamer, for the message. Optional.
+	Author, AuthorIcon string
+	// How long the stream ran. Zero when unknown.
+	Duration time.Duration
 }
 
 func (m Meta) URL() string { return "https://youtu.be/" + m.VideoID }
 
-// Build writes the log and reports whether any lines made it in. The
+// Build writes the log and returns how many lines made it in. The
 // blacklist and filters are applied as they are now, so authors blacklisted
 // after they spoke are left out too. The streamer's own lines skip them,
 // like in relays.
-func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, bool) {
+func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, int) {
 	type key struct {
 		author string
 		at     int64
@@ -54,7 +58,7 @@ func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, bool) {
 		}
 	}
 	if len(kept) == 0 {
-		return "", false
+		return "", 0
 	}
 
 	slices.SortStableFunc(kept, func(a, b store.Line) int { return cmp.Compare(a.SaidAt.UnixMilli(), b.SaidAt.UnixMilli()) })
@@ -77,7 +81,7 @@ func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, bool) {
 		fmt.Fprintf(&sb, "[%s] %s: %s\n", offset(l.SaidAt.Sub(start)), l.AuthorName, l.Body)
 	}
 
-	return sb.String(), true
+	return sb.String(), len(kept)
 }
 
 // Lines from the waiting room come before the start, so they're negative.

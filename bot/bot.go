@@ -151,6 +151,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		Store:      st,
 		Sender:     b.Sender,
 		Moderation: b.Moderation.For,
+		Streamer:   b.Streamers.Streamer,
+		Color:      Color,
 		Log:        log.With("component", "tllog"),
 	})
 
