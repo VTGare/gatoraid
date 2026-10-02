@@ -144,7 +144,7 @@ func ownerStreamerRemove(b *bot.Bot) *gumi.Command {
 				return err
 			}
 
-			if err := b.Streamers.Delete(ctx.Context(), st.ChannelID); err != nil {
+			if err := b.Streamers.Remove(ctx.Context(), st.ChannelID); err != nil {
 				return err
 			}
 

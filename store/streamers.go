@@ -40,7 +40,12 @@ type Streamer struct {
 	Source          StreamerSource
 	AddedByGuild    string
 	UpdatedAt       time.Time
+	// Set while the streamer is hidden: dropped from the seed or removed by
+	// the owner. The row stays so subscriptions to it survive.
+	RemovedAt *time.Time
 }
+
+func (s *Streamer) Removed() bool { return s.RemovedAt != nil }
 
 // Only curated streamers count as VTubers when they show up in other
 // streamers' chats.
@@ -59,13 +64,15 @@ type StreamerStore interface {
 	Streamers(ctx context.Context) ([]Streamer, error)
 	Streamer(ctx context.Context, channelID string) (*Streamer, error)
 
-	// Replaces the groups and the seed streamers. Owner streamers are left
-	// alone unless the seed has an identical entry, which takes them back.
-	// User streamers that appear in the seed become seed streamers.
+	// Replaces the groups and the seed streamers. Seed streamers missing from
+	// the seed are hidden, not deleted. Owner streamers are left alone unless
+	// the seed has an identical entry, which takes them back. User streamers
+	// that appear in the seed become seed streamers.
 	SyncSeed(ctx context.Context, groups []Group, streamers []Streamer) (SeedResult, error)
 
 	SaveStreamer(ctx context.Context, s Streamer) error
 	// Skips unknown channels and returns how many avatars changed.
 	UpdateAvatars(ctx context.Context, avatars map[string]string) (int, error)
-	DeleteStreamer(ctx context.Context, channelID string) error
+	// Hides the streamer. Saving it again brings it back.
+	RemoveStreamer(ctx context.Context, channelID string) error
 }

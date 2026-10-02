@@ -67,16 +67,28 @@ var _ = Describe("Streamers", func() {
 		Expect(res).To(Equal(store.SeedResult{Updated: 1}))
 	})
 
-	It("removes seed streamers that left the seed", func() {
+	It("hides seed streamers that left the seed and brings them back", func() {
 		_, err := db.SyncSeed(ctx, groups, []store.Streamer{ame, kiara})
 		Expect(err).NotTo(HaveOccurred())
 
 		res, err := db.SyncSeed(ctx, groups, []store.Streamer{ame})
-
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res.Removed).To(Equal(1))
-		_, err = db.Streamer(ctx, "UCkiara")
-		Expect(err).To(MatchError(store.ErrStreamerNotFound))
+
+		st, err := db.Streamer(ctx, "UCkiara")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.Removed()).To(BeTrue())
+
+		res, err = db.SyncSeed(ctx, groups, []store.Streamer{ame})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.Removed).To(BeZero())
+
+		res, err = db.SyncSeed(ctx, groups, []store.Streamer{ame, kiara})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.Updated).To(Equal(1))
+		st, err = db.Streamer(ctx, "UCkiara")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.Removed()).To(BeFalse())
 	})
 
 	It("never overwrites or removes owner edits", func() {
@@ -180,15 +192,23 @@ var _ = Describe("Streamers", func() {
 		Expect(st.AvatarURL).To(Equal("k2.png"))
 	})
 
-	It("deletes streamers", func() {
+	It("hides removed streamers until they're saved again", func() {
 		_, err := db.SyncSeed(ctx, groups, []store.Streamer{ame})
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(db.DeleteStreamer(ctx, "UCame")).To(Succeed())
-		Expect(db.DeleteStreamer(ctx, "UCame")).To(MatchError(store.ErrStreamerNotFound))
+		Expect(db.RemoveStreamer(ctx, "UCame")).To(Succeed())
+		Expect(db.RemoveStreamer(ctx, "UCame")).To(MatchError(store.ErrStreamerNotFound))
+		Expect(db.RemoveStreamer(ctx, "UCnobody")).To(MatchError(store.ErrStreamerNotFound))
 
-		all, err := db.Streamers(ctx)
+		st, err := db.Streamer(ctx, "UCame")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(all).To(BeEmpty())
+		Expect(st.Removed()).To(BeTrue())
+
+		restored := *st
+		restored.Source = store.SourceOwner
+		Expect(db.SaveStreamer(ctx, restored)).To(Succeed())
+		st, err = db.Streamer(ctx, "UCame")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.Removed()).To(BeFalse())
 	})
 })

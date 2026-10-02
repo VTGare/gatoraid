@@ -79,7 +79,8 @@ youtube/livechat/     YouTube live chat reader
 
 [`streamers/seed/`](streamers/seed/README.md) is the curated list of streamers, one TOML file per
 group. It's synced into the database on
-startup: new entries are added, changed ones updated and removed ones deleted. Streamers edited with
-`/owner streamers` belong to the owner from then on and the seed leaves them alone.
+startup: new entries are added, changed ones updated and removed ones hidden, so subscriptions to
+them come back if they return. Streamers edited with `/owner streamers` belong to the owner from then
+on and the seed leaves them alone.
 
 Commands are built on [gumi](https://github.com/VTGare/gumi).

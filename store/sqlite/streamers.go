@@ -11,7 +11,7 @@ import (
 )
 
 const streamerColumns = `channel_id, name, channel_name, group_id, twitter, aliases, avatar_url,
-	free_chat_streams, source, added_by_guild, updated_at`
+	free_chat_streams, source, added_by_guild, updated_at, removed_at`
 
 func (s *Store) StreamerGroups(ctx context.Context) ([]store.Group, error) {
 	rows, err := s.read.QueryContext(ctx,
@@ -128,7 +128,7 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 				// Once the owner's entry has been copied into the seed
 				// (see /owner streamers export), the seed takes it back.
 				r, err := tx.ExecContext(ctx, `
-					UPDATE streamers SET source = 'seed', added_by_guild = NULL, updated_at = ?
+					UPDATE streamers SET source = 'seed', added_by_guild = NULL, removed_at = NULL, updated_at = ?
 					WHERE channel_id = ? AND name IS ? AND channel_name IS ? AND group_id IS ? AND twitter IS ?
 						AND aliases IS ? AND free_chat_streams IS ?`,
 					now, st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter,
@@ -145,9 +145,10 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 				// Avatars come from Holodex, so the seed doesn't touch them.
 				r, err := tx.ExecContext(ctx, `
 					UPDATE streamers SET name = ?, channel_name = ?, group_id = ?, twitter = ?, aliases = ?,
-						free_chat_streams = ?, source = 'seed', added_by_guild = NULL, updated_at = ?
+						free_chat_streams = ?, source = 'seed', added_by_guild = NULL, removed_at = NULL, updated_at = ?
 					WHERE channel_id = ? AND (name IS NOT ? OR channel_name IS NOT ? OR group_id IS NOT ?
-						OR twitter IS NOT ? OR aliases IS NOT ? OR free_chat_streams IS NOT ? OR source IS NOT 'seed')`,
+						OR twitter IS NOT ? OR aliases IS NOT ? OR free_chat_streams IS NOT ? OR source IS NOT 'seed'
+						OR removed_at IS NOT NULL)`,
 					st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, string(aliases), st.FreeChatStreams, now,
 					st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, string(aliases), st.FreeChatStreams)
 				if err != nil {
@@ -159,9 +160,10 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 			}
 		}
 
-		r, err := tx.ExecContext(ctx,
-			`DELETE FROM streamers WHERE source = 'seed' AND channel_id NOT IN (SELECT value FROM json_each(?))`,
-			jsonArray(seedIDs))
+		r, err := tx.ExecContext(ctx, `
+			UPDATE streamers SET removed_at = ?
+			WHERE source = 'seed' AND removed_at IS NULL AND channel_id NOT IN (SELECT value FROM json_each(?))`,
+			now, jsonArray(seedIDs))
 		if err != nil {
 			return err
 		}
@@ -181,8 +183,9 @@ func (s *Store) SaveStreamer(ctx context.Context, st store.Streamer) error {
 
 	_, err = s.write.ExecContext(ctx, `
 		INSERT INTO streamers (`+streamerColumns+`)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
 		ON CONFLICT (channel_id) DO UPDATE SET
+			removed_at = NULL,
 			name = excluded.name,
 			channel_name = excluded.channel_name,
 			group_id = excluded.group_id,
@@ -220,8 +223,10 @@ func (s *Store) UpdateAvatars(ctx context.Context, avatars map[string]string) (i
 	return changed, err
 }
 
-func (s *Store) DeleteStreamer(ctx context.Context, channelID string) error {
-	r, err := s.write.ExecContext(ctx, `DELETE FROM streamers WHERE channel_id = ?`, channelID)
+func (s *Store) RemoveStreamer(ctx context.Context, channelID string) error {
+	r, err := s.write.ExecContext(ctx,
+		`UPDATE streamers SET removed_at = ? WHERE channel_id = ? AND removed_at IS NULL`,
+		time.Now().UnixMilli(), channelID)
 	if err != nil {
 		return err
 	}
@@ -265,10 +270,11 @@ func scanStreamer(row scanner) (*store.Streamer, error) {
 		aliases        string
 		source         string
 		updatedAt      int64
+		removedAt      sql.NullInt64
 	)
 
 	err := row.Scan(&st.ChannelID, &st.Name, &st.ChannelName, &group, &st.Twitter, &aliases, &st.AvatarURL,
-		&st.FreeChatStreams, &source, &addedBy, &updatedAt)
+		&st.FreeChatStreams, &source, &addedBy, &updatedAt, &removedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -281,6 +287,10 @@ func scanStreamer(row scanner) (*store.Streamer, error) {
 	st.AddedByGuild = addedBy.String
 	st.Source = store.StreamerSource(source)
 	st.UpdatedAt = time.UnixMilli(updatedAt)
+	if removedAt.Valid {
+		t := time.UnixMilli(removedAt.Int64)
+		st.RemovedAt = &t
+	}
 
 	return &st, nil
 }

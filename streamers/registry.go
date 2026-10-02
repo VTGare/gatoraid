@@ -39,8 +39,10 @@ type snapshot struct {
 	groups    []*store.Group
 	groupByID map[string]*store.Group
 	children  map[string][]*store.Group
+	// Active streamers only. Hidden ones are just in all.
 	streamers []*store.Streamer
 	byChannel map[string]*store.Streamer
+	all       map[string]*store.Streamer
 }
 
 func New(st store.StreamerStore) *Registry {
@@ -74,6 +76,7 @@ func (r *Registry) Reload(ctx context.Context) error {
 		groupByID: make(map[string]*store.Group, len(groups)),
 		children:  make(map[string][]*store.Group),
 		byChannel: make(map[string]*store.Streamer, len(streamers)),
+		all:       make(map[string]*store.Streamer, len(streamers)),
 	}
 
 	for i := range groups {
@@ -90,6 +93,10 @@ func (r *Registry) Reload(ctx context.Context) error {
 	})
 	for i := range streamers {
 		st := &streamers[i]
+		s.all[st.ChannelID] = st
+		if st.Removed() {
+			continue
+		}
 		s.streamers = append(s.streamers, st)
 		s.byChannel[st.ChannelID] = st
 	}
@@ -100,6 +107,13 @@ func (r *Registry) Reload(ctx context.Context) error {
 
 func (r *Registry) Streamer(channelID string) (*store.Streamer, bool) {
 	st, ok := r.snap.Load().byChannel[channelID]
+	return st, ok
+}
+
+// Lookup also finds hidden streamers, for showing what a subscription
+// points at.
+func (r *Registry) Lookup(channelID string) (*store.Streamer, bool) {
+	st, ok := r.snap.Load().all[channelID]
 	return st, ok
 }
 
@@ -316,8 +330,8 @@ func (r *Registry) Save(ctx context.Context, st store.Streamer) error {
 	return r.Reload(ctx)
 }
 
-func (r *Registry) Delete(ctx context.Context, channelID string) error {
-	if err := r.store.DeleteStreamer(ctx, channelID); err != nil {
+func (r *Registry) Remove(ctx context.Context, channelID string) error {
+	if err := r.store.RemoveStreamer(ctx, channelID); err != nil {
 		return err
 	}
 	return r.Reload(ctx)

@@ -278,8 +278,12 @@ var _ = Describe("Registry", func() {
 		Expect(reg.Save(ctx, edited)).To(Succeed())
 		Expect(resolve("gremlin")).To(Equal("Mori Calliope"))
 
-		Expect(reg.Delete(ctx, calli.ChannelID)).To(Succeed())
+		Expect(reg.Remove(ctx, calli.ChannelID)).To(Succeed())
 		_, ok := reg.Streamer(calli.ChannelID)
 		Expect(ok).To(BeFalse())
+		hidden, ok := reg.Lookup(calli.ChannelID)
+		Expect(ok).To(BeTrue())
+		Expect(hidden.Removed()).To(BeTrue())
+		Expect(names(reg.Search("calli", 5))).NotTo(ContainElement("Mori Calliope"))
 	})
 })
