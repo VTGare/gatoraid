@@ -12,7 +12,7 @@ channel_name = "FIRST STAGE PRODUCTION EN"
 twitter = "fsp_english"
 
 
-# Members
+# EN Avallum
 
 [[streamer]]
 name = "Rosco Graves"
@@ -48,3 +48,96 @@ channel_id = "UC9mydBOLdL6-Fp61paK68Tw"
 channel_name = "Cassian Floros【FIRST STAGE PRODUCTION EN】"
 twitter = "CassianFloros"
 aliases = ["Cassian"]
+
+
+# EN Ravanis
+
+[[streamer]]
+name = "Nayuta Umbrage"
+channel_id = "UCkN17JBEg63-17srUnyfWaA"
+channel_name = "Nayuta Umbrage【FIRST STAGE PRODUCTION EN】"
+twitter = "NayutaUmbrage"
+
+[[streamer]]
+name = "Malim Cendari"
+channel_id = "UCoVOQRAu354dQIG047gNkFw"
+channel_name = "Malim Cendari【FIRST STAGE PRODUCTION EN】"
+twitter = "MalimCendari"
+
+[[streamer]]
+name = "Altus Zendoji"
+channel_id = "UCpxGLLkVwa2Q86w5Brok33g"
+channel_name = "Altus Zendoji【FIRST STAGE PRODUCTION EN】"
+twitter = "AltusZendoji"
+
+[[streamer]]
+name = "Ryzar Blazenfang"
+channel_id = "UCsNIVzD4AJ2FPLi9rY7I05Q"
+channel_name = "Ryzar Blazenfang【FIRST STAGE PRODUCTION EN】"
+twitter = "RyzarBlazenfang"
+
+
+# EN Lamentus
+
+[[streamer]]
+name = "Caelen Strayfe"
+channel_id = "UCe3tlAzxc9eEGKH5PGC4arg"
+channel_name = "Caelen Strayfe 【FIRST STAGE PRODUCTION EN】"
+twitter = "CaelenStrayfe"
+
+[[streamer]]
+name = "Elias Delborne"
+channel_id = "UCfVSveW0-5LoLjM_SmkR2PQ"
+channel_name = "Elias Delborne【FIRST STAGE PRODUCTION EN】"
+twitter = "EliasDelborne"
+
+[[streamer]]
+name = "Liron Lockheart"
+channel_id = "UCh1BGjlKPa0BJqmeZerVrpA"
+channel_name = "Liron Lockheart 【FIRST STAGE PRODUCTION EN】"
+twitter = "LironLockheart"
+
+[[streamer]]
+name = "Shiki Katagami"
+channel_id = "UCVEvMzXlpobF6hhfwfAYKJg"
+channel_name = "Shiki Katagami【FIRST STAGE PRODUCTION EN】"
+twitter = "ShikiKatagami"
+
+[[streamer]]
+name = "Ashkariel"
+channel_id = "UCyJPVXNqCOm5jHaneVwde_A"
+channel_name = "Ashkariel【FIRST STAGE PRODUCTION EN】"
+twitter = "Ashkariel_FSP"
+
+
+# EN Sontaris
+
+[[streamer]]
+name = "Varis Hemlock"
+channel_id = "UCB4G5YgdI4rfTU0IU3dkjDw"
+channel_name = "Varis Hemlock 【FIRST STAGE PRODUCTION EN】"
+twitter = "Varis_Hemlock"
+
+[[streamer]]
+name = "Saeir Alarie"
+channel_id = "UChwB-iMNTouaemKeS6NgOOQ"
+channel_name = "Saeir Alarie 【FIRST STAGE PRODUCTION EN】"
+twitter = "SaeirAlarie"
+
+[[streamer]]
+name = "Nimue Eversea"
+channel_id = "UCMu8Uwowp1c1-N3mLnZnflA"
+channel_name = "Nimue Eversea【FIRST STAGE PRODUCTION EN】"
+twitter = "NimueEversea"
+
+[[streamer]]
+name = "Aurel Ophidia"
+channel_id = "UCrk73NgQe0XPjKTAa-nXzKg"
+channel_name = "Aurel Ophidia【FIRST STAGE PRODUCTION EN 】"
+twitter = "AurelOphidia"
+
+[[streamer]]
+name = "Solan Fernwick"
+channel_id = "UCUtoueXsWIIwpb0joVtl6JA"
+channel_name = "Solan Fernwick【FIRST STAGE PRODUCTION EN】"
+twitter = "SolanFernwick"

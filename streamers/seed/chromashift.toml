@@ -1,0 +1,107 @@
+[group]
+id = "chromashift"
+name = "ChromaSHIFT"
+
+
+# Official channels
+
+[[streamer]]
+name = "idol"
+channel_id = "UCRMs0dRR4MEnCftyk6l1tvQ"
+twitter = "idol_corp"
+
+
+# ENCORE
+
+[[streamer]]
+name = "Enya Ignis"
+channel_id = "UCBghUKA_L0na0SeQ6snzMMQ"
+channel_name = "Enya Ignis Ch. idol-EN"
+twitter = "EnyaIgnis"
+aliases = ["Enya", "Ignis"]
+
+[[streamer]]
+name = "Shabel Tonya"
+channel_id = "UCCA4jJY5PrTfIFJIcbI_NhQ"
+channel_name = "Shabel Tonya Ch. idol-EN"
+twitter = "ShabelTonya"
+aliases = ["Shabel", "Tonya"]
+
+
+# AKUPIN
+
+[[streamer]]
+name = "Akugaki Koa"
+channel_id = "UC4R6ddhBJp2bjQHVNxgNQSA"
+channel_name = "Akugaki Koa Ch. idol-ES"
+twitter = "AkugakiKoa"
+aliases = ["Akugaki", "Koa"]
+
+[[streamer]]
+name = "Lalabell Lullaby"
+channel_id = "UCuDmUl3WY41FqGI_bUr62PA"
+channel_name = "Lalabell Lullaby Ch. idol-ES"
+twitter = "LalabellLullaby"
+aliases = ["Lalabell", "Lullaby"]
+
+
+# OUT/LAWS
+
+[[streamer]]
+name = "Ruby Runeheart"
+channel_id = "UC-W-yaVIjqkXoh6dZ6_TcMA"
+channel_name = "Ruby Runeheart Ch. idol-ES"
+twitter = "RubyRuneheart"
+aliases = ["Ruby", "Runeheart"]
+
+[[streamer]]
+name = "Yena Youngblood"
+channel_id = "UCeRQcxnk_XDkUZIsEpZUfQA"
+channel_name = "Yena Youngblood Ch. ChromaSHIFT"
+twitter = "YenaYoungblood"
+
+[[streamer]]
+name = "Cersea Soulstorm"
+channel_id = "UCmTRbCwWxsdsLe5a4GElcNA"
+channel_name = "Cersea Soulstorm Ch. ChromaSHIFT"
+twitter = "cerseasoulstorm"
+
+
+# RE:Belle
+
+[[streamer]]
+name = "Roca Rourin"
+channel_id = "UC9xR7uN0x5a6CH3Uopq7czA"
+channel_name = "Roca Rourin Ch. idol-EN"
+twitter = "RocaRourin"
+aliases = ["Roca", "Rourin"]
+
+[[streamer]]
+name = "Taiga Toragami"
+channel_id = "UCiBMH1d7ew_3bi2A_zZGsmw"
+channel_name = "Taiga Toragami Ch. idol-ES"
+twitter = "TaigaToragami"
+aliases = ["Taiga", "Toragami"]
+
+[[streamer]]
+name = "Riki Poppet"
+channel_id = "UCxq402WAMVFx5lNcMzKU0cA"
+channel_name = "Riki Poppet Ch. ChromaSHIFT"
+twitter = "RikiPoppet"
+
+
+# PRI♡MARI
+
+[[streamer]]
+name = "Momo Otako"
+channel_id = "UCe0JiGnjPfEwEIbWASbOimw"
+channel_name = "Momo Otako Ch. idol-EN"
+twitter = "MomoOtako"
+aliases = ["Momo", "Otako"]
+
+[[streamer]]
+name = "Poko Rakun"
+channel_id = "UCk2k1y-d24nFyVCvyxnAaYA"
+channel_name = "Poko Rakun Ch. idol-EN"
+twitter = "PokoRakun"
+aliases = ["Poko", "Rakun"]

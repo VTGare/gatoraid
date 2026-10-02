@@ -2,12 +2,306 @@
 id = "indie"
 name = "Indie"
 
+
+# Independent
+
+[[streamer]]
+name = "Rana Ianna"
+channel_id = "UC-Y3evMx7MXbVeSbRKQ3gNw"
+channel_name = "Rana Ianna Ch. [VReverie]"
+twitter = "ranavreverie"
+aliases = ["Rana", "Ianna"]
+
+[[streamer]]
+name = "Luto Araka"
+channel_id = "UCnYhIk9aGEx_bIgheVjs53w"
+channel_name = "Luto Araka / 新火ると [PRISM Project]"
+twitter = "LutoAraka"
+aliases = ["Araka", "Luto"]
+
+[[streamer]]
+name = "Ami Amami"
+channel_id = "UCkjP_w607B-n4kWJrZAsHMQ"
+channel_name = "Ami Amami / 雨海あみ [PRISM Project]"
+twitter = "itsAmiAmami"
+aliases = ["Amami", "Ami"]
+
+[[streamer]]
+name = "Jun Akane"
+channel_id = "UCuTNHY_b7EvqhRO7COboxsQ"
+channel_name = "Jun Akane / 赤金ジュン [PRISM Project]"
+twitter = "akanejun_"
+aliases = ["Akane", "Jun"]
+
+[[streamer]]
+name = "Mako Sameshima"
+channel_id = "UCqVwRGYcVavZ49rGmPB1DKA"
+channel_name = "Mako Sameshima / 鮫島メイコ [PRISM Project]"
+twitter = "sharksprite"
+aliases = ["Sameshima", "Mako"]
+
+[[streamer]]
+name = "Nana Asteria"
+channel_id = "UCJwnGUjoniJA3It-P2snc-A"
+channel_name = "Nana Asteria Ch. アステリアなな [PRISM Project]"
+twitter = "NanaAsteria"
+aliases = ["Asteria", "Nana"]
+
+[[streamer]]
+name = "Emma Oumiya"
+channel_id = "UCDdmoA79bfI8DHDnE_Yy2dg"
+channel_name = "Oumiya Emma / 大宮エマ [PRISM Project]"
+twitter = "OumiyaEmma"
+aliases = ["Oumiya", "Emma"]
+
+[[streamer]]
+name = "kson"
+channel_id = "UC9ruVYPv7yJmV0Rh0NKA-Lw"
+channel_name = "kson ONAIR"
+twitter = "ksonONAIR"
+aliases = ["kson ONAIR"]
+free_chat_streams = true
+
+[[streamer]]
+name = "Raki Kazuki"
+channel_id = "UCtuoyOZhnxJ12pE294FdH8Q"
+channel_name = "Raki Kazuki Ch.【PixelLink】"
+twitter = "RakiKazuki"
+aliases = ["Raki", "Kazuki"]
+
 [[streamer]]
 name = "Iida Pochi"
 channel_id = "UC22BVlBsZc6ta3Dqz75NU6Q"
 channel_name = "Iida Pochi."
 twitter = "lizhi3"
 aliases = ["Pochi", "Iida"]
+
+[[streamer]]
+name = "Ayamy Garubinu"
+channel_id = "UCr9p1ZjLKgfaoqNorY7PiWQ"
+channel_name = "ayamy あやみちゃんねる"
+twitter = "ayamy_garubinu"
+aliases = ["ayamy"]
+
+[[streamer]]
+name = "Mikeneko"
+channel_id = "UC54JqsuIbMw_d1Ieb4hjKoQ"
+channel_name = "みけねこch"
+twitter = "95rn16"
+aliases = ["みけねこ"]
+
+[[streamer]]
+name = "Kiyon"
+channel_id = "UCycPDRVWCQakmKRKh6Z3Dqw"
+channel_name = "Kiyon Ch."
+twitter = "KiyonVT"
+
+[[streamer]]
+name = "Kou Mariya"
+channel_id = "UCqyL0oB2jl-5GpSg-GWZ_gw"
+channel_name = "Kou Mariya Ch.【V4Mirai】"
+twitter = "koumariya"
+aliases = ["Kou"]
+
+[[streamer]]
+name = "Kattarina Qutie"
+channel_id = "UCMmy_EmxnYQ8aar8fNZrumw"
+channel_name = "Kattarina Qutie Ch. idol"
+twitter = "kattarina_qutie"
+aliases = ["Kattarina", "Qutie"]
+
+[[streamer]]
+name = "Nikki Rei"
+channel_id = "UCBnmfjpmhGxao6v54fIIMUA"
+channel_name = "Nikki Rei Ch. idol"
+twitter = "nikki_rei_idol"
+aliases = ["Nikki", "Rei"]
+
+[[streamer]]
+name = "Juna Unagi"
+channel_id = "UCTFCSCPvqjXEs3zq91aeOVg"
+channel_name = "Juna Unagi Ch. idol-EN"
+twitter = "JunaUnagi"
+aliases = ["Juna", "Unagi"]
+
+[[streamer]]
+name = "Fuyo Cloverfield"
+channel_id = "UC8zgKaS8LiyL28mdhRC2nBg"
+channel_name = "Fuyo Cloverfield Ch. idol-EN"
+twitter = "FuyoCloverfield"
+aliases = ["Fuyo", "Cloverfield"]
+
+[[streamer]]
+name = "Meica05"
+channel_id = "UCp4G83RMBDN0EgZFSUDK7zw"
+channel_name = "Meica05 Ch. idol-ES"
+twitter = "Meica05"
+aliases = ["Meica"]
+
+[[streamer]]
+name = "Chikafuji Lisa"
+channel_id = "UCdureux7B_V-xhM7tYImASQ"
+channel_name = "Chikafuji Lisa Ch. idol-EN"
+twitter = "ChikafujiLisa"
+aliases = ["Chikafuji", "Lisa"]
+
+[[streamer]]
+name = "Skye Shinryu"
+channel_id = "UC1tRqQTI3Bchs8XvUnj8yvQ"
+channel_name = "Skye Shinryu Ch. 【EIEN Project】"
+twitter = "SkyeShinryu"
+aliases = ["Skye", "Shinryu"]
+
+[[streamer]]
+name = "Mirri Saffire"
+channel_id = "UCz_8ztQ9rcu_UpUp0hv7bYw"
+channel_name = "Mirri Saffire Ch. 【EIEN Project】"
+twitter = "MirriSaffire"
+aliases = ["Mirri", "Saffire"]
+
+[[streamer]]
+name = "Blaise Shinryu"
+channel_id = "UCLdkcTt5vOfGi_myvK-iO0g"
+channel_name = "Blaise Shinryu Ch. 【EIEN Project】"
+twitter = "BlaiseShinryu"
+aliases = ["Blaise", "Shinryu"]
+
+[[streamer]]
+name = "Amora Lumina"
+channel_id = "UC0JFt5Jjl5a__zOaZLqk7Pg"
+channel_name = "Amora Lumina Ch. 【EIEN Project】"
+twitter = "AmoraLumina"
+aliases = ["Amora", "Lumina"]
+
+
+# Cosmia
+
+[[streamer]]
+name = "Iku Hoshifuri"
+channel_id = "UC2hWFlqMew61Jy6A8zu5HzQ"
+channel_name = "Iku Hoshifuri / 星降いく [PRISM Project]"
+twitter = "IkuHoshifuri"
+aliases = ["Hoshifuri", "Iku"]
+
+[[streamer]]
+name = "Aoi Tokimori"
+channel_id = "UCRWF6QSuklmwY3UJHyVTQ1w"
+channel_name = "Aoi Tokimori / 時守あおい [PRISM Project]"
+twitter = "AoiTokimori"
+aliases = ["Tokimori", "Aoi"]
+
+[[streamer]]
+name = "Menu Ibuki"
+channel_id = "UCZfQRuwSLty74QAj55BaKlA"
+channel_name = "Meno Ibuki / 伊吹めの [PRISM Project]"
+twitter = "ibukimeno"
+aliases = ["Ibuki", "Meno"]
+
+
+# Crunchyroll
+
+[[streamer]]
+name = "Crunchyroll Hime"
+channel_id = "UCWRgyZ7sllnMwli-9IeouTQ"
+channel_name = "Crunchyroll-Hime Ch."
+twitter = "HimeVT"
+aliases = ["Hime"]
+
+
+# Densetsu.EXE
+
+[[streamer]]
+name = "Mint Fantome"
+channel_id = "UCcHHkJ98eSfa5aj0mdTwwLQ"
+channel_name = "Maid Mint Ch. ミント・ファントーム"
+twitter = "MintFantome"
+aliases = ["Mint", "Mint Maid", "MintMaid", "mintfantome", "fantomemint"]
+
+
+# DetonatioN FocusMe
+
+[[streamer]]
+name = "Amatsuka Uto"
+channel_id = "UCdYR5Oyz8Q4g0ZmB4PkTD7g"
+channel_name = "天使うと"
+twitter = "amatsukauto"
+aliases = ["Amatsuka", "Uto"]
+
+
+# DREAMERS
+
+[[streamer]]
+name = "Nova Aokami"
+channel_id = "UCA4bOB1Jnw5-lbuoSCfxc-w"
+channel_name = "Nova Aokami Ch. [VReverie]"
+twitter = "novavreverie"
+aliases = ["Nova", "Aokami"]
+
+
+# EverAfter
+
+[[streamer]]
+name = "Naki Kamizuki"
+channel_id = "UCgM1sly6rnxqWe8GLbceEag"
+channel_name = "Naki Kamizuki / 上月なき [PRISM Project]"
+twitter = "nakikamizuki"
+aliases = ["Kamizuki", "Naki"]
+
+[[streamer]]
+name = "Sara Nagare"
+channel_id = "UCkJ64W0J7R0zCSAsZfRIhVQ"
+channel_name = "Sara Nagare / 流サラ [PRISM Project]"
+twitter = "saranagare"
+aliases = ["Nagare", "Sara"]
+
+[[streamer]]
+name = "Non Anon"
+channel_id = "UCx_A6fns9qKjybu-6k0ur1g"
+channel_name = "Non Anon / 亜音ノン [PRISM Project]"
+twitter = "non_a_non"
+aliases = ["Anon", "Non"]
+
+
+# GeeXPlus
+
+[[streamer]]
+name = "OniGiri"
+channel_id = "UC97JZwjhKFJ3HwrGkcJekSw"
+twitter = "OnigiriEn_"
+aliases = ["Giri", "OniGiriEN"]
+
+
+# KINOTROPE Gaming
+
+[[streamer]]
+name = "rpr"
+channel_id = "UCcMCZ0PPqw-L9rU9LWhOazA"
+channel_name = "rprxx"
+twitter = "rpr"
+aliases = ["rprxx", "rprx"]
+
+
+# Loaded
+
+[[streamer]]
+name = "Vienna"
+channel_id = "UCN-UumTCLD7zVey1czA-75g"
+channel_name = "C9 Vienna"
+twitter = "viennavtuber"
+aliases = ["C9 Vienna"]
+
+
+# lucid
+
+[[streamer]]
+name = "Rita Kamishiro"
+channel_id = "UCBJFsaCvgBa1a9BnEaxu97Q"
+channel_name = "Rita Kamishiro / 神代りた [PRISM Project]"
+twitter = "RitaKamishiro"
+aliases = ["Kamishiro", "Rita"]
+
+
+# Mythic Talent
 
 [[streamer]]
 name = "Nyatasha Nyanners"
@@ -21,6 +315,111 @@ name = "Silvervale"
 channel_id = "UCm8Dj7dQ0oRHXNUXF31kjEw"
 twitter = "_Silvervale_"
 
+
+# REJECT
+
+[[streamer]]
+name = "dtto"
+channel_id = "UCWNVjAzZmYUni8YBXYiy01w"
+channel_name = "dtto."
+twitter = "_dtto_"
+aliases = ["dttodot", "ditto"]
+
+
+# Requiem
+
+[[streamer]]
+name = "Shiki Miyoshino"
+channel_id = "UCswvd6_YWmd6riRk-8oT-sA"
+channel_name = "Shiki Miyoshino / 美吉野しき [PRISM Project]"
+twitter = "ShikiMiyoshino"
+aliases = ["Miyoshino", "Shiki"]
+
+[[streamer]]
+name = "Nia Suzune"
+channel_id = "UCw1KNjVqfrJSfcFd6zlcSzA"
+channel_name = "Nia Suzune / 鈴音にあ [PRISM Project]"
+twitter = "NiaSuzune"
+aliases = ["Suzune", "Nia"]
+
+[[streamer]]
+name = "Yura Rikudou"
+channel_id = "UC0ZTVxCHkZanT5dnP2FZD4Q"
+channel_name = "Yura Rikudou / 六道ユラ [PRISM Project]"
+twitter = "YuraRikudo"
+aliases = ["Rikudou", "Yura"]
+
+[[streamer]]
+name = "Pina Pengin"
+channel_id = "UCpeRj9-GaLGNUoKdI5I7vZA"
+channel_name = "Pina Pengin / 辺銀ピナ [PRISM Project]"
+twitter = "PinaPengin"
+aliases = ["Pengin", "Pina"]
+
+
+# Socks Agency
+
+[[streamer]]
+name = "Zentreya"
+channel_id = "UCVLsPBwDtv7n7FZLiOsvhSQ"
+twitter = "zentreya"
+
+
+# The Wildcard Club
+
+[[streamer]]
+name = "ironmouse"
+channel_id = "UChgPVLjqugDQpRLWvC7zzig"
+twitter = "ironmouse"
+
+[[streamer]]
+name = "Dokibird"
+channel_id = "UComInW10MkHJs-_vi4rHQCQ"
+twitter = "Dokibird"
+aliases = ["jkterjter"]
+
+[[streamer]]
+name = "Rin Penrose"
+channel_id = "UCpZIbzoEC_3rZglErpQkbDg"
+channel_name = "Rin Penrose Ch. idol-EN"
+twitter = "RinPenrose"
+aliases = ["Rin", "Penrose"]
+
+
+# Twitch Independents
+
+[[streamer]]
+name = "Projekt Melody"
+channel_id = "UC1yoRdFoFJaCY-AGfD9W0wQ"
+channel_name = "CDawgVA"
+twitter = "ProjektMelody"
+aliases = ["Melody"]
+
+[[streamer]]
+name = "Haruka Karibu"
+channel_id = "UCsk_mKQyv_xdhahUBqoVhcg"
+twitter = "haruka_karibu"
+aliases = ["Haruka", "How To Car"]
+
+[[streamer]]
+name = "Froot"
+channel_id = "UCtNeQ8cUwvAAhBbVbwfGWpg"
+channel_name = "Apricot the Lich"
+twitter = "LichVtuber"
+aliases = ["Apricot the Lich"]
+
+[[streamer]]
+name = "GEEGA"
+channel_id = "UCUERxnZSjCq-G7OfYL7Nukg"
+twitter = "GeneralGEEGA"
+aliases = ["General GEEGA"]
+
+[[streamer]]
+name = "Matara Kan"
+channel_id = "UCxx2uRmAwkhb3QJMfLssgsw"
+twitter = "MataraKan"
+aliases = ["Matara"]
+
 [[streamer]]
 name = "LeeandLie"
 channel_id = "UC8THb_fnOptyVgpi3xuCd-A"
@@ -28,17 +427,23 @@ channel_name = "LeeandLie (AmaLee)"
 twitter = "LeeandLie"
 
 [[streamer]]
+name = "Gumi"
+channel_id = "UCidzkUQ_y3nvYjn7cSBK_kA"
+channel_name = "vGumiho"
+twitter = "vgumiho"
+aliases = ["Gumiho", "vGumiho"]
+
+
+# Underscore Talent
+
+[[streamer]]
 name = "girl_dm_"
 channel_id = "UC_WC6plpIdL_buebR9vSVkg"
 twitter = "Girl_Dm_"
 aliases = ["girldm"]
 
-[[streamer]]
-name = "Vienna"
-channel_id = "UCN-UumTCLD7zVey1czA-75g"
-channel_name = "C9 Vienna"
-twitter = "viennavtuber"
-aliases = ["C9 Vienna"]
+
+# United Talent Agency
 
 [[streamer]]
 name = "Bao"
@@ -51,87 +456,3 @@ aliases = ["Bao The Whale"]
 name = "Shoto"
 channel_id = "UCgwJ4ReZqFOw_Y6eTEIunDQ"
 twitter = "shxtou"
-
-[[streamer]]
-name = "Crunchyroll Hime"
-channel_id = "UCWRgyZ7sllnMwli-9IeouTQ"
-channel_name = "Crunchyroll-Hime Ch."
-twitter = "HimeVT"
-aliases = ["Hime"]
-
-[[streamer]]
-name = "OniGiri"
-channel_id = "UC97JZwjhKFJ3HwrGkcJekSw"
-twitter = "OnigiriEn_"
-aliases = ["Giri", "OniGiriEN"]
-
-[[streamer]]
-name = "Ayamy Garubinu"
-channel_id = "UCr9p1ZjLKgfaoqNorY7PiWQ"
-channel_name = "ayamy あやみちゃんねる"
-twitter = "ayamy_garubinu"
-aliases = ["ayamy"]
-
-[[streamer]]
-name = "Nabi"
-channel_id = "UCzKkwB84Y0ql0EvyOWRSkEw"
-
-[[streamer]]
-name = "Mikeneko"
-channel_id = "UC54JqsuIbMw_d1Ieb4hjKoQ"
-channel_name = "みけねこch"
-twitter = "95rn16"
-aliases = ["みけねこ"]
-
-[[streamer]]
-name = "Amatsuka Uto"
-channel_id = "UCdYR5Oyz8Q4g0ZmB4PkTD7g"
-channel_name = "天使うと"
-twitter = "amatsukauto"
-aliases = ["Amatsuka", "Uto"]
-
-[[streamer]]
-name = "Dokibird"
-channel_id = "UComInW10MkHJs-_vi4rHQCQ"
-twitter = "Dokibird"
-aliases = ["jkterjter"]
-
-[[streamer]]
-name = "Gumi"
-channel_id = "UCidzkUQ_y3nvYjn7cSBK_kA"
-channel_name = "vGumiho"
-twitter = "vgumiho"
-aliases = ["Gumiho", "vGumiho"]
-
-[[streamer]]
-name = "rpr"
-channel_id = "UCcMCZ0PPqw-L9rU9LWhOazA"
-channel_name = "rprxx"
-twitter = "rpr"
-aliases = ["rprxx", "rprx"]
-
-[[streamer]]
-name = "dtto"
-channel_id = "UCWNVjAzZmYUni8YBXYiy01w"
-channel_name = "dtto."
-twitter = "_dtto_"
-aliases = ["dttodot", "ditto"]
-
-[[streamer]]
-name = "Kiyon"
-channel_id = "UCycPDRVWCQakmKRKh6Z3Dqw"
-channel_name = "Kiyon Ch."
-twitter = "KiyonVT"
-
-[[streamer]]
-name = "Mint Fantome"
-channel_id = "UCcHHkJ98eSfa5aj0mdTwwLQ"
-channel_name = "Maid Mint Ch. ミント・ファントーム"
-twitter = "MintFantome"
-aliases = ["Mint", "Mint Maid", "MintMaid", "mintfantome", "fantomemint"]
-
-[[streamer]]
-name = "Mintara Podcast"
-channel_id = "UCxgMWRQYmppOrIh3_5hpq7A"
-channel_name = "Mint & Matara's Summer Special"
-aliases = ["Mintara", "Mint & Matara's Summer Special", "Mint & Matara"]

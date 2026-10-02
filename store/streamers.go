@@ -65,5 +65,7 @@ type StreamerStore interface {
 	SyncSeed(ctx context.Context, groups []Group, streamers []Streamer) (SeedResult, error)
 
 	SaveStreamer(ctx context.Context, s Streamer) error
+	// Skips unknown channels and returns how many avatars changed.
+	UpdateAvatars(ctx context.Context, avatars map[string]string) (int, error)
 	DeleteStreamer(ctx context.Context, channelID string) error
 }

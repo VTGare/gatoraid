@@ -14,14 +14,7 @@ twitter = "NIJISANJI_World"
 aliases = ["Nijisanji EN"]
 
 
-# Members
-
-[[streamer]]
-name = "Pomu Rainpuff"
-channel_id = "UCP4nMSTdwU1KqYWu3UH5DHQ"
-channel_name = "Pomu Rainpuff 【NIJISANJI EN】"
-twitter = "PomuRainpuff"
-aliases = ["pomu", "Pom", "pmu", "pimo"]
+# EN LazuLight
 
 [[streamer]]
 name = "Elira Pendora"
@@ -37,12 +30,8 @@ channel_name = "Finana Ryugu 【NIJISANJI EN】"
 twitter = "FinanaRyugu"
 aliases = ["Finana", "Finaurnaur", "Ryugu"]
 
-[[streamer]]
-name = "Rosemi Lovelock"
-channel_id = "UC4WvIIAo89_AzGUh1AZ6Dkg"
-channel_name = "Rosemi Lovelock【NIJISANJI EN】"
-twitter = "Rosemi_Lovelock"
-aliases = ["Rosemi", "Rosie", "Rose Lady", "Lovelock"]
+
+# EN OBSYDIA
 
 [[streamer]]
 name = "Petra Gurin"
@@ -51,19 +40,8 @@ channel_name = "Petra Gurin【NIJISANJI EN】"
 twitter = "Petra_Gurin"
 aliases = ["Petra", "Gurin"]
 
-[[streamer]]
-name = "Selen Tatsuki"
-channel_id = "UCV1xUwfM2v2oBtT3JNvic3w"
-channel_name = "Selen Tatsuki 【NIJISANJI EN】"
-twitter = "selen_tatsuki"
-aliases = ["Selen", "Selen Tatuski", "Tatsuki"]
 
-[[streamer]]
-name = "Nina Kosaka"
-channel_id = "UCkieJGn3pgJikVW8gmMXE2w"
-channel_name = "Nina Kosaka【NIJISANJI EN】"
-twitter = "NinaKosaka"
-aliases = ["Nina"]
+# EN Ethyria
 
 [[streamer]]
 name = "Millie Parfait"
@@ -73,18 +51,14 @@ twitter = "MillieParfait"
 aliases = ["Millie", "Parfait"]
 
 [[streamer]]
-name = "Reimu Endou"
-channel_id = "UCBURM8S4LH7cRZ0Clea9RDA"
-channel_name = "Reimu Endou【NIJISANJI EN】"
-twitter = "ReimuEndou"
-aliases = ["Reimu", "Endou"]
-
-[[streamer]]
 name = "Enna Alouette"
 channel_id = "UCR6qhsLpn62WVxCBK1dkLow"
 channel_name = "Enna Alouette【NIJISANJI EN】"
 twitter = "EnnaAlouette"
 aliases = ["Enna", "Enner"]
+
+
+# EN Luxiem
 
 [[streamer]]
 name = "Luca Kaneshiro"
@@ -101,25 +75,20 @@ twitter = "shu_yamino"
 aliases = ["Shu", "Yamino"]
 
 [[streamer]]
-name = "Ike Eveland"
-channel_id = "UC4yNIKGvy-YUrwYupVdLDXA"
-channel_name = "Ike Eveland【NIJISANJI EN】"
-twitter = "ike_eveland"
-aliases = ["Ike", "Eveland"]
-
-[[streamer]]
-name = "Mysta Rias"
-channel_id = "UCIM92Ok_spNKLVB5TsgwseQ"
-channel_name = "Mysta Rias 【NIJISANJI EN】"
-twitter = "Mysta_Rias"
-aliases = ["Mysta", "Rias"]
-
-[[streamer]]
 name = "Vox Akuma"
 channel_id = "UCckdfYDGrjojJM28n5SHYrA"
 channel_name = "Vox Akuma【NIJISANJI EN】"
 twitter = "Vox_Akuma"
 aliases = ["Vox", "Akuma"]
+
+[[streamer]]
+name = "Luxiem Channel"
+channel_id = "UCtHFXfrn52juTqGBN4WbMVw"
+channel_name = "Luxiem Channel【NIJISANJI EN】"
+twitter = "NIJISANJI_World"
+
+
+# EN Noctyx
 
 [[streamer]]
 name = "Sonny Brisko"
@@ -142,12 +111,8 @@ channel_name = "Alban Knox 【NIJISANJI EN"
 twitter = "alban_knox"
 aliases = ["Alban", "Knox"]
 
-[[streamer]]
-name = "Fulgur Ovid"
-channel_id = "UCGhqxhovNfaPBpxfCruy9EA"
-channel_name = "Fulgur Ovid 【NIJISANJI EN】"
-twitter = "Fulgur_Ovid"
-aliases = ["Fulgur", "Ovid"]
+
+# EN ILUNA
 
 [[streamer]]
 name = "Maria Marionette"
@@ -157,25 +122,11 @@ twitter = "MariaMari0nette"
 aliases = ["Maria", "Marionette"]
 
 [[streamer]]
-name = "Kyo Kaneko"
-channel_id = "UCsb-1aJgiJXJH2feV-zlZRw"
-channel_name = "Kyo Kaneko 【NIJISANJI EN】"
-twitter = "KyoKanek0"
-aliases = ["Kyo", "Kaneko"]
-
-[[streamer]]
 name = "Aia Amare"
 channel_id = "UCN68LoM3khS4gdBMiWJO8WA"
 channel_name = "Aia Amare 【NIJISANJI EN】"
 twitter = "AiaAmare"
 aliases = ["Aia", "Amare"]
-
-[[streamer]]
-name = "Aster Arcadia"
-channel_id = "UCpzxZW5kghGnO5TmAFJQAVw"
-channel_name = "Aster Arcadia 【NIJISANJI EN】"
-twitter = "AsterArcadia"
-aliases = ["Aster", "Arcadia"]
 
 [[streamer]]
 name = "Scarle Yonaguni"
@@ -190,6 +141,9 @@ channel_id = "UCKu59gTZ_rdEmerdx5rV4Yg"
 channel_name = "Ren Zotto 【NIJISANJI EN】"
 twitter = "RenZott0"
 aliases = ["Ren", "Zotto"]
+
+
+# EN XSOLEIL
 
 [[streamer]]
 name = "Doppio Dropscythe"
@@ -206,25 +160,14 @@ twitter = "MelocoKyoran"
 aliases = ["Meloco", "Kyoran"]
 
 [[streamer]]
-name = "Hex Haywire"
-channel_id = "UCz_ZRw6ak4Foy8zZy0kEprQ"
-channel_name = "Hex Haywire【NIJISANJI EN】"
-twitter = "HexHaywire"
-aliases = ["Hex", "Haywire"]
-
-[[streamer]]
-name = "Kotoka Torahime"
-channel_id = "UCggO2c1unS-oLwTLT0ICywg"
-channel_name = "Kotoka Torahime【NIJISANJI EN】"
-twitter = "KotokaTorahime"
-aliases = ["Kotoka", "Torahime"]
-
-[[streamer]]
 name = "Ver Vermillion"
 channel_id = "UCO8WcDsF5znr-qsXlzZNpqg"
 channel_name = "Ver Vermillion【NIJISANJI EN】"
 twitter = "Ver_Vermillion"
 aliases = ["Ver", "Vermillion"]
+
+
+# EN Krisis
 
 [[streamer]]
 name = "Yu Q. Wilson"
@@ -247,19 +190,8 @@ channel_name = "Vezalius Bandage【NIJISANJI EN】"
 twitter = "VezaliusBandage"
 aliases = ["Vezalius", "Bandage"]
 
-[[streamer]]
-name = "Kunai Nakasato"
-channel_id = "UCwqtK-m6954_aHEvOYtZpyQ"
-channel_name = "Kunai Nakasato【NIJISANJI EN】"
-twitter = "kunainakasato"
-aliases = ["Kunai", "Nakasato"]
 
-[[streamer]]
-name = "Victoria Brightshield"
-channel_id = "UChTA8kHyInr2rKZ2aBv5ULw"
-channel_name = "Victoria Brightshield【NIJISANJI EN】"
-twitter = "VBrightshield"
-aliases = ["Victoria", "Brightshield"]
+# EN TTT
 
 [[streamer]]
 name = "Claude Clawmark"
@@ -268,12 +200,8 @@ channel_name = "Claude Clawmark【NIJISANJI EN】"
 twitter = "ClaudeClawmark"
 aliases = ["Claude", "Clawmark"]
 
-[[streamer]]
-name = "Twisty Amanozako"
-channel_id = "UCUI1qpjJSEbgzdlwmpdVmMw"
-channel_name = "Twisty Amanozako【NIJISANJI EN】"
-twitter = "TwistyAmanozako"
-aliases = ["Twisty"]
+
+# EN Denauth
 
 [[streamer]]
 name = "Ryoma Barrenwort"
@@ -288,3 +216,35 @@ channel_id = "UCQYwIUCLqFoin7lHKmePjJw"
 channel_name = "Klara Charmwood【NIJISANJI EN】"
 twitter = "KlaraCharmwood"
 aliases = ["Klara"]
+
+
+# EN BY THE BEAT
+
+[[streamer]]
+name = "Seible"
+channel_id = "UCCugV2RWXqJMjVVQl_Yh4TQ"
+channel_name = "Seible【NIJISANJI EN】"
+twitter = "Seible_2434"
+
+[[streamer]]
+name = "Kaelix Debonair"
+channel_id = "UCEFOogmvTTcCaO8Qe0I8-tg"
+channel_name = "Kaelix Debonair【NIJISANJI EN】"
+twitter = "kaelixdebonair"
+
+[[streamer]]
+name = "Zeal Ginjoka"
+channel_id = "UClMYGvekJOb51eBOCK-d4Dw"
+channel_name = "Zeal Ginjoka【NIJISANJI EN】"
+twitter = "zealginjoka"
+
+[[streamer]]
+name = "Freodore"
+channel_id = "UCr40BzcLiGruKe7M5gXR9zQ"
+channel_name = "Freodore【NIJISANJI EN】"
+twitter = "Freo_2434"
+
+[[streamer]]
+name = "BY THE BEAT"
+channel_id = "UCUEiLI0PQYewvAEtp6vEitA"
+twitter = "by_the_beat"

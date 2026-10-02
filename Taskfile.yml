@@ -35,6 +35,11 @@ tasks:
     cmds:
       - go test -race -timeout {{.TEST_TIMEOUT}} {{.CLI_ARGS | default "./..."}}
 
+  test:live:
+    desc: Test against the real Holodex API (needs GATORAID_HOLODEX_API_KEY, e.g. in .env)
+    cmds:
+      - go test -v -tags live -count=1 -timeout 5m ./holodex/... ./stream/... -args -ginkgo.v {{.CLI_ARGS}}
+
   cover:
     desc: Run the tests with coverage and print a per-function summary
     cmds:

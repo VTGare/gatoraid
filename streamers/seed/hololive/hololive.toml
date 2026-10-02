@@ -10,3 +10,24 @@ name = "Hololive VTuber Group"
 channel_id = "UCJFZiqLMntJufDCHc6bQixg"
 channel_name = "hololive ホロライブ - VTuber Group"
 twitter = "hololivetv"
+
+[[streamer]]
+name = "ASOBI★MAWARI-TAI!"
+channel_id = "UCAHwWUotyS3l2qBetFDsjgQ"
+channel_name = "アソビ★まわり隊!"
+twitter = "ASOBIMAWARITAI"
+
+[[streamer]]
+name = "mekPark"
+channel_id = "UCLGFMR7JOmPUuLXRh0hliTQ"
+twitter = "mekParkOfficial"
+
+[[streamer]]
+name = "holoAN room"
+channel_id = "UCozx5csNhCx1wsVq3SZVkBQ"
+channel_name = "holoAN room (ホロアナ)"
+twitter = "hololivetv"
+
+[[streamer]]
+name = "hololive FLOW GLOW"
+channel_id = "UCu2n3qHuOuQIygREMnWeQWg"

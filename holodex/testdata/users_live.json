@@ -1,0 +1,77 @@
+[
+ {
+  "id": "L6pXtGVbR4k",
+  "title": "【AIBOO... I'M ALREADY A DEMON!♡】3D BIRTHDAY LIVE #MintoDemon3D 【Maid Mint Fantôme】",
+  "type": "stream",
+  "topic_id": "Birthday",
+  "published_at": "2026-09-27T00:45:40.000Z",
+  "available_at": "2026-10-01T23:03:37.000Z",
+  "duration": 0,
+  "status": "live",
+  "start_scheduled": "2026-10-01T23:00:00.000Z",
+  "start_actual": "2026-10-01T23:03:37.000Z",
+  "live_viewers": 9292,
+  "mentions": [
+   {
+    "id": "UComInW10MkHJs-_vi4rHQCQ",
+    "org": "Independents",
+    "lang": null,
+    "name": "Dokibird",
+    "type": "vtuber",
+    "photo": "https://yt3.ggpht.com/3H2nFlB-HSID7--rYQVirRxMZW1Ld3BxDuH8g8ObAcRQSlNuR_JKkO6Wn9bjkLEcN-BB31x6lI8=s800-c-k-c0x00ffffff-no-rj",
+    "suborg": "WCThe Wildcard Club",
+    "english_name": null
+   }
+  ],
+  "channel": {
+   "id": "UCcHHkJ98eSfa5aj0mdTwwLQ",
+   "name": "Maid Mint Ch. ミント・ファントーム",
+   "org": "Independents",
+   "suborg": "DEDensetsu.EXE",
+   "type": "vtuber",
+   "photo": "https://yt3.ggpht.com/qYDe2nQvqZzDKmlbXDSmDx5PP5yH2TLfBG6NdzS_f1LKJOhfh6NbIWJIkAkr3xhE3Mcy4CE6kA=s800-c-k-c0x00ffffff-no-rj",
+   "english_name": "Mint Fantome"
+  }
+ },
+ {
+  "id": "IcWVL4944V8",
+  "title": "【Iku's Weekly Schedule】",
+  "type": "stream",
+  "topic_id": "FreeChat",
+  "published_at": "2022-02-15T15:07:09.000Z",
+  "available_at": "2028-01-31T04:00:00.000Z",
+  "duration": 0,
+  "status": "upcoming",
+  "start_scheduled": "2028-01-31T04:00:00.000Z",
+  "live_viewers": 0,
+  "channel": {
+   "id": "UC2hWFlqMew61Jy6A8zu5HzQ",
+   "name": "Iku Hoshifuri / 星降いく【Cosmia】",
+   "org": "Independents",
+   "suborg": "coCosmia",
+   "type": "vtuber",
+   "photo": "https://yt3.ggpht.com/5nQa5CtXi-Q2n0vkEjD16O-12KWF3DZ5Ysx79xHcWxD9tyVShUwSSFLZwVgkYtouj0bOGnHByw=s800-c-k-c0x00ffffff-no-rj",
+   "english_name": "Hoshifuri Iku"
+  }
+ },
+ {
+  "id": "zPt6-HNGQtE",
+  "title": "【Donothon Day 5】we're doing whatever the heckie I wanna today! (free day)【Cosmia】",
+  "type": "stream",
+  "published_at": "2026-09-27T17:03:30.000Z",
+  "available_at": "2026-10-02T04:00:00.000Z",
+  "duration": 0,
+  "status": "upcoming",
+  "start_scheduled": "2026-10-02T04:00:00.000Z",
+  "live_viewers": 0,
+  "channel": {
+   "id": "UC2hWFlqMew61Jy6A8zu5HzQ",
+   "name": "Iku Hoshifuri / 星降いく【Cosmia】",
+   "org": "Independents",
+   "suborg": "coCosmia",
+   "type": "vtuber",
+   "photo": "https://yt3.ggpht.com/5nQa5CtXi-Q2n0vkEjD16O-12KWF3DZ5Ysx79xHcWxD9tyVShUwSSFLZwVgkYtouj0bOGnHByw=s800-c-k-c0x00ffffff-no-rj",
+   "english_name": "Hoshifuri Iku"
+  }
+ }
+]

@@ -49,7 +49,6 @@ func newHarness(seed *streamers.Seed) *harness {
 	return &harness{b: b, rec: dt.Attach(b.Session)}
 }
 
-// run invokes a command and returns the data of the response it sent.
 func (h *harness) run(i *discordgo.InteractionCreate) map[string]any {
 	before := len(h.rec.Responses())
 	h.b.Router.HandleInteraction(h.b.Session, i)
@@ -107,10 +106,10 @@ var _ = Describe("/streamers", func() {
 	})
 
 	It("shows a streamer by alias", func() {
-		e := embed(h.run(dt.Command(user, "streamers", dt.Sub("info", dt.String("streamer", "ame")))))
+		e := embed(h.run(dt.Command(user, "streamers", dt.Sub("info", dt.String("streamer", "calli")))))
 
-		Expect(e["title"]).To(Equal("Watson Amelia"))
-		Expect(e["url"]).To(Equal("https://www.youtube.com/channel/UCyl1z3jo3XHR1riLFKG5UAg"))
+		Expect(e["title"]).To(Equal("Mori Calliope"))
+		Expect(e["url"]).To(Equal("https://www.youtube.com/channel/UCL_qhgtOy0dy1Agp8vkySQg"))
 		Expect(fmt.Sprint(e["fields"])).To(ContainSubstring("Hololive › Hololive EN"))
 	})
 
@@ -222,23 +221,23 @@ var _ = Describe("/owner streamers", func() {
 	})
 
 	It("refuses duplicates and bad channels", func() {
-		Expect(ownerRun("add", dt.String("channel", "UCyl1z3jo3XHR1riLFKG5UAg"), dt.String("name", "x"))["content"]).
-			To(ContainSubstring("Watson Amelia is already in the registry"))
+		Expect(ownerRun("add", dt.String("channel", "UCL_qhgtOy0dy1Agp8vkySQg"), dt.String("name", "x"))["content"]).
+			To(ContainSubstring("Mori Calliope is already in the registry"))
 		Expect(ownerRun("add", dt.String("channel", "not a channel"), dt.String("name", "x"))["content"]).
 			To(ContainSubstring("doesn't look like a YouTube channel"))
 	})
 
 	It("edits only the given fields and clears with -", func() {
 		data := ownerRun("edit",
-			dt.String("streamer", "ame"),
+			dt.String("streamer", "calli"),
 			dt.String("aliases", "gremlin"),
 			dt.String("twitter", "-"),
 		)
-		Expect(data["content"]).To(Equal("Updated Watson Amelia."))
+		Expect(data["content"]).To(Equal("Updated Mori Calliope."))
 
 		st, err := reg.Resolve("gremlin")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(st.Name).To(Equal("Watson Amelia"))
+		Expect(st.Name).To(Equal("Mori Calliope"))
 		Expect(st.GroupID).To(Equal("hololive-en"))
 		Expect(st.Twitter).To(BeEmpty())
 		Expect(st.Source).To(Equal(store.SourceOwner))
@@ -257,7 +256,7 @@ var _ = Describe("/owner streamers", func() {
 		Expect(ownerRun("export")["content"]).To(ContainSubstring("Nothing to export"))
 
 		ownerRun("add", dt.String("channel", "UCaaaaaaaaaaaaaaaaaaaaaa"), dt.String("name", "New Indie"), dt.String("group", "indie"))
-		ownerRun("edit", dt.String("streamer", "ame"), dt.String("aliases", "gremlin"))
+		ownerRun("edit", dt.String("streamer", "calli"), dt.String("aliases", "gremlin"))
 
 		content := ownerRun("export")["content"].(string)
 		Expect(content).To(ContainSubstring("```toml\n# streamers/seed/hololive/en.toml"))

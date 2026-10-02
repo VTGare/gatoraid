@@ -1,4 +1,3 @@
-// Package streamers keeps the streamer registry in memory.
 package streamers
 
 import (
@@ -28,8 +27,8 @@ func (e *AmbiguousError) Error() string {
 	return fmt.Sprintf("%q matches several streamers: %s", e.Query, strings.Join(names, ", "))
 }
 
-// Registry serves lookups from an in-memory snapshot. Returned streamers and
-// groups are shared, so don't modify them; Save a copy instead.
+// Returned streamers and groups are shared between callers, so don't modify
+// them. Save a copy instead.
 type Registry struct {
 	store store.StreamerStore
 	snap  atomic.Pointer[snapshot]
@@ -50,7 +49,6 @@ func New(st store.StreamerStore) *Registry {
 	return r
 }
 
-// Sync writes the seed to the store and reloads.
 func (r *Registry) Sync(ctx context.Context, seed *Seed) (store.SeedResult, error) {
 	res, err := r.store.SyncSeed(ctx, seed.Groups, seed.Streamers)
 	if err != nil {
@@ -112,12 +110,12 @@ func (r *Registry) Group(id string) (*store.Group, bool) {
 	return g, ok
 }
 
-// Groups are in seed order, parents before their subgroups.
+// Parents come before their subgroups.
 func (r *Registry) Groups() []*store.Group { return r.snap.Load().groups }
 
 func (r *Registry) Subgroups(id string) []*store.Group { return r.snap.Load().children[id] }
 
-// GroupFile is the seed file defining the group, or "" if unknown.
+// Empty for groups that aren't from the seed.
 func (r *Registry) GroupFile(id string) string {
 	if files := r.files.Load(); files != nil {
 		return (*files)[id]
@@ -125,7 +123,7 @@ func (r *Registry) GroupFile(id string) string {
 	return ""
 }
 
-// Members of the group and all its subgroups, by name.
+// Includes subgroups' members, sorted by name.
 func (r *Registry) Members(groupID string) []*store.Streamer {
 	s := r.snap.Load()
 
@@ -215,8 +213,8 @@ func (r *Registry) Resolve(query string) (*store.Streamer, error) {
 	return nil, ErrNotFound
 }
 
-// Search ranks streamers for autocomplete: exact matches first, then name
-// prefixes, word and alias prefixes, and finally substrings.
+// Exact matches rank first, then name prefixes, word and alias prefixes,
+// and finally substrings.
 func (r *Registry) Search(query string, limit int) []*store.Streamer {
 	q := strings.ToLower(strings.TrimSpace(query))
 	all := r.Streamers()
@@ -274,7 +272,7 @@ func matchScore(st *store.Streamer, raw, q string) (int, bool) {
 	return 0, false
 }
 
-// SearchGroups matches group IDs and names by prefix, then substring.
+// Prefix matches come before substring matches.
 func (r *Registry) SearchGroups(query string, limit int) []*store.Group {
 	q := strings.ToLower(strings.TrimSpace(query))
 
@@ -293,7 +291,24 @@ func (r *Registry) SearchGroups(query string, limit int) []*store.Group {
 	return out[:min(limit, len(out))]
 }
 
-// Save stores st and reloads the snapshot.
+// Reloads only if an avatar changed.
+func (r *Registry) UpdateAvatars(ctx context.Context, avatars map[string]string) error {
+	n, err := r.store.UpdateAvatars(ctx, avatars)
+	if err != nil || n == 0 {
+		return err
+	}
+	return r.Reload(ctx)
+}
+
+func (r *Registry) ChannelIDs() []string {
+	sts := r.Streamers()
+	ids := make([]string, len(sts))
+	for i, st := range sts {
+		ids[i] = st.ChannelID
+	}
+	return ids
+}
+
 func (r *Registry) Save(ctx context.Context, st store.Streamer) error {
 	if err := r.store.SaveStreamer(ctx, st); err != nil {
 		return err

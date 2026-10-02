@@ -13,29 +13,13 @@ channel_id = "UCWsfcksUUpoEvhia0_ut0bA"
 channel_name = "holostars ホロスターズ - VTuber Group"
 twitter = "holostarstv"
 
-
-# 1st Generation
-
 [[streamer]]
-name = "Hanasaki Miyabi"
-channel_id = "UC6t3-_N8A6ME1JShZHHqOMw"
-channel_name = "Miyabi Ch. 花咲みやび"
-twitter = "miyabihanasaki"
-aliases = ["miyabi", "みやび"]
+name = "HOLOSTARS English"
+channel_id = "UCJxZpzx4wHzEYD-eCiZPikg"
+twitter = "HOLOSTARSen"
 
-[[streamer]]
-name = "Rikkaroid"
-channel_id = "UC9mf_ZVpouoILRY9NUIaK-w"
-channel_name = "Rikka ch.律可"
-twitter = "rikkaroid"
-aliases = ["rikka", "りっか", "律可"]
 
-[[streamer]]
-name = "Arurandeisu"
-channel_id = "UCKeAhJvy8zgXWbh9duVjIaQ"
-channel_name = "Aruran Ch. アルランディス"
-twitter = "arurandeisu"
-aliases = ["aruran"]
+# HOLOSTARS 1st Gen
 
 [[streamer]]
 name = "Kanade Izuru"
@@ -46,7 +30,7 @@ aliases = ["izuru"]
 free_chat_streams = true
 
 
-# 2nd Generation
+# HOLOSTARS 2nd Gen (SunTempo)
 
 [[streamer]]
 name = "Yukoku Roberu"
@@ -56,13 +40,6 @@ twitter = "yukokuroberu"
 aliases = ["winning son", "roberu", "ロベル"]
 
 [[streamer]]
-name = "Kishido Temma"
-channel_id = "UCGNI4MENvnsymYjKiZwv9eg"
-channel_name = "Temma Ch. 岸堂天真"
-twitter = "kishidotemma"
-aliases = ["temma", "天真", "てんま"]
-
-[[streamer]]
 name = "Astel Leda"
 channel_id = "UCNVEsYbiZjH5QLmGeSgTSzg"
 channel_name = "astel ch.アステル"
@@ -70,14 +47,7 @@ twitter = "astelleda"
 aliases = ["astel", "アステル"]
 
 
-# 3rd Generation
-
-[[streamer]]
-name = "Kageyama Shien"
-channel_id = "UChSvpZYRPh0FvG4SJGSga3g"
-channel_name = "Shien Ch.影山シエン"
-twitter = "kageyamashien"
-aliases = ["shien", "シエン"]
+# HOLOSTARS 3rd Gen (TriNero)
 
 [[streamer]]
 name = "Aragami Oga"
@@ -87,7 +57,7 @@ twitter = "aragamioga"
 aliases = ["oga"]
 
 
-# UPROAR!!
+# HOLOSTARS UPROAR!!
 
 [[streamer]]
 name = "Yatogami Fuma"
@@ -103,22 +73,8 @@ channel_name = "Uyu Ch. 羽継烏有 - UPROAR!! -"
 twitter = "utsugiuyu"
 aliases = ["uyu"]
 
-[[streamer]]
-name = "Hizaki Gamma"
-channel_id = "UCkT1u65YS49ca_LsFwcTakw"
-channel_name = "Gamma Ch. 緋崎ガンマ - UPROAR!! -"
-twitter = "hizakigamma"
-aliases = ["gamma"]
 
-[[streamer]]
-name = "Minase Rio"
-channel_id = "UCdfMHxjcCc2HSd9qFvfJgjg"
-channel_name = "Rio Ch. 水無世燐央 - UPROAR!! -"
-twitter = "minaserioch"
-aliases = ["rio"]
-
-
-# English: TEMPUS
+# HOLOSTARS English -TEMPUS- HQ
 
 [[streamer]]
 name = "Regis Altare"
@@ -128,25 +84,14 @@ twitter = "regisaltare"
 aliases = ["Regis"]
 
 [[streamer]]
-name = "Magni Dezmond"
-channel_id = "UC7MMNHR-kf9EN1rXiesMTMw"
-channel_name = "Magni Dezmond Ch. HOLOSTARS-EN"
-twitter = "magnidezmond"
-aliases = ["Magni"]
-
-[[streamer]]
 name = "Axel Syrios"
 channel_id = "UC2hx0xVkMoHGWijwr_lA01w"
 channel_name = "Axel Syrios Ch. HOLOSTARS-EN"
 twitter = "axelsyrios"
 aliases = ["Axel"]
 
-[[streamer]]
-name = "Noir Vesper"
-channel_id = "UCDRWSO281bIHYVi-OV3iFYA"
-channel_name = "Noir Vesper Ch. HOLOSTARS-EN"
-twitter = "noirvesper_en"
-aliases = ["Noir"]
+
+# HOLOSTARS English -TEMPUS- Vanguard
 
 [[streamer]]
 name = "Josuiji Shinri"
@@ -177,7 +122,7 @@ twitter = "gavisbettel"
 aliases = ["Gavis"]
 
 
-# English: ARMIS
+# HOLOSTARS English -ARMIS-
 
 [[streamer]]
 name = "Jurard T Rexford"

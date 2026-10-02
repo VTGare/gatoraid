@@ -1,4 +1,4 @@
-// Package discordtest fakes Discord's HTTP API for tests.
+// Package discordtest stands in for Discord's HTTP API in tests.
 package discordtest
 
 import (
@@ -45,8 +45,8 @@ func (r *Recorder) RoundTrip(req *http.Request) (*http.Response, error) {
 	}, nil
 }
 
-// readBody decodes JSON bodies, and multipart ones as discordgo sends them
-// with attachments: the JSON in payload_json, plus files.
+// With attachments, discordgo sends multipart bodies with the JSON in a
+// payload_json part.
 func readBody(req *http.Request) (map[string]any, map[string]string) {
 	var body map[string]any
 
@@ -82,7 +82,6 @@ func (r *Recorder) Requests() []Request {
 	return append([]Request(nil), r.reqs...)
 }
 
-// Messages returns the content of messages posted to a channel.
 func (r *Recorder) Messages(channelID string) []string {
 	var out []string
 	for _, req := range r.Requests() {
@@ -94,13 +93,24 @@ func (r *Recorder) Messages(channelID string) []string {
 	return out
 }
 
-// Responses returns the data of every interaction response.
 func (r *Recorder) Responses() []map[string]any {
 	var out []map[string]any
 	for _, req := range r.Requests() {
 		if strings.HasSuffix(req.Path, "/callback") {
 			data, _ := req.Body["data"].(map[string]any)
 			out = append(out, data)
+		}
+	}
+	return out
+}
+
+// Edits returns edits of the original response, which is how replies to
+// deferred commands arrive.
+func (r *Recorder) Edits() []Request {
+	var out []Request
+	for _, req := range r.Requests() {
+		if req.Method == http.MethodPatch && strings.HasSuffix(req.Path, "/messages/@original") {
+			out = append(out, req)
 		}
 	}
 	return out
@@ -113,13 +123,11 @@ func Attach(s *discordgo.Session) *Recorder {
 	return rec
 }
 
-// Command builds a slash command invocation by userID in a guild.
 func Command(userID, name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.InteractionCreate {
 	return interaction(discordgo.InteractionApplicationCommand, userID, name, opts)
 }
 
-// Autocomplete builds an autocomplete request; mark the typed option with
-// Focused.
+// Mark the option being typed with Focused.
 func Autocomplete(userID, name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.InteractionCreate {
 	return interaction(discordgo.InteractionApplicationCommandAutocomplete, userID, name, opts)
 }

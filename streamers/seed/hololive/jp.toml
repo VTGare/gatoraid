@@ -11,6 +11,7 @@ order = 1
 name = "Hololive DEV_IS"
 channel_id = "UC10wVt6hoQiwySRhz7RdOUA"
 channel_name = "hololive DEV_IS"
+twitter = "reglossofficial"
 
 
 # 0th Generation
@@ -66,13 +67,6 @@ channel_name = "HAACHAMA DARKWEB CH"
 twitter = "akaihaato"
 
 [[streamer]]
-name = "Yozora Mel"
-channel_id = "UCD8HOxPs4Xvsm8H0ZxXGiBw"
-channel_name = "Mel Channel 夜空メルチャンネル"
-twitter = "yozoramel"
-aliases = ["mel", "メル"]
-
-[[streamer]]
 name = "Shirakami Fubuki"
 channel_id = "UCdn5BQ06XqgXoAxIhbqw5Rg"
 channel_name = "フブキCh。白上フブキ"
@@ -93,15 +87,13 @@ channel_name = "Matsuri Channel 夏色まつり"
 twitter = "natsuiromatsuri"
 aliases = ["matsuri", "まつり"]
 
+[[streamer]]
+name = "Aki Rosenthal (Sub)"
+channel_id = "UCLbtM3JZfRTg8v2KGag-RMw"
+channel_name = "AkiRose Ch.アキ・ローゼンタールSub"
+
 
 # 2nd Generation
-
-[[streamer]]
-name = "Minato Aqua"
-channel_id = "UC1opHUrw8rvnsadT-iGp7Cg"
-channel_name = "Aqua Ch. 湊あくあ"
-twitter = "minatoaqua"
-aliases = ["aqua", "baqua", "akutan", "あくあ", "あくたん"]
 
 [[streamer]]
 name = "Yuzuki Choco"
@@ -125,11 +117,9 @@ twitter = "oozorasubaru"
 aliases = ["subaru", "shuba", "スバル"]
 
 [[streamer]]
-name = "Murasaki Shion"
-channel_id = "UCXTpFs_3PqI41qX2d9tL2Rw"
-channel_name = "Shion Ch. 紫咲シオン"
-twitter = "murasakishionch"
-aliases = ["shion", "シオン", "kusogaki", "クソガキ"]
+name = "Choco Sub Channel"
+channel_id = "UCp3tgHXw_HI0QMk1K8qh3gQ"
+channel_name = "Choco subCh. 癒月ちょこ"
 
 
 # GAMERS
@@ -156,7 +146,7 @@ twitter = "nekomataokayu"
 aliases = ["okayu", "おかゆ"]
 
 
-# 3rd Generation
+# 3rd Generation (Fantasy)
 
 [[streamer]]
 name = "Usada Pekora"
@@ -187,7 +177,7 @@ twitter = "shiranuiflare"
 aliases = ["flare", "フレア"]
 
 
-# 4th Generation
+# 4th Generation (holoForce)
 
 [[streamer]]
 name = "Tokoyami Towa"
@@ -211,15 +201,8 @@ channel_name = "Watame Ch. 角巻わため"
 twitter = "tsunomakiwatame"
 aliases = ["watame", "わため"]
 
-[[streamer]]
-name = "Amane Kanata"
-channel_id = "UCZlDXzGoo7d44bwdNObFacg"
-channel_name = "Kanata Ch. 天音かなた"
-twitter = "amanekanatach"
-aliases = ["kanata", "かなた", "pp tenshi", "かなごり", "kanataso", "kanatan", "kanakana", "kanata-senpai", "kanata-san"]
 
-
-# 5th Generation
+# 5th Generation (holoFive)
 
 [[streamer]]
 name = "Momosuzu Nene"
@@ -252,7 +235,7 @@ twitter = "shishirobotan"
 aliases = ["botan", "ぼたん", "shishiron", "bossan"]
 
 
-# 6th Generation (holoX)
+# 6th Generation -holoX-
 
 [[streamer]]
 name = "Laplus Darkness"
@@ -276,13 +259,6 @@ twitter = "hakuikoyori"
 aliases = ["Koyori"]
 
 [[streamer]]
-name = "Sakamata Chloe"
-channel_id = "UCIBY1ollUsauvVi4hW4cumw"
-channel_name = "Chloe ch. 沙花叉クロヱ - holoX -"
-twitter = "sakamatachloe"
-aliases = ["Chloe"]
-
-[[streamer]]
 name = "Kazama Iroha"
 channel_id = "UC_vMYWcDjmfdpH6r4TTn1MQ"
 channel_name = "Iroha ch. 風真いろは - holoX -"
@@ -290,14 +266,34 @@ twitter = "kazamairohach"
 aliases = ["Iroha"]
 
 
-# DEV_IS ReGLOSS
+# ASOBI★MAWARI-TAI!
 
 [[streamer]]
-name = "Hiodoshi Ao"
-channel_id = "UCMGfV7TVTmHhEErVJg1oHBQ"
-channel_name = "Ao Ch. 火威青 ‐ ReGLOSS"
-twitter = "hiodoshiao"
-aliases = ["Hiodoshi", "Ao"]
+name = "Achichi Mela"
+channel_id = "UC8eitCE9Z6EwUCs-VUi1blg"
+channel_name = "Mela Ch. 熱千めら‐ アソビ★まわり隊!"
+twitter = "achichi_mela"
+
+[[streamer]]
+name = "Sorashina Sopia"
+channel_id = "UCROQtXcp2loQEmvpe5rhJzQ"
+channel_name = "Sopia Ch. 宙科そぴあ ‐ アソビ★まわり隊!"
+twitter = "sorashina_sopia"
+
+[[streamer]]
+name = "Hyakuto Kyoko"
+channel_id = "UCSjQDxud2HkAO2DVD3lwxmw"
+channel_name = "Kyoko Ch. 百灯キョーコ ‐ アソビ★まわり隊!"
+twitter = "hyakuto_kyoko"
+
+[[streamer]]
+name = "Suzuna Tsuzuri"
+channel_id = "UCy9mgxB8pn2C4aNK_MPthDQ"
+channel_name = "Tsuzuri Ch. 鈴鳴つづり ‐ アソビ★まわり隊!"
+twitter = "suzuna_tsuzuri"
+
+
+# DEV_IS ReGLOSS
 
 [[streamer]]
 name = "Otonose Kanade"
@@ -326,3 +322,89 @@ channel_id = "UC1iA6_NT4mtAcIII6ygrvCw"
 channel_name = "Hajime Ch. 轟はじめ ‐ ReGLOSS"
 twitter = "todoroki_hajime"
 aliases = ["Todoroki", "Hajime"]
+
+
+# DEV_IS FLOW GLOW
+
+[[streamer]]
+name = "Isaki Riona"
+channel_id = "UC9LSiN9hXI55svYEBrrK-tw"
+channel_name = "Riona Ch. 響咲リオナ - FLOW GLOW"
+twitter = "isakiriona"
+
+[[streamer]]
+name = "Kikirara Vivi"
+channel_id = "UCGzTVXqMQHa4AgJVJIVvtDQ"
+channel_name = "Vivi Ch. 綺々羅々ヴィヴィ - FLOW GLOW"
+twitter = "kikiraravivi"
+
+[[streamer]]
+name = "Mizumiya Su"
+channel_id = "UCjk2nKmHzgH5Xy-C5qYRd5A"
+channel_name = "Su Ch. 水宮枢 - FLOW GLOW"
+twitter = "mizumiya_su"
+
+[[streamer]]
+name = "Rindo Chihaya"
+channel_id = "UCKMWFR6lAstLa7Vbf5dH7ig"
+channel_name = "Chihaya Ch. 輪堂 千速 - FLOW GLOW"
+twitter = "rindochihaya"
+
+[[streamer]]
+name = "Koganei Niko"
+channel_id = "UCuI_opAVX6qbxZY-a-AxFuQ"
+channel_name = "Niko Ch. 虎金妃笑虎 - FLOW GLOW"
+twitter = "koganeiniko"
+
+
+# mekPark
+
+[[streamer]]
+name = "ACHRORA"
+channel_id = "UChpRPsAeSZn5DistGacR3iA"
+channel_name = "ACHRORA - mekPark"
+twitter = "ACHRORAofficial"
+
+
+# Misc
+
+[[streamer]]
+name = "hololive Dreams"
+channel_id = "UCawGfU44CZxd2ZVf_VGijbA"
+channel_name = "hololive Dreams ホロライブドリームス"
+twitter = "holo_dreams_en"
+
+[[streamer]]
+name = "Holoearth"
+channel_id = "UCfpWrWvbA34LmrZ9h4Lbwag"
+channel_name = "HOLOEARTH ホロアース"
+twitter = "holoearth_en"
+
+[[streamer]]
+name = "hololive OFFICIAL CARD GAME"
+channel_id = "UCmms2EE02mK4zdECwrHBpaA"
+channel_name = "hololive OFFICIAL CARD GAME【公式】"
+twitter = "hololive_OCG"
+
+[[streamer]]
+name = "Odeholo"
+channel_id = "UCMyuwtApj--U6jm-NFzZMOw"
+channel_name = "『おでかけホロライブ』アニメ公式チャンネル"
+twitter = "odeholo"
+
+[[streamer]]
+name = "Midnight Grand Orchestra"
+channel_id = "UCnVbtCwr-5LXxUlGxsgD7sQ"
+twitter = "m_g_orchestra"
+
+[[streamer]]
+name = "holo indie"
+channel_id = "UCt4-iv7EP0UU_w733D_r_jA"
+channel_name = "holo Indie チャンネル"
+twitter = "holoindie_ccmc"
+
+[[streamer]]
+name = "YAGOO"
+channel_id = "UCu2DMOGLeR_DSStCyeQpi5Q"
+channel_name = "tanigox"
+twitter = "tanigox"

@@ -17,8 +17,8 @@ var channelInURL = regexp.MustCompile(`UC[\w-]{22}`)
 const clearValue = "-"
 
 func ownerCommand(b *bot.Bot) *gumi.Command {
-	// Zero permissions hides the command from everyone but administrators;
-	// OwnerOnly does the real gatekeeping.
+	// Zero permissions hides the command from everyone but admins. OwnerOnly
+	// is what actually keeps them out.
 	hidden := int64(0)
 
 	var guilds []string
@@ -43,8 +43,10 @@ func ownerCommand(b *bot.Bot) *gumi.Command {
 					ownerStreamerEdit(b),
 					ownerStreamerRemove(b),
 					ownerStreamerExport(b),
+					ownerStreamerSync(b),
 				},
 			},
+			ownerStreams(b),
 		},
 	}
 }
@@ -155,7 +157,8 @@ func ownerStreamerRemove(b *bot.Bot) *gumi.Command {
 	}
 }
 
-// Discord messages max out at 2000 characters; longer exports become a file.
+// Discord messages max out at 2000 characters, so longer exports are sent
+// as a file.
 const maxInlineExport = 1900
 
 func ownerStreamerExport(b *bot.Bot) *gumi.Command {
@@ -202,7 +205,6 @@ func ownerStreamerExport(b *bot.Bot) *gumi.Command {
 	}
 }
 
-// applyStreamerEdits copies the optional fields that were filled in.
 func applyStreamerEdits(b *bot.Bot, ctx *gumi.Context, st *store.Streamer) error {
 	opts := ctx.Options
 

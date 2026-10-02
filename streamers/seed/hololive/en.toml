@@ -14,14 +14,7 @@ channel_name = "hololive English"
 twitter = "hololive_En"
 
 
-# Myth
-
-[[streamer]]
-name = "Watson Amelia"
-channel_id = "UCyl1z3jo3XHR1riLFKG5UAg"
-channel_name = "Watson Amelia Ch. hololive-EN"
-twitter = "watsonameliaen"
-aliases = ["amelia", "ame"]
+# English -Myth-
 
 [[streamer]]
 name = "Takanashi Kiara"
@@ -50,24 +43,14 @@ channel_name = "Ninomae Ina'nis Ch. hololive-EN"
 twitter = "ninomaeinanis"
 aliases = ["ina"]
 
-[[streamer]]
-name = "Gawr Gura"
-channel_id = "UCoSrY_IQQVpmIRZ9Xf-y93g"
-channel_name = "Gawr Gura Ch. hololive-EN"
-twitter = "gawrgura"
-aliases = ["gura"]
 
-
-# Project: HOPE
+# English -Promise-
 
 [[streamer]]
 name = "IRyS"
 channel_id = "UC8rcEBzJSleTkf_-agPM20g"
 channel_name = "IRyS Ch. hololive-EN"
 twitter = "irys_en"
-
-
-# Promise
 
 [[streamer]]
 name = "Hakos Baelz"
@@ -77,28 +60,14 @@ twitter = "hakosbaelz"
 aliases = ["baelz", "hakos"]
 
 [[streamer]]
-name = "Nanashi Mumei"
-channel_id = "UC3n5uGu18FoCy23ggWWp8tA"
-channel_name = "Nanashi Mumei Ch. hololive-EN"
-twitter = "nanashimumei_en"
-aliases = ["nanashi", "mumei"]
-
-[[streamer]]
 name = "Ouro Kronii"
 channel_id = "UCmbs8T6MWqUHP1tIQvSgKrg"
 channel_name = "Ouro Kronii Ch. hololive-EN"
 twitter = "ourokronii"
 aliases = ["kronii"]
 
-[[streamer]]
-name = "Ceres Fauna"
-channel_id = "UCO_aKKYxn4tvrqPjcTzZ6EQ"
-channel_name = "Ceres Fauna Ch. hololive-EN"
-twitter = "ceresfauna"
-aliases = ["fauna"]
 
-
-# Advent
+# English -Advent-
 
 [[streamer]]
 name = "FUWAMOCO"
@@ -129,7 +98,7 @@ twitter = "nerissa_en"
 aliases = ["Nerissa", "Ravencroft"]
 
 
-# Justice
+# English -Justice-
 
 [[streamer]]
 name = "Cecilia Immergreen"

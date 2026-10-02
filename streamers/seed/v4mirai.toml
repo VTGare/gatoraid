@@ -11,28 +11,7 @@ channel_id = "UCffASWaVk1PFnpC-gTvuJgw"
 twitter = "V4Mirai"
 
 
-# Members
-
-[[streamer]]
-name = "Abi Kadabura"
-channel_id = "UCESQsSc7Uh8EbiXVtmPbD_A"
-channel_name = "Abi Kadabura Ch.【V4Mirai】"
-twitter = "AbiKadabura"
-aliases = ["Abi"]
-
-[[streamer]]
-name = "Serina Maiko"
-channel_id = "UCv1ThyE4KVYnnVY8GLftnoA"
-channel_name = "Serina Maiko Ch.【V4Mirai】"
-twitter = "SerinaMaiko"
-aliases = ["Serina"]
-
-[[streamer]]
-name = "Kou Mariya"
-channel_id = "UCqyL0oB2jl-5GpSg-GWZ_gw"
-channel_name = "Kou Mariya Ch.【V4Mirai】"
-twitter = "koumariya"
-aliases = ["Kou"]
+# 2nd Gen Petalight
 
 [[streamer]]
 name = "Mono Monet"
@@ -48,12 +27,8 @@ channel_name = "Yae Yugiri Ch.【V4Mirai】"
 twitter = "YaeYugiri"
 aliases = ["Yae"]
 
-[[streamer]]
-name = "Alias Anono"
-channel_id = "UCEY9CnSH0n0QKmY2Q-OH7Zw"
-channel_name = "Alias Anono Ch.【V4Mirai】"
-twitter = "Alias_Anono"
-aliases = ["Alias"]
+
+# 3rd Gen Lunalia
 
 [[streamer]]
 name = "Dr Novae"
@@ -69,9 +44,38 @@ channel_name = "REM Kanashibari Ch.【V4Mirai】"
 twitter = "REMKanashibari"
 aliases = ["REM"]
 
+
+# 4th Gen Voltail
+
 [[streamer]]
-name = "Yumi the Witch"
-channel_id = "UC1JnagrqjTzERqfpNtRfx1A"
-channel_name = "Yumi the Witch Ch.【V4Mirai】"
-twitter = "YumiTheWitch"
-aliases = ["Yumi"]
+name = "Lyko Lianna"
+channel_id = "UC1nhjH-Jrh7GH9y0Fma-dGw"
+channel_name = "Lyko Lianna Ch.【V4Mirai】"
+twitter = "LykoLianna"
+
+[[streamer]]
+name = "Rara Rocora"
+channel_id = "UCJmMPjJSRDOSfQKHHUs1efQ"
+channel_name = "Rara Rocora Ch.【V4Mirai】"
+twitter = "RaraRocora"
+
+[[streamer]]
+name = "Poma Pon"
+channel_id = "UCWChGhf3iYh9C_zAUNe9nag"
+channel_name = "Poma Pon Ch.【V4Mirai】"
+twitter = "pomapon_"
+
+
+# 5th Gen AuraRain
+
+[[streamer]]
+name = "Paige Terner"
+channel_id = "UCPet_g252gdu3R_jg4VP_ZQ"
+channel_name = "Paige Terner Ch. 【V4Mirai】"
+twitter = "paigeterner_"
+
+[[streamer]]
+name = "Ao WuWu"
+channel_id = "UCXxakVxNmVfFEu1zuU9JmMQ"
+channel_name = "Ao WuWu Ch.【V4Mirai】"
+twitter = "_aowuwu"

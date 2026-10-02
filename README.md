@@ -43,6 +43,7 @@ option.
 task            # list tasks
 task test       # tests, 60 s timeout
 task test:race  # with the race detector (slower first build)
+task test:live  # against the real Holodex API, needs GATORAID_HOLODEX_API_KEY
 task lint       # golangci-lint, pinned version
 task check      # format check, vet, lint, race tests
 task build      # static binary in out/bin/
@@ -54,6 +55,8 @@ task build      # static binary in out/bin/
 cmd/gatoraid/      entry point
 bot/               Discord session, router wiring, guild lifecycle
 commands/             slash commands
+holodex/              Holodex API client
+stream/               stream tracker: Holodex polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup
 internal/discordtest/ fake Discord API for tests

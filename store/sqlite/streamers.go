@@ -199,6 +199,27 @@ func (s *Store) SaveStreamer(ctx context.Context, st store.Streamer) error {
 	return err
 }
 
+func (s *Store) UpdateAvatars(ctx context.Context, avatars map[string]string) (int, error) {
+	changed := 0
+	err := s.inTx(ctx, func(tx *sql.Tx) error {
+		for id, url := range avatars {
+			r, err := tx.ExecContext(ctx,
+				`UPDATE streamers SET avatar_url = ? WHERE channel_id = ? AND avatar_url IS NOT ?`, url, id, url)
+			if err != nil {
+				return err
+			}
+			n, err := r.RowsAffected()
+			if err != nil {
+				return err
+			}
+			changed += int(n)
+		}
+		return nil
+	})
+
+	return changed, err
+}
+
 func (s *Store) DeleteStreamer(ctx context.Context, channelID string) error {
 	r, err := s.write.ExecContext(ctx, `DELETE FROM streamers WHERE channel_id = ?`, channelID)
 	if err != nil {

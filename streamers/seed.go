@@ -55,7 +55,6 @@ type seedGroup struct {
 	file  string
 }
 
-// LoadSeed parses the embedded seed directory.
 func LoadSeed() (*Seed, error) {
 	sub, err := fs.Sub(seedFS, "seed")
 	if err != nil {
@@ -64,7 +63,7 @@ func LoadSeed() (*Seed, error) {
 	return ParseSeed(sub)
 }
 
-// ParseSeed reads every .toml file in fsys. Each file is one group.
+// Each .toml file in fsys is one group.
 func ParseSeed(fsys fs.FS) (*Seed, error) {
 	var (
 		errs      []error
@@ -165,8 +164,7 @@ func ParseSeed(fsys fs.FS) (*Seed, error) {
 	return &Seed{Groups: sortGroups(groups), Streamers: streamers, Files: files}, nil
 }
 
-// sortGroups walks the tree: top-level groups by name, subgroups by order
-// and then name.
+// Top-level groups are sorted by name, subgroups by order and then name.
 func sortGroups(groups map[string]*seedGroup) []store.Group {
 	children := map[string][]*seedGroup{}
 	for _, g := range groups {

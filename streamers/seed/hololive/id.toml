@@ -15,7 +15,7 @@ channel_name = "hololive Indonesia"
 twitter = "hololive_id"
 
 
-# 1st Generation (AREA 15)
+# Indonesia 1st Gen (AREA 15)
 
 [[streamer]]
 name = "Airani Iofifteen"
@@ -39,7 +39,7 @@ twitter = "moonahoshinova"
 aliases = ["moona", "ムーナ"]
 
 
-# 2nd Generation (holoro)
+# Indonesia 2nd Gen (holoro)
 
 [[streamer]]
 name = "Anya Melfissa"
@@ -62,7 +62,7 @@ twitter = "pavoliareine"
 aliases = ["reine", "レイネ"]
 
 
-# 3rd Generation (holoh3ro)
+# Indonesia 3rd Gen (holoh3ro)
 
 [[streamer]]
 name = "Vestia Zeta"

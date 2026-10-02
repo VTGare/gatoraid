@@ -4,12 +4,18 @@ name = "Nijisanji ID"
 parent = "nijisanji"
 order = 3
 
+
+# Ex-ID 3SetBBQ
+
 [[streamer]]
 name = "Hana Macchia"
 channel_id = "UCpJtk0myFr5WnyfsmnInP-w"
 channel_name = "Hana Macchia Ch.【NIJISANJI・にじさんじ】"
 twitter = "Hana_Macchia"
 aliases = ["Hana", "Macchia"]
+
+
+# Ex-ID CloverMcOver
 
 [[streamer]]
 name = "Rai Galilei"
@@ -18,19 +24,8 @@ channel_name = "Rai Galilei【NIJISANJI / にじさんじ】"
 twitter = "Rai_Galilei"
 aliases = ["Rai", "Galilei"]
 
-[[streamer]]
-name = "Amicia Michella"
-channel_id = "UCrR7JxkbeLY82e8gsj_I0pQ"
-channel_name = "Amicia Michella【NIJISANJI / にじさんじ】"
-twitter = "AmiciaMichella"
-aliases = ["Amicia", "Michella"]
 
-[[streamer]]
-name = "Riksa Dhirendra"
-channel_id = "UCkL9OLKjIQbKk2CztbpOCFg"
-channel_name = "Riksa Dhirendra【NIJISANJI】"
-twitter = "RiksaDhirendra"
-aliases = ["Riksa", "Dhirendra"]
+# Ex-ID LAN_NEE3S
 
 [[streamer]]
 name = "Layla Alstroemeria"
@@ -39,12 +34,8 @@ channel_name = "Layla Alstroemeria【NIJISANJI / にじさんじ】"
 twitter = "LaylaAlstro2434"
 aliases = ["Layla", "Alstroemeria"]
 
-[[streamer]]
-name = "Nara Haramaung"
-channel_id = "UCoWH3sDpeXG1aXmOxveX4KA"
-channel_name = "Nara Haramaung【 NIJISANJI / にじさんじ 】"
-twitter = "Nara_Haramaung"
-aliases = ["Nara", "Haramaung【"]
+
+# Ex-ID 3FicLite
 
 [[streamer]]
 name = "Etna Crimson"
@@ -53,19 +44,8 @@ channel_name = "Etna Crimson【NIJISANJI / にじさんじ】"
 twitter = "Etna_Crimson"
 aliases = ["Etna", "Crimson"]
 
-[[streamer]]
-name = "Bonnivier Pranaja"
-channel_id = "UCHjeZylSgXDSnor8wUnwU_g"
-channel_name = "Bonnivier Pranaja 【NIJISANJI / にじさんじ】"
-twitter = "bobon_pranaja"
-aliases = ["Bonnivier", "Pranaja", "Boni", "Bobon", "Bonni", "Om Bonni", "Om Bon", "Bonbon"]
 
-[[streamer]]
-name = "Siska Leontyne"
-channel_id = "UC5qSx7KzdRwbsO1QmJc4d-w"
-channel_name = "Siska Leontyne 【NIJISANJI / にじさんじ】"
-twitter = "SiskaLeontyne"
-aliases = ["Siska", "Leontyne"]
+# Ex-ID 53Renade
 
 [[streamer]]
 name = "Nagisa Arcinia"
@@ -80,31 +60,3 @@ channel_id = "UCMzVa7B8UEdrvUGsPmSgyjA"
 channel_name = "Derem Kado 【にじさんじ / NIJISANJI】"
 twitter = "DeremKado"
 aliases = ["Derem", "Kado"]
-
-[[streamer]]
-name = "Reza Avanluna"
-channel_id = "UC5yckZliCkuaEFbqzLBD7hQ"
-channel_name = "Reza Avanluna 【NIJISANJI / にじさんじ】"
-twitter = "RezaAvanluna"
-aliases = ["Reza", "Avanluna"]
-
-[[streamer]]
-name = "Hyona Elatiora"
-channel_id = "UCIBj1-d71vKjRftiauF50pg"
-channel_name = "Hyona Elatiora【NIJISANJI / にじさんじ】"
-twitter = "HyonaElatiora"
-aliases = ["Hyona", "Elatiora"]
-
-[[streamer]]
-name = "Xia Ekavira"
-channel_id = "UCoJ0Ct-jdas4cLPpSp06gZg"
-channel_name = "Xia Ekavira【NIJISANJI / にじさんじ】"
-twitter = "Xia_Ekavira"
-aliases = ["Xia", "Ekavira"]
-
-[[streamer]]
-name = "Mika Melatika"
-channel_id = "UCahgMxSIQ2zIRrPKhM6Mjvg"
-channel_name = "Mika Melatika【NIJISANJI・にじさんじ】"
-twitter = "MikaMelatika"
-aliases = ["Mika", "Melatika"]

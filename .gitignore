@@ -18,3 +18,6 @@
 
 # Task output
 /out/
+
+# Editor settings
+/.vscode/

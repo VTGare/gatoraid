@@ -18,8 +18,8 @@ type exportEntry struct {
 	FreeChatStreams bool     `toml:"free_chat_streams,omitempty"`
 }
 
-// Export renders streamers as [[streamer]] blocks ready to paste into the
-// seed, grouped under a comment naming the file each belongs in.
+// Each group's entries start with a comment naming the seed file they
+// belong in.
 func (r *Registry) Export(sts []*store.Streamer) (string, error) {
 	byGroup := map[string][]*store.Streamer{}
 	for _, st := range sts {

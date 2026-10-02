@@ -26,8 +26,8 @@ var _ = Describe("Seed", func() {
 		seed, err := streamers.LoadSeed()
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(seed.Groups).To(HaveLen(20))
-		Expect(seed.Streamers).To(HaveLen(398))
+		Expect(seed.Groups).To(HaveLen(15))
+		Expect(seed.Streamers).To(HaveLen(474))
 	})
 
 	It("orders groups as a tree, subgroups by order then name", func() {
@@ -117,7 +117,7 @@ var _ = Describe("Registry", func() {
 		reg = streamers.New(db)
 		res, err := reg.Sync(ctx, seed)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(res.Added).To(Equal(398))
+		Expect(res.Added).To(Equal(474))
 	})
 
 	resolve := func(q string) string {
@@ -127,9 +127,9 @@ var _ = Describe("Registry", func() {
 	}
 
 	It("resolves by channel ID, name, alias and name word", func() {
-		Expect(resolve("UCyl1z3jo3XHR1riLFKG5UAg")).To(Equal("Watson Amelia"))
-		Expect(resolve("watson amelia")).To(Equal("Watson Amelia"))
-		Expect(resolve("ame")).To(Equal("Watson Amelia"))
+		Expect(resolve("UCL_qhgtOy0dy1Agp8vkySQg")).To(Equal("Mori Calliope"))
+		Expect(resolve("mori calliope")).To(Equal("Mori Calliope"))
+		Expect(resolve("calli")).To(Equal("Mori Calliope"))
 		Expect(resolve("キアラ")).To(Equal("Takanashi Kiara"))
 		Expect(resolve("kanaeru")).To(Equal("Kobo Kanaeru"))
 	})
@@ -153,9 +153,9 @@ var _ = Describe("Registry", func() {
 	})
 
 	It("ranks search results for autocomplete", func() {
-		Expect(names(reg.Search("ame", 3))[0]).To(Equal("Watson Amelia"))
+		Expect(names(reg.Search("calli", 3))[0]).To(Equal("Mori Calliope"))
 		Expect(names(reg.Search("takanashi", 5))).To(Equal([]string{"Takanashi Kiara", "Takanashi Kiara SubCh"}))
-		Expect(names(reg.Search("UCyl1z3jo3XHR1riLFKG5UAg", 5))).To(Equal([]string{"Watson Amelia"}))
+		Expect(names(reg.Search("UCL_qhgtOy0dy1Agp8vkySQg", 5))).To(Equal([]string{"Mori Calliope"}))
 		Expect(reg.Search("", 25)).To(HaveLen(25))
 		Expect(reg.Search("zzzzzz", 25)).To(BeEmpty())
 	})
@@ -164,20 +164,20 @@ var _ = Describe("Registry", func() {
 		en := names(reg.Members("hololive-en"))
 		all := names(reg.Members("hololive"))
 
-		Expect(en).To(ContainElements("Watson Amelia", "Hololive English"))
+		Expect(en).To(ContainElements("Mori Calliope", "Hololive English"))
 		Expect(en).NotTo(ContainElement("Kobo Kanaeru"))
-		Expect(all).To(ContainElements("Watson Amelia", "Kobo Kanaeru", "Hololive VTuber Group"))
+		Expect(all).To(ContainElements("Mori Calliope", "Kobo Kanaeru", "Hololive VTuber Group"))
 		Expect(len(all)).To(BeNumerically(">", len(en)))
 	})
 
 	It("walks group lineage for auto-translate and subgroups", func() {
 		kobo, err := reg.Resolve("kobo")
 		Expect(err).NotTo(HaveOccurred())
-		ame, err := reg.Resolve("ame")
+		calli, err := reg.Resolve("calli")
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(reg.SkipAutoTranslate(kobo)).To(BeTrue())
-		Expect(reg.SkipAutoTranslate(ame)).To(BeFalse())
+		Expect(reg.SkipAutoTranslate(calli)).To(BeFalse())
 
 		var lineage []string
 		for _, g := range reg.Lineage("hololive-id") {
@@ -201,26 +201,26 @@ var _ = Describe("Registry", func() {
 			return out
 		}
 
-		Expect(ids("en")).To(Equal([]string{"eien", "hololive-en", "nijisanji-en"}))
-		v := ids("v")
-		Expect(v[:3]).To(Equal([]string{"v4mirai", "vreverie", "vshojo"}))
-		Expect(v[3:]).To(ContainElement("hololive"))
+		Expect(ids("en")).To(Equal([]string{"hololive-en", "nijisanji-en"}))
+		h := ids("h")
+		Expect(h[:5]).To(Equal([]string{"hololive", "hololive-jp", "hololive-en", "hololive-id", "holostars"}))
+		Expect(h[5:]).To(ContainElements("chromashift", "phase-connect"))
 	})
 
 	It("exports entries that parse back into the same streamers", func() {
-		ame, err := reg.Resolve("ame")
+		calli, err := reg.Resolve("calli")
 		Expect(err).NotTo(HaveOccurred())
 
-		out, err := reg.Export([]*store.Streamer{ame})
+		out, err := reg.Export([]*store.Streamer{calli})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(out).To(HavePrefix("# streamers/seed/hololive/en.toml\n\n[[streamer]]\nname = \"Watson Amelia\"\n"))
+		Expect(out).To(HavePrefix("# streamers/seed/hololive/en.toml\n\n[[streamer]]\nname = \"Mori Calliope\"\n"))
 
 		seed, err := streamers.ParseSeed(fstest.MapFS{"en.toml": {
 			Data: []byte("[group]\nid = \"hololive-en\"\nname = \"Hololive EN\"\n\n" + out),
 		}})
 		Expect(err).NotTo(HaveOccurred())
 
-		want := *ame
+		want := *calli
 		want.AvatarURL, want.UpdatedAt = "", seed.Streamers[0].UpdatedAt
 		Expect(seed.Streamers).To(Equal([]store.Streamer{want}))
 	})
@@ -269,17 +269,17 @@ var _ = Describe("Registry", func() {
 	})
 
 	It("reloads after saving and deleting", func() {
-		ame, err := reg.Resolve("ame")
+		calli, err := reg.Resolve("calli")
 		Expect(err).NotTo(HaveOccurred())
 
-		edited := *ame
+		edited := *calli
 		edited.Aliases = append(edited.Aliases, "gremlin")
 		edited.Source = store.SourceOwner
 		Expect(reg.Save(ctx, edited)).To(Succeed())
-		Expect(resolve("gremlin")).To(Equal("Watson Amelia"))
+		Expect(resolve("gremlin")).To(Equal("Mori Calliope"))
 
-		Expect(reg.Delete(ctx, ame.ChannelID)).To(Succeed())
-		_, ok := reg.Streamer(ame.ChannelID)
+		Expect(reg.Delete(ctx, calli.ChannelID)).To(Succeed())
+		_, ok := reg.Streamer(calli.ChannelID)
 		Expect(ok).To(BeFalse())
 	})
 })

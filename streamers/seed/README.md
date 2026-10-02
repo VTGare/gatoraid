@@ -14,7 +14,11 @@ Every `.toml` file is one group. Agencies with branches get a folder: `hololive/
 the Hololive group itself (for agency-wide channels), and `hololive/en.toml` is Hololive EN. Where
 files go doesn't matter to the bot; only `[group]` does.
 
-Comments like `# Myth` are just for finding your way around.
+Section comments like `# English -Myth-` follow Holodex's branch and generation names and are just
+for finding your way around. `indie.toml` also holds small agencies, under their own headers.
+
+To check the list against Holodex, run `/owner streamers sync org:<org>`: it reports streamers
+Holodex marks inactive (graduated) and members missing from the seed.
 
 ## Adding a streamer
 
@@ -22,17 +26,17 @@ Copy a block into the right file:
 
 ```toml
 [[streamer]]
-name = "Watson Amelia"
-channel_id = "UCyl1z3jo3XHR1riLFKG5UAg"
-channel_name = "Watson Amelia Ch. hololive-EN"
-twitter = "watsonameliaen"
-aliases = ["amelia", "ame"]
+name = "Mori Calliope"
+channel_id = "UCL_qhgtOy0dy1Agp8vkySQg"
+channel_name = "Mori Calliope Ch. hololive-EN"
+twitter = "moricalliope"
+aliases = ["calliope", "calli", "mori"]
 ```
 
 | Field | Required | |
 |---|---|---|
 | `name` | yes | Shown everywhere, and how people search for them. |
-| `channel_id` | yes | The `UC…` ID from the channel URL. A handle like `@WatsonAmelia` won't work. |
+| `channel_id` | yes | The `UC…` ID from the channel URL. A handle like `@MoriCalliope` won't work. |
 | `channel_name` | | The YouTube channel title. Used to spot collabs for gossip. |
 | `twitter` | | Handle without the `@`. Also used to spot collabs. |
 | `aliases` | | Nicknames people search and gossip by. Japanese ones match inside words too. |

@@ -47,7 +47,7 @@ type GuildStore interface {
 	// had left.
 	JoinGuild(ctx context.Context, guildID string) (*Guild, JoinKind, error)
 
-	// Soft delete: the data stays until PurgeGuilds removes it.
+	// The data stays until PurgeGuilds removes it.
 	LeaveGuild(ctx context.Context, guildID string, at time.Time) error
 
 	// Marks active guilds missing from present as left and returns their

@@ -163,6 +163,23 @@ var _ = Describe("Streamers", func() {
 		Expect(st.GroupID).To(BeEmpty())
 	})
 
+	It("updates only avatars that changed", func() {
+		_, err := db.SyncSeed(ctx, groups, []store.Streamer{ame, kiara})
+		Expect(err).NotTo(HaveOccurred())
+
+		n, err := db.UpdateAvatars(ctx, map[string]string{"UCame": "a.png", "UCkiara": "k.png", "UCnobody": "x.png"})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(n).To(Equal(2))
+
+		n, err = db.UpdateAvatars(ctx, map[string]string{"UCame": "a.png", "UCkiara": "k2.png"})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(n).To(Equal(1))
+
+		st, err := db.Streamer(ctx, "UCkiara")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.AvatarURL).To(Equal("k2.png"))
+	})
+
 	It("deletes streamers", func() {
 		_, err := db.SyncSeed(ctx, groups, []store.Streamer{ame})
 		Expect(err).NotTo(HaveOccurred())

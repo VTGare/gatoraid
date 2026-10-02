@@ -10,8 +10,10 @@ import (
 	"github.com/VTGare/gumi/middleware"
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 )
 
@@ -28,6 +30,9 @@ type Bot struct {
 	Streamers *streamers.Registry
 	Session   *discordgo.Session
 	Router    *gumi.Router
+	// Nil without a Holodex API key.
+	Holodex *holodex.Client
+	Streams *stream.Tracker
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -72,6 +77,24 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		middleware.Timeout(commandTimeout),
 	)
 
+	if cfg.Holodex.APIKey != "" {
+		b.Holodex = holodex.New(cfg.Holodex.APIKey)
+		b.Streams = stream.NewTracker(stream.Config{
+			Source:   b.Holodex,
+			Channels: b.Streamers.ChannelIDs,
+			Classifier: stream.Classifier{FreeChatStreams: func(id string) bool {
+				st, ok := b.Streamers.Streamer(id)
+				return ok && st.FreeChatStreams
+			}},
+			Log: log.With("component", "streams"),
+			OnAvatars: func(ctx context.Context, avatars map[string]string) {
+				if err := b.Streamers.UpdateAvatars(ctx, avatars); err != nil {
+					log.Warn("failed to update avatars", slog.Any("error", err))
+				}
+			},
+		})
+	}
+
 	return b, nil
 }
 
@@ -100,6 +123,13 @@ func (b *Bot) Start(ctx context.Context) error {
 
 	go b.purgeLoop(ctx)
 
+	if b.Streams != nil {
+		go func() { _ = b.Streams.Run(ctx) }()
+		go b.watchStreams(ctx)
+	} else {
+		b.Log.Warn("no Holodex API key, so stream discovery is off")
+	}
+
 	<-ctx.Done()
 	b.Log.Info("shutting down")
 
@@ -117,6 +147,24 @@ func (b *Bot) purgeLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
+		}
+	}
+}
+
+// Relays and notifications will hook in here. Until then the events are
+// only logged.
+func (b *Bot) watchStreams(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case e := <-b.Streams.Events():
+			b.Log.Info("stream "+e.Kind.String(),
+				slog.String("video_id", e.Stream.VideoID),
+				slog.String("channel", e.Stream.ChannelName),
+				slog.String("title", e.Stream.Title),
+				slog.Bool("members_only", e.Stream.MembersOnly),
+				slog.Bool("free_chat", e.Stream.FreeChat))
 		}
 	}
 }
