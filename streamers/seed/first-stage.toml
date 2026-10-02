@@ -1,0 +1,50 @@
+[group]
+id = "first-stage"
+name = "First Stage Production"
+
+
+# Official channels
+
+[[streamer]]
+name = "First Stage Production"
+channel_id = "UCfm05QV1b5BP0TSS842mF7Q"
+channel_name = "FIRST STAGE PRODUCTION EN"
+twitter = "fsp_english"
+
+
+# Members
+
+[[streamer]]
+name = "Rosco Graves"
+channel_id = "UCsQqk4cn8pljUeadYbUVgyg"
+channel_name = "Rosco Graves【FIRST STAGE PRODUCTION EN】"
+twitter = "rosco_graves"
+aliases = ["Rosco"]
+
+[[streamer]]
+name = "Gale Galleon"
+channel_id = "UCxerQlE0t1yY4bqeK5ldM9A"
+channel_name = "Gale Galleon【FIRST STAGE PRODUCTION EN】"
+twitter = "GaleGalleon"
+aliases = ["Gale"]
+
+[[streamer]]
+name = "Zander Netherbrand"
+channel_id = "UC1ZRXoTQUwZtKnpOfJwGNPw"
+channel_name = "Zander Netherbrand【FIRST STAGE PRODUCTION EN】"
+twitter = "ZanNetherbrand"
+aliases = ["Zander"]
+
+[[streamer]]
+name = "Lucien Lunaris"
+channel_id = "UCFwcEIsjvi9XEvpGx6iwHpw"
+channel_name = "Lucien Lunaris【FIRST STAGE PRODUCTION EN】"
+twitter = "Lucienlunaris"
+aliases = ["Lucien"]
+
+[[streamer]]
+name = "Cassian Floros"
+channel_id = "UC9mydBOLdL6-Fp61paK68Tw"
+channel_name = "Cassian Floros【FIRST STAGE PRODUCTION EN】"
+twitter = "CassianFloros"
+aliases = ["Cassian"]

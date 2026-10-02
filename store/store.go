@@ -8,6 +8,7 @@ import (
 
 type Store interface {
 	GuildStore
+	StreamerStore
 	Close() error
 }
 

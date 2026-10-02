@@ -53,11 +53,20 @@ task build      # static binary in out/bin/
 ```
 cmd/gatoraid/      entry point
 bot/               Discord session, router wiring, guild lifecycle
-commands/          slash commands
-internal/config/   env-first configuration
-internal/logging/  slog setup
-store/             persistence interfaces and models
-store/sqlite/      SQLite implementation and migrations
+commands/             slash commands
+internal/config/      env-first configuration
+internal/logging/     slog setup
+internal/discordtest/ fake Discord API for tests
+store/                persistence interfaces and models
+store/sqlite/         SQLite implementation and migrations
+streamers/            streamer registry; seed/ holds the curated list
 ```
+
+### Streamer registry
+
+[`streamers/seed/`](streamers/seed/README.md) is the curated list of streamers, one TOML file per
+group. It's synced into the database on
+startup: new entries are added, changed ones updated and removed ones deleted. Streamers edited with
+`/owner streamers` belong to the owner from then on and the seed leaves them alone.
 
 Commands are built on [gumi](https://github.com/VTGare/gumi).

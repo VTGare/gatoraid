@@ -1,0 +1,137 @@
+[group]
+id = "indie"
+name = "Indie"
+
+[[streamer]]
+name = "Iida Pochi"
+channel_id = "UC22BVlBsZc6ta3Dqz75NU6Q"
+channel_name = "Iida Pochi."
+twitter = "lizhi3"
+aliases = ["Pochi", "Iida"]
+
+[[streamer]]
+name = "Nyatasha Nyanners"
+channel_id = "UCO5Jvsc_sKuZi3MhnJxrlzQ"
+channel_name = "Nyanners"
+twitter = "NyanNyanners"
+aliases = ["Nyanners", "Nyan", "Nyatasha"]
+
+[[streamer]]
+name = "Silvervale"
+channel_id = "UCm8Dj7dQ0oRHXNUXF31kjEw"
+twitter = "_Silvervale_"
+
+[[streamer]]
+name = "LeeandLie"
+channel_id = "UC8THb_fnOptyVgpi3xuCd-A"
+channel_name = "LeeandLie (AmaLee)"
+twitter = "LeeandLie"
+
+[[streamer]]
+name = "girl_dm_"
+channel_id = "UC_WC6plpIdL_buebR9vSVkg"
+twitter = "Girl_Dm_"
+aliases = ["girldm"]
+
+[[streamer]]
+name = "Vienna"
+channel_id = "UCN-UumTCLD7zVey1czA-75g"
+channel_name = "C9 Vienna"
+twitter = "viennavtuber"
+aliases = ["C9 Vienna"]
+
+[[streamer]]
+name = "Bao"
+channel_id = "UCZQ7nZ8Lc7pslBN0gN1Jg0w"
+channel_name = "Bao The Whale"
+twitter = "baovtuber"
+aliases = ["Bao The Whale"]
+
+[[streamer]]
+name = "Shoto"
+channel_id = "UCgwJ4ReZqFOw_Y6eTEIunDQ"
+twitter = "shxtou"
+
+[[streamer]]
+name = "Crunchyroll Hime"
+channel_id = "UCWRgyZ7sllnMwli-9IeouTQ"
+channel_name = "Crunchyroll-Hime Ch."
+twitter = "HimeVT"
+aliases = ["Hime"]
+
+[[streamer]]
+name = "OniGiri"
+channel_id = "UC97JZwjhKFJ3HwrGkcJekSw"
+twitter = "OnigiriEn_"
+aliases = ["Giri", "OniGiriEN"]
+
+[[streamer]]
+name = "Ayamy Garubinu"
+channel_id = "UCr9p1ZjLKgfaoqNorY7PiWQ"
+channel_name = "ayamy あやみちゃんねる"
+twitter = "ayamy_garubinu"
+aliases = ["ayamy"]
+
+[[streamer]]
+name = "Nabi"
+channel_id = "UCzKkwB84Y0ql0EvyOWRSkEw"
+
+[[streamer]]
+name = "Mikeneko"
+channel_id = "UC54JqsuIbMw_d1Ieb4hjKoQ"
+channel_name = "みけねこch"
+twitter = "95rn16"
+aliases = ["みけねこ"]
+
+[[streamer]]
+name = "Amatsuka Uto"
+channel_id = "UCdYR5Oyz8Q4g0ZmB4PkTD7g"
+channel_name = "天使うと"
+twitter = "amatsukauto"
+aliases = ["Amatsuka", "Uto"]
+
+[[streamer]]
+name = "Dokibird"
+channel_id = "UComInW10MkHJs-_vi4rHQCQ"
+twitter = "Dokibird"
+aliases = ["jkterjter"]
+
+[[streamer]]
+name = "Gumi"
+channel_id = "UCidzkUQ_y3nvYjn7cSBK_kA"
+channel_name = "vGumiho"
+twitter = "vgumiho"
+aliases = ["Gumiho", "vGumiho"]
+
+[[streamer]]
+name = "rpr"
+channel_id = "UCcMCZ0PPqw-L9rU9LWhOazA"
+channel_name = "rprxx"
+twitter = "rpr"
+aliases = ["rprxx", "rprx"]
+
+[[streamer]]
+name = "dtto"
+channel_id = "UCWNVjAzZmYUni8YBXYiy01w"
+channel_name = "dtto."
+twitter = "_dtto_"
+aliases = ["dttodot", "ditto"]
+
+[[streamer]]
+name = "Kiyon"
+channel_id = "UCycPDRVWCQakmKRKh6Z3Dqw"
+channel_name = "Kiyon Ch."
+twitter = "KiyonVT"
+
+[[streamer]]
+name = "Mint Fantome"
+channel_id = "UCcHHkJ98eSfa5aj0mdTwwLQ"
+channel_name = "Maid Mint Ch. ミント・ファントーム"
+twitter = "MintFantome"
+aliases = ["Mint", "Mint Maid", "MintMaid", "mintfantome", "fantomemint"]
+
+[[streamer]]
+name = "Mintara Podcast"
+channel_id = "UCxgMWRQYmppOrIh3_5hpq7A"
+channel_name = "Mint & Matara's Summer Special"
+aliases = ["Mintara", "Mint & Matara's Summer Special", "Mint & Matara"]

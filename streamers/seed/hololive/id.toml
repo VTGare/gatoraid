@@ -1,0 +1,86 @@
+[group]
+id = "hololive-id"
+name = "Hololive ID"
+parent = "hololive"
+order = 3
+skip_auto_translate = true
+
+
+# Official channels
+
+[[streamer]]
+name = "Hololive Indonesia"
+channel_id = "UCfrWoRGlawPQDQxxeIDRP0Q"
+channel_name = "hololive Indonesia"
+twitter = "hololive_id"
+
+
+# 1st Generation (AREA 15)
+
+[[streamer]]
+name = "Airani Iofifteen"
+channel_id = "UCAoy6rzhSf4ydcYjJw3WoVg"
+channel_name = "Airani Iofifteen Channel hololive-ID"
+twitter = "airaniiofifteen"
+aliases = ["iofi", "イオフィ"]
+
+[[streamer]]
+name = "Ayunda Risu"
+channel_id = "UCOyYb1c43VlX9rc_lT6NKQw"
+channel_name = "Ayunda Risu Ch. hololive-ID"
+twitter = "ayunda_risu"
+aliases = ["risu", "ayunda", "アユンダ"]
+
+[[streamer]]
+name = "Moona Hoshinova"
+channel_id = "UCP0BspO_AMEe3aQqqpo89Dg"
+channel_name = "Moona Hoshinova hololive-ID"
+twitter = "moonahoshinova"
+aliases = ["moona", "ムーナ"]
+
+
+# 2nd Generation (holoro)
+
+[[streamer]]
+name = "Anya Melfissa"
+channel_id = "UC727SQYUvx5pDDGQpTICNWg"
+channel_name = "Anya Melfissa Ch. hololive-ID"
+twitter = "anyamelfissa"
+aliases = ["anya", "アーニャ"]
+
+[[streamer]]
+name = "Kureiji Ollie"
+channel_id = "UCYz_5n-uDuChHtLo7My1HnQ"
+channel_name = "Kureiji Ollie Ch. hololive-ID"
+twitter = "kureijiollie"
+
+[[streamer]]
+name = "Pavolia Reine"
+channel_id = "UChgTyjG-pdNvxxhdsXfHQ5Q"
+channel_name = "Pavolia Reine Ch. hololive-ID"
+twitter = "pavoliareine"
+aliases = ["reine", "レイネ"]
+
+
+# 3rd Generation (holoh3ro)
+
+[[streamer]]
+name = "Vestia Zeta"
+channel_id = "UCTvHWSfBZgtxE4sILOaurIQ"
+channel_name = "Vestia Zeta Ch. hololive-ID"
+twitter = "vestiazeta"
+aliases = ["Zeta"]
+
+[[streamer]]
+name = "Kobo Kanaeru"
+channel_id = "UCjLEmnpCNeisMxy134KPwWw"
+channel_name = "Kobo Kanaeru Ch. hololive-ID"
+twitter = "kobokanaeru"
+aliases = ["kobo"]
+
+[[streamer]]
+name = "Kaela Kovalskia"
+channel_id = "UCZLZ8Jjx_RN2CXloOmgTHVg"
+channel_name = "Kaela Kovalskia Ch. hololive-ID"
+twitter = "kaelakovalskia"
+aliases = ["kaela"]

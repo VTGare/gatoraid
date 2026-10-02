@@ -1,0 +1,13 @@
+[group]
+id = "nijisanji"
+name = "Nijisanji"
+
+
+# Official channels
+
+[[streamer]]
+name = "Nijisanji"
+channel_id = "UCX7YkU9nEeaoZbkVLVajcMg"
+channel_name = "にじさんじ"
+twitter = "nijisanji_app"
+aliases = ["Nijisanji JP Official", "にじさんじ"]

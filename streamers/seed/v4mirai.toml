@@ -1,0 +1,77 @@
+[group]
+id = "v4mirai"
+name = "V4Mirai"
+
+
+# Official channels
+
+[[streamer]]
+name = "V4Mirai"
+channel_id = "UCffASWaVk1PFnpC-gTvuJgw"
+twitter = "V4Mirai"
+
+
+# Members
+
+[[streamer]]
+name = "Abi Kadabura"
+channel_id = "UCESQsSc7Uh8EbiXVtmPbD_A"
+channel_name = "Abi Kadabura Ch.【V4Mirai】"
+twitter = "AbiKadabura"
+aliases = ["Abi"]
+
+[[streamer]]
+name = "Serina Maiko"
+channel_id = "UCv1ThyE4KVYnnVY8GLftnoA"
+channel_name = "Serina Maiko Ch.【V4Mirai】"
+twitter = "SerinaMaiko"
+aliases = ["Serina"]
+
+[[streamer]]
+name = "Kou Mariya"
+channel_id = "UCqyL0oB2jl-5GpSg-GWZ_gw"
+channel_name = "Kou Mariya Ch.【V4Mirai】"
+twitter = "koumariya"
+aliases = ["Kou"]
+
+[[streamer]]
+name = "Mono Monet"
+channel_id = "UCdubotSy4pPOsiaW4MrYn3Q"
+channel_name = "Mono Monet Ch.【V4Mirai】"
+twitter = "mono_monet"
+aliases = ["Mono"]
+
+[[streamer]]
+name = "Yae Yugiri"
+channel_id = "UCbDHIS0NpXROhYjsaXQX4pA"
+channel_name = "Yae Yugiri Ch.【V4Mirai】"
+twitter = "YaeYugiri"
+aliases = ["Yae"]
+
+[[streamer]]
+name = "Alias Anono"
+channel_id = "UCEY9CnSH0n0QKmY2Q-OH7Zw"
+channel_name = "Alias Anono Ch.【V4Mirai】"
+twitter = "Alias_Anono"
+aliases = ["Alias"]
+
+[[streamer]]
+name = "Dr Novae"
+channel_id = "UC2Ne6dDcFxnM2hCBLii3IUg"
+channel_name = "Dr.NOVA(e) Ch.【V4Mirai】"
+twitter = "Dr_NOVAe"
+aliases = ["Novae", "Nova"]
+
+[[streamer]]
+name = "REM Kanashibari"
+channel_id = "UCbZZlqASU668-wyW1K2kYBw"
+channel_name = "REM Kanashibari Ch.【V4Mirai】"
+twitter = "REMKanashibari"
+aliases = ["REM"]
+
+[[streamer]]
+name = "Yumi the Witch"
+channel_id = "UC1JnagrqjTzERqfpNtRfx1A"
+channel_name = "Yumi the Witch Ch.【V4Mirai】"
+twitter = "YumiTheWitch"
+aliases = ["Yumi"]

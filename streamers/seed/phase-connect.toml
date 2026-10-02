@@ -1,0 +1,122 @@
+[group]
+id = "phase-connect"
+name = "Phase Connect"
+
+[[streamer]]
+name = "Ashelia Rinkou"
+channel_id = "UCg7sW-h1PUowdiR5K4HlBew"
+channel_name = "Lia Ch.【Phase Connect】"
+twitter = "RinkouAshelia"
+aliases = ["Ashelia", "Lia"]
+
+[[streamer]]
+name = "Utatane Nasa"
+channel_id = "UCB7sSUNwh_dXE7ZL3DsGDpw"
+channel_name = "Nasa Ch. 転寝ナサ 【Phase Connect】"
+twitter = "UtataneNasa"
+aliases = ["Nasa", "Utatane"]
+
+[[streamer]]
+name = "Pipkin Pippa"
+channel_id = "UCJ46YTYBQVXsfsp8-HryoUA"
+channel_name = "Pipkin Pippa Ch.【Phase Connect】"
+twitter = "pipkinpippa"
+aliases = ["Pipkin", "Pippa"]
+
+[[streamer]]
+name = "Tenma Maemi"
+channel_id = "UC3K7pmiHsNSx1y0tdx2bbCw"
+channel_name = "Tenma Ch. マエミ 天満 【Phase Connect】"
+twitter = "tenmamaemi"
+aliases = ["Tenma", "Maemi"]
+
+[[streamer]]
+name = "Hakushika Iori"
+channel_id = "UCN5bD1YYapThOeadG7YkBOA"
+channel_name = "Iori Ch. 白鹿いおり【Phase Connect】"
+twitter = "hakushikaiori"
+aliases = ["Iori", "Hakushika"]
+
+[[streamer]]
+name = "Fujikura Uruka"
+channel_id = "UCjXJYPsKxoJyc-1RPB6dSyw"
+channel_name = "Uruka Ch. 藤倉ウルカ 【Phase Connect】"
+twitter = "fujikurauruka"
+aliases = ["Uruka", "Fujikura"]
+
+[[streamer]]
+name = "Shisui Michiru"
+channel_id = "UC1cExET9xoWSO9iSnRsW_1Q"
+channel_name = "Michiru Ch. 紫翠みちる【Phase Connect】"
+twitter = "shisuimichiru"
+aliases = ["Michiru", "Shisui"]
+
+[[streamer]]
+name = "Remilia Nephys"
+channel_id = "UC-hMwvRuMsQrfgu0DPKLV2A"
+channel_name = "Remilia Ch. レミリア・ネフィス 【Phase Connect】"
+twitter = "Remilia_Nephys"
+aliases = ["Remilia", "Nephys"]
+
+[[streamer]]
+name = "Chisaka Airi"
+channel_id = "UC5qlAhrec6-0J-K3zmhNPPQ"
+channel_name = "Airi Ch. 千坂 アイリ【Phase Connect】"
+twitter = "ChisakaAiri"
+aliases = ["Airi", "Chisaka"]
+
+[[streamer]]
+name = "Amanogawa Shiina"
+channel_id = "UCnJNNk45O1QYS2oMRYFKSyw"
+channel_name = "Shiina Ch. 天ノ川 しいな 【Phase Connect】"
+twitter = "AmanogawaShiina"
+aliases = ["Shiina", "Amanogawa"]
+
+[[streamer]]
+name = "Himemiya Rie"
+channel_id = "UCJ4O6PWA47f6XbCgrLQNqEQ"
+channel_name = "Rie Ch. 姫宮りえ【Phase Connect】"
+twitter = "HimemiyaRie"
+aliases = ["Rie", "Himemiya"]
+
+[[streamer]]
+name = "Erina Makina"
+channel_id = "UCupmjRr7kPgzXKh-cPxxGbg"
+channel_name = "Erina Ch. エリナ・マキナ 【Phase Connect】"
+twitter = "ErinaMakina"
+aliases = ["Erina", "Makina"]
+
+[[streamer]]
+name = "Komachi Panko"
+channel_id = "UCVo_KgPNsDKxHwzib7uarCw"
+channel_name = "Panko Ch. 小町ぱんこ 【Phase Connect】"
+twitter = "komachipanko"
+aliases = ["Panko", "Komachi"]
+
+[[streamer]]
+name = "Kaneko Lumi"
+channel_id = "UCx_zwZuGIS4jxO07kFk8G6Q"
+channel_name = "Lumi Ch.【Phase Connect】"
+twitter = "Kaneko_Lumi"
+aliases = ["Lumi", "Kaneko"]
+
+[[streamer]]
+name = "Ember Amane"
+channel_id = "UC0w_dvkIwnXzMak6gfeioRQ"
+channel_name = "Ember Amane Ch. 【Phase Connect】"
+twitter = "EmberAmane"
+aliases = ["Ember", "Amane"]
+
+[[streamer]]
+name = "Dizzy Dokuro"
+channel_id = "UC98iRMvRqUxRD6GP4NtRskw"
+channel_name = "Dizzy Dokuro Ch. 【Phase Connect】"
+twitter = "dizzydokuro"
+aliases = ["Dizzy", "Dokuro"]
+
+[[streamer]]
+name = "Hoshiumi Jelly"
+channel_id = "UCkb-r702uhx4-6Lrmetp-Ow"
+channel_name = "Jelly Hoshiumi Ch. 【Phase Connect】"
+twitter = "jellyhoshiumi"
+aliases = ["Jelly", "Hoshiumi"]

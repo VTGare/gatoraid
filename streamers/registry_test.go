@@ -1,0 +1,285 @@
+package streamers_test
+
+import (
+	"context"
+	"path/filepath"
+	"testing/fstest"
+
+	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/store/sqlite"
+	"github.com/VTGare/gatoraid/streamers"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
+
+func names(sts []*store.Streamer) []string {
+	out := make([]string, len(sts))
+	for i, s := range sts {
+		out[i] = s.Name
+	}
+	return out
+}
+
+var _ = Describe("Seed", func() {
+	It("loads the embedded seed", func() {
+		seed, err := streamers.LoadSeed()
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(seed.Groups).To(HaveLen(20))
+		Expect(seed.Streamers).To(HaveLen(398))
+	})
+
+	It("orders groups as a tree, subgroups by order then name", func() {
+		seed, err := streamers.ParseSeed(fstest.MapFS{
+			"z.toml":       {Data: []byte("[group]\nid = \"z\"\nname = \"Zeta\"")},
+			"a/a.toml":     {Data: []byte("[group]\nid = \"a\"\nname = \"Alpha\"")},
+			"a/late.toml":  {Data: []byte("[group]\nid = \"a-late\"\nname = \"Aa\"\nparent = \"a\"\norder = 2")},
+			"a/early.toml": {Data: []byte("[group]\nid = \"a-early\"\nname = \"Zz\"\nparent = \"a\"\norder = 1")},
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		var ids []string
+		for _, g := range seed.Groups {
+			ids = append(ids, g.ID)
+		}
+		Expect(ids).To(Equal([]string{"a", "a-early", "a-late", "z"}))
+	})
+
+	It("puts streamers in their file's group", func() {
+		seed, err := streamers.ParseSeed(fstest.MapFS{"g.toml": {Data: []byte(`
+[group]
+id = "g"
+name = "G"
+
+[[streamer]]
+name = "A"
+channel_id = "UCaaaaaaaaaaaaaaaaaaaaaa"
+aliases = ["x"]
+free_chat_streams = true
+`)}})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(seed.Streamers).To(Equal([]store.Streamer{{
+			ChannelID: "UCaaaaaaaaaaaaaaaaaaaaaa", Name: "A", GroupID: "g", Aliases: []string{"x"},
+			FreeChatStreams: true, Source: store.SourceSeed,
+		}}))
+	})
+
+	DescribeTable("rejects broken seeds",
+		func(files map[string]string, msg string) {
+			fsys := fstest.MapFS{}
+			for name, data := range files {
+				fsys[name] = &fstest.MapFile{Data: []byte(data)}
+			}
+
+			_, err := streamers.ParseSeed(fsys)
+			Expect(err).To(MatchError(ContainSubstring(msg)))
+		},
+		Entry("typo in a field", map[string]string{
+			"g.toml": "[group]\nid = \"g\"\nname = \"G\"\n[[streamer]]\nname = \"A\"\nchanel_id = \"x\"",
+		}, `g.toml: unknown field "streamer.chanel_id"`),
+		Entry("missing group", map[string]string{"g.toml": "[[streamer]]\nname = \"A\""}, "g.toml: missing [group]"),
+		Entry("bad channel id", map[string]string{
+			"g.toml": "[group]\nid = \"g\"\nname = \"G\"\n[[streamer]]\nname = \"A\"\nchannel_id = \"@a\"",
+		}, `g.toml: A: "@a" isn't a channel ID`),
+		Entry("duplicate channel id", map[string]string{
+			"a.toml": "[group]\nid = \"a\"\nname = \"A\"\n[[streamer]]\nname = \"One\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"",
+			"b.toml": "[group]\nid = \"b\"\nname = \"B\"\n[[streamer]]\nname = \"Two\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"",
+		}, "channel UCaaaaaaaaaaaaaaaaaaaaaa is already used by One"),
+		Entry("duplicate group", map[string]string{
+			"a.toml": "[group]\nid = \"g\"\nname = \"A\"",
+			"b.toml": "[group]\nid = \"g\"\nname = \"B\"",
+		}, `group "g" is already defined in a.toml`),
+		Entry("unknown parent", map[string]string{"a.toml": "[group]\nid = \"a\"\nname = \"A\"\nparent = \"b\""}, `a.toml: unknown parent "b"`),
+		Entry("parent cycle", map[string]string{
+			"a.toml": "[group]\nid = \"a\"\nname = \"A\"\nparent = \"b\"",
+			"b.toml": "[group]\nid = \"b\"\nname = \"B\"\nparent = \"a\"",
+		}, "is its own ancestor"),
+		Entry("syntax error", map[string]string{"g.toml": "[group\nid = "}, "g.toml:"),
+	)
+})
+
+var _ = Describe("Registry", func() {
+	var (
+		ctx context.Context
+		reg *streamers.Registry
+	)
+
+	BeforeEach(func() {
+		ctx = context.Background()
+		db, err := sqlite.Open(ctx, filepath.Join(GinkgoT().TempDir(), "test.db"))
+		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(db.Close)
+
+		seed, err := streamers.LoadSeed()
+		Expect(err).NotTo(HaveOccurred())
+
+		reg = streamers.New(db)
+		res, err := reg.Sync(ctx, seed)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res.Added).To(Equal(398))
+	})
+
+	resolve := func(q string) string {
+		st, err := reg.Resolve(q)
+		Expect(err).NotTo(HaveOccurred())
+		return st.Name
+	}
+
+	It("resolves by channel ID, name, alias and name word", func() {
+		Expect(resolve("UCyl1z3jo3XHR1riLFKG5UAg")).To(Equal("Watson Amelia"))
+		Expect(resolve("watson amelia")).To(Equal("Watson Amelia"))
+		Expect(resolve("ame")).To(Equal("Watson Amelia"))
+		Expect(resolve("キアラ")).To(Equal("Takanashi Kiara"))
+		Expect(resolve("kanaeru")).To(Equal("Kobo Kanaeru"))
+	})
+
+	It("prefers an alias over name words", func() {
+		// The sub channel also has "Kiara" in its name, but only the main
+		// channel has the alias.
+		Expect(resolve("kiara")).To(Equal("Takanashi Kiara"))
+	})
+
+	It("reports ambiguous and unknown queries", func() {
+		_, err := reg.Resolve("takanashi")
+		var amb *streamers.AmbiguousError
+		Expect(err).To(BeAssignableToTypeOf(amb))
+		Expect(err.(*streamers.AmbiguousError).Candidates).To(HaveLen(2))
+
+		_, err = reg.Resolve("definitely nobody")
+		Expect(err).To(MatchError(streamers.ErrNotFound))
+		_, err = reg.Resolve("  ")
+		Expect(err).To(MatchError(streamers.ErrNotFound))
+	})
+
+	It("ranks search results for autocomplete", func() {
+		Expect(names(reg.Search("ame", 3))[0]).To(Equal("Watson Amelia"))
+		Expect(names(reg.Search("takanashi", 5))).To(Equal([]string{"Takanashi Kiara", "Takanashi Kiara SubCh"}))
+		Expect(names(reg.Search("UCyl1z3jo3XHR1riLFKG5UAg", 5))).To(Equal([]string{"Watson Amelia"}))
+		Expect(reg.Search("", 25)).To(HaveLen(25))
+		Expect(reg.Search("zzzzzz", 25)).To(BeEmpty())
+	})
+
+	It("includes subgroups in group members", func() {
+		en := names(reg.Members("hololive-en"))
+		all := names(reg.Members("hololive"))
+
+		Expect(en).To(ContainElements("Watson Amelia", "Hololive English"))
+		Expect(en).NotTo(ContainElement("Kobo Kanaeru"))
+		Expect(all).To(ContainElements("Watson Amelia", "Kobo Kanaeru", "Hololive VTuber Group"))
+		Expect(len(all)).To(BeNumerically(">", len(en)))
+	})
+
+	It("walks group lineage for auto-translate and subgroups", func() {
+		kobo, err := reg.Resolve("kobo")
+		Expect(err).NotTo(HaveOccurred())
+		ame, err := reg.Resolve("ame")
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(reg.SkipAutoTranslate(kobo)).To(BeTrue())
+		Expect(reg.SkipAutoTranslate(ame)).To(BeFalse())
+
+		var lineage []string
+		for _, g := range reg.Lineage("hololive-id") {
+			lineage = append(lineage, g.ID)
+		}
+		Expect(lineage).To(Equal([]string{"hololive-id", "hololive"}))
+
+		var subs []string
+		for _, g := range reg.Subgroups("nijisanji") {
+			subs = append(subs, g.ID)
+		}
+		Expect(subs).To(Equal([]string{"nijisanji-jp", "nijisanji-en", "nijisanji-id", "nijisanji-kr"}))
+	})
+
+	It("searches groups by prefix before substring", func() {
+		ids := func(q string) []string {
+			var out []string
+			for _, g := range reg.SearchGroups(q, 25) {
+				out = append(out, g.ID)
+			}
+			return out
+		}
+
+		Expect(ids("en")).To(Equal([]string{"eien", "hololive-en", "nijisanji-en"}))
+		v := ids("v")
+		Expect(v[:3]).To(Equal([]string{"v4mirai", "vreverie", "vshojo"}))
+		Expect(v[3:]).To(ContainElement("hololive"))
+	})
+
+	It("exports entries that parse back into the same streamers", func() {
+		ame, err := reg.Resolve("ame")
+		Expect(err).NotTo(HaveOccurred())
+
+		out, err := reg.Export([]*store.Streamer{ame})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(out).To(HavePrefix("# streamers/seed/hololive/en.toml\n\n[[streamer]]\nname = \"Watson Amelia\"\n"))
+
+		seed, err := streamers.ParseSeed(fstest.MapFS{"en.toml": {
+			Data: []byte("[group]\nid = \"hololive-en\"\nname = \"Hololive EN\"\n\n" + out),
+		}})
+		Expect(err).NotTo(HaveOccurred())
+
+		want := *ame
+		want.AvatarURL, want.UpdatedAt = "", seed.Streamers[0].UpdatedAt
+		Expect(seed.Streamers).To(Equal([]store.Streamer{want}))
+	})
+
+	It("labels exported streamers without a known group", func() {
+		out, err := reg.Export([]*store.Streamer{
+			{ChannelID: "UCaaaaaaaaaaaaaaaaaaaaaa", Name: "Loner"},
+			{ChannelID: "UCbbbbbbbbbbbbbbbbbbbbbb", Name: "Lost", GroupID: "gone"},
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(out).To(ContainSubstring("# No group: add them to the file of the group they belong to."))
+		Expect(out).To(ContainSubstring(`# Group "gone" isn't in the seed.`))
+	})
+
+	It("hands owner entries back to the seed once they're pasted in", func() {
+		db, err := sqlite.Open(ctx, filepath.Join(GinkgoT().TempDir(), "cycle.db"))
+		Expect(err).NotTo(HaveOccurred())
+		DeferCleanup(db.Close)
+
+		header := "[group]\nid = \"g\"\nname = \"G\"\n\n"
+		empty, err := streamers.ParseSeed(fstest.MapFS{"g.toml": {Data: []byte(header)}})
+		Expect(err).NotTo(HaveOccurred())
+
+		cycle := streamers.New(db)
+		_, err = cycle.Sync(ctx, empty)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(cycle.Save(ctx, store.Streamer{
+			ChannelID: "UCaaaaaaaaaaaaaaaaaaaaaa", Name: "New", GroupID: "g", Aliases: []string{"nu"}, Source: store.SourceOwner,
+		})).To(Succeed())
+		added, _ := cycle.Streamer("UCaaaaaaaaaaaaaaaaaaaaaa")
+
+		out, err := cycle.Export([]*store.Streamer{added})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(out).To(HavePrefix("# streamers/seed/g.toml"))
+
+		pasted, err := streamers.ParseSeed(fstest.MapFS{"g.toml": {Data: []byte(header + out)}})
+		Expect(err).NotTo(HaveOccurred())
+
+		res, err := cycle.Sync(ctx, pasted)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res).To(Equal(store.SeedResult{Returned: 1}))
+
+		back, _ := cycle.Streamer("UCaaaaaaaaaaaaaaaaaaaaaa")
+		Expect(back.Source).To(Equal(store.SourceSeed))
+	})
+
+	It("reloads after saving and deleting", func() {
+		ame, err := reg.Resolve("ame")
+		Expect(err).NotTo(HaveOccurred())
+
+		edited := *ame
+		edited.Aliases = append(edited.Aliases, "gremlin")
+		edited.Source = store.SourceOwner
+		Expect(reg.Save(ctx, edited)).To(Succeed())
+		Expect(resolve("gremlin")).To(Equal("Watson Amelia"))
+
+		Expect(reg.Delete(ctx, ame.ChannelID)).To(Succeed())
+		_, ok := reg.Streamer(ame.ChannelID)
+		Expect(ok).To(BeFalse())
+	})
+})

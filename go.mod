@@ -3,6 +3,7 @@ module github.com/VTGare/gatoraid
 go 1.27.0
 
 require (
+	github.com/BurntSushi/toml v1.6.0
 	github.com/VTGare/gumi v1.0.1
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/caarlos0/env/v11 v11.4.1

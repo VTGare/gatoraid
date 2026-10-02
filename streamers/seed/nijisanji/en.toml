@@ -1,0 +1,290 @@
+[group]
+id = "nijisanji-en"
+name = "Nijisanji EN"
+parent = "nijisanji"
+order = 2
+
+
+# Official channels
+
+[[streamer]]
+name = "NIJISANJI EN Official"
+channel_id = "UC-JSeFfovhNsEhftt1WHMvg"
+twitter = "NIJISANJI_World"
+aliases = ["Nijisanji EN"]
+
+
+# Members
+
+[[streamer]]
+name = "Pomu Rainpuff"
+channel_id = "UCP4nMSTdwU1KqYWu3UH5DHQ"
+channel_name = "Pomu Rainpuff 【NIJISANJI EN】"
+twitter = "PomuRainpuff"
+aliases = ["pomu", "Pom", "pmu", "pimo"]
+
+[[streamer]]
+name = "Elira Pendora"
+channel_id = "UCIeSUTOTkF9Hs7q3SGcO-Ow"
+channel_name = "Elira Pendora 【NIJISANJI EN】"
+twitter = "EliraPendora"
+aliases = ["Elira", "Pendora", "Miss Pendora", "Ewiwa", "wiwi", "Ewiwi", "Eli"]
+
+[[streamer]]
+name = "Finana Ryugu"
+channel_id = "UCu-J8uIXuLZh16gG-cT1naw"
+channel_name = "Finana Ryugu 【NIJISANJI EN】"
+twitter = "FinanaRyugu"
+aliases = ["Finana", "Finaurnaur", "Ryugu"]
+
+[[streamer]]
+name = "Rosemi Lovelock"
+channel_id = "UC4WvIIAo89_AzGUh1AZ6Dkg"
+channel_name = "Rosemi Lovelock【NIJISANJI EN】"
+twitter = "Rosemi_Lovelock"
+aliases = ["Rosemi", "Rosie", "Rose Lady", "Lovelock"]
+
+[[streamer]]
+name = "Petra Gurin"
+channel_id = "UCgA2jKRkqpY_8eysPUs8sjw"
+channel_name = "Petra Gurin【NIJISANJI EN】"
+twitter = "Petra_Gurin"
+aliases = ["Petra", "Gurin"]
+
+[[streamer]]
+name = "Selen Tatsuki"
+channel_id = "UCV1xUwfM2v2oBtT3JNvic3w"
+channel_name = "Selen Tatsuki 【NIJISANJI EN】"
+twitter = "selen_tatsuki"
+aliases = ["Selen", "Selen Tatuski", "Tatsuki"]
+
+[[streamer]]
+name = "Nina Kosaka"
+channel_id = "UCkieJGn3pgJikVW8gmMXE2w"
+channel_name = "Nina Kosaka【NIJISANJI EN】"
+twitter = "NinaKosaka"
+aliases = ["Nina"]
+
+[[streamer]]
+name = "Millie Parfait"
+channel_id = "UC47rNmkDcNgbOcM-2BwzJTQ"
+channel_name = "Millie Parfait【NIJISANJI EN】"
+twitter = "MillieParfait"
+aliases = ["Millie", "Parfait"]
+
+[[streamer]]
+name = "Reimu Endou"
+channel_id = "UCBURM8S4LH7cRZ0Clea9RDA"
+channel_name = "Reimu Endou【NIJISANJI EN】"
+twitter = "ReimuEndou"
+aliases = ["Reimu", "Endou"]
+
+[[streamer]]
+name = "Enna Alouette"
+channel_id = "UCR6qhsLpn62WVxCBK1dkLow"
+channel_name = "Enna Alouette【NIJISANJI EN】"
+twitter = "EnnaAlouette"
+aliases = ["Enna", "Enner"]
+
+[[streamer]]
+name = "Luca Kaneshiro"
+channel_id = "UC7Gb7Uawe20QyFibhLl1lzA"
+channel_name = "Luca Kaneshiro【NIJISANJI EN】"
+twitter = "luca_kaneshiro"
+aliases = ["Pog-Man", "Lucy", "Luca"]
+
+[[streamer]]
+name = "Shu Yamino"
+channel_id = "UCG0rzBZV_QMP4MtWg6IjhEA"
+channel_name = "Shu Yamino【NIJISANJI EN】"
+twitter = "shu_yamino"
+aliases = ["Shu", "Yamino"]
+
+[[streamer]]
+name = "Ike Eveland"
+channel_id = "UC4yNIKGvy-YUrwYupVdLDXA"
+channel_name = "Ike Eveland【NIJISANJI EN】"
+twitter = "ike_eveland"
+aliases = ["Ike", "Eveland"]
+
+[[streamer]]
+name = "Mysta Rias"
+channel_id = "UCIM92Ok_spNKLVB5TsgwseQ"
+channel_name = "Mysta Rias 【NIJISANJI EN】"
+twitter = "Mysta_Rias"
+aliases = ["Mysta", "Rias"]
+
+[[streamer]]
+name = "Vox Akuma"
+channel_id = "UCckdfYDGrjojJM28n5SHYrA"
+channel_name = "Vox Akuma【NIJISANJI EN】"
+twitter = "Vox_Akuma"
+aliases = ["Vox", "Akuma"]
+
+[[streamer]]
+name = "Sonny Brisko"
+channel_id = "UCuuAb_72QzK0M1USPMEl1yw"
+channel_name = "Sonny Brisko 【NIJISANJI EN】"
+twitter = "sonny_brisko"
+aliases = ["Sonny", "Brisko"]
+
+[[streamer]]
+name = "Uki Violeta"
+channel_id = "UChJ5FTsHOu72_5OVx0rvsvQ"
+channel_name = "Uki Violeta 【NIJISANJI EN"
+twitter = "uki_violeta"
+aliases = ["Uki", "Violeta"]
+
+[[streamer]]
+name = "Alban Knox"
+channel_id = "UCQ1zGxHrfEmmW4CPpBx9-qw"
+channel_name = "Alban Knox 【NIJISANJI EN"
+twitter = "alban_knox"
+aliases = ["Alban", "Knox"]
+
+[[streamer]]
+name = "Fulgur Ovid"
+channel_id = "UCGhqxhovNfaPBpxfCruy9EA"
+channel_name = "Fulgur Ovid 【NIJISANJI EN】"
+twitter = "Fulgur_Ovid"
+aliases = ["Fulgur", "Ovid"]
+
+[[streamer]]
+name = "Maria Marionette"
+channel_id = "UCwaS8_S7kMiKA3izlTWHbQg"
+channel_name = "Maria Marionette 【NIJISANJI EN】"
+twitter = "MariaMari0nette"
+aliases = ["Maria", "Marionette"]
+
+[[streamer]]
+name = "Kyo Kaneko"
+channel_id = "UCsb-1aJgiJXJH2feV-zlZRw"
+channel_name = "Kyo Kaneko 【NIJISANJI EN】"
+twitter = "KyoKanek0"
+aliases = ["Kyo", "Kaneko"]
+
+[[streamer]]
+name = "Aia Amare"
+channel_id = "UCN68LoM3khS4gdBMiWJO8WA"
+channel_name = "Aia Amare 【NIJISANJI EN】"
+twitter = "AiaAmare"
+aliases = ["Aia", "Amare"]
+
+[[streamer]]
+name = "Aster Arcadia"
+channel_id = "UCpzxZW5kghGnO5TmAFJQAVw"
+channel_name = "Aster Arcadia 【NIJISANJI EN】"
+twitter = "AsterArcadia"
+aliases = ["Aster", "Arcadia"]
+
+[[streamer]]
+name = "Scarle Yonaguni"
+channel_id = "UCFgXWZOUZA2oYHNr6qDmsTQ"
+channel_name = "Scarle Yonaguni 【NIJISANJI EN】"
+twitter = "ScarleYonaguni"
+aliases = ["Scarle", "Yonaguni"]
+
+[[streamer]]
+name = "Ren Zotto"
+channel_id = "UCKu59gTZ_rdEmerdx5rV4Yg"
+channel_name = "Ren Zotto 【NIJISANJI EN】"
+twitter = "RenZott0"
+aliases = ["Ren", "Zotto"]
+
+[[streamer]]
+name = "Doppio Dropscythe"
+channel_id = "UCy91xBlY_Brh3bnHxKtjrrg"
+channel_name = "Doppio Dropscythe【NIJISANJI EN】"
+twitter = "D_Dropscythe"
+aliases = ["Dropscythe", "Doppio"]
+
+[[streamer]]
+name = "Meloco Kyoran"
+channel_id = "UChKXd7oqD18qiIYBoRIHTlw"
+channel_name = "Meloco Kyoran【NIJISANJI EN】"
+twitter = "MelocoKyoran"
+aliases = ["Meloco", "Kyoran"]
+
+[[streamer]]
+name = "Hex Haywire"
+channel_id = "UCz_ZRw6ak4Foy8zZy0kEprQ"
+channel_name = "Hex Haywire【NIJISANJI EN】"
+twitter = "HexHaywire"
+aliases = ["Hex", "Haywire"]
+
+[[streamer]]
+name = "Kotoka Torahime"
+channel_id = "UCggO2c1unS-oLwTLT0ICywg"
+channel_name = "Kotoka Torahime【NIJISANJI EN】"
+twitter = "KotokaTorahime"
+aliases = ["Kotoka", "Torahime"]
+
+[[streamer]]
+name = "Ver Vermillion"
+channel_id = "UCO8WcDsF5znr-qsXlzZNpqg"
+channel_name = "Ver Vermillion【NIJISANJI EN】"
+twitter = "Ver_Vermillion"
+aliases = ["Ver", "Vermillion"]
+
+[[streamer]]
+name = "Yu Q. Wilson"
+channel_id = "UCKpKC3M5fkcEvtOr06dmYlA"
+channel_name = "Yu Q. Wilson【NIJISANJI EN】"
+twitter = "YuQWilson"
+aliases = ["Yu", "Wilson"]
+
+[[streamer]]
+name = "Vantacrow Bringer"
+channel_id = "UCpYf6C9QsP_BRf97vLuXlIA"
+channel_name = "Vantacrow Bringer 【NIJISANJI EN】"
+twitter = "Tyrant_Vanta"
+aliases = ["Vantacrow", "Bringer"]
+
+[[streamer]]
+name = "Vezalius Bandage"
+channel_id = "UCK9l6rTwU3hiSZijIMq51Gw"
+channel_name = "Vezalius Bandage【NIJISANJI EN】"
+twitter = "VezaliusBandage"
+aliases = ["Vezalius", "Bandage"]
+
+[[streamer]]
+name = "Kunai Nakasato"
+channel_id = "UCwqtK-m6954_aHEvOYtZpyQ"
+channel_name = "Kunai Nakasato【NIJISANJI EN】"
+twitter = "kunainakasato"
+aliases = ["Kunai", "Nakasato"]
+
+[[streamer]]
+name = "Victoria Brightshield"
+channel_id = "UChTA8kHyInr2rKZ2aBv5ULw"
+channel_name = "Victoria Brightshield【NIJISANJI EN】"
+twitter = "VBrightshield"
+aliases = ["Victoria", "Brightshield"]
+
+[[streamer]]
+name = "Claude Clawmark"
+channel_id = "UCdh-YF2gTzqDNu0VU9lwPPw"
+channel_name = "Claude Clawmark【NIJISANJI EN】"
+twitter = "ClaudeClawmark"
+aliases = ["Claude", "Clawmark"]
+
+[[streamer]]
+name = "Twisty Amanozako"
+channel_id = "UCUI1qpjJSEbgzdlwmpdVmMw"
+channel_name = "Twisty Amanozako【NIJISANJI EN】"
+twitter = "TwistyAmanozako"
+aliases = ["Twisty"]
+
+[[streamer]]
+name = "Ryoma Barrenwort"
+channel_id = "UCIzZDiilcPv0wim_MbuizFA"
+channel_name = "Ryoma Barrenwort【NIJISANJI EN】"
+twitter = "RyomaBarrenwort"
+aliases = ["Ryoma"]
+
+[[streamer]]
+name = "Klara Charmwood"
+channel_id = "UCQYwIUCLqFoin7lHKmePjJw"
+channel_name = "Klara Charmwood【NIJISANJI EN】"
+twitter = "KlaraCharmwood"
+aliases = ["Klara"]

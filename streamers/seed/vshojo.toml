@@ -1,0 +1,53 @@
+[group]
+id = "vshojo"
+name = "VShojo"
+
+[[streamer]]
+name = "ironmouse"
+channel_id = "UChgPVLjqugDQpRLWvC7zzig"
+twitter = "ironmouse"
+
+[[streamer]]
+name = "Projekt Melody"
+channel_id = "UC1yoRdFoFJaCY-AGfD9W0wQ"
+channel_name = "CDawgVA"
+twitter = "ProjektMelody"
+aliases = ["Melody"]
+
+[[streamer]]
+name = "Haruka Karibu"
+channel_id = "UCsk_mKQyv_xdhahUBqoVhcg"
+twitter = "haruka_karibu"
+aliases = ["Haruka", "How To Car"]
+
+[[streamer]]
+name = "Zentreya"
+channel_id = "UCVLsPBwDtv7n7FZLiOsvhSQ"
+twitter = "zentreya"
+
+[[streamer]]
+name = "Froot"
+channel_id = "UCtNeQ8cUwvAAhBbVbwfGWpg"
+channel_name = "Apricot the Lich"
+twitter = "LichVtuber"
+aliases = ["Apricot the Lich"]
+
+[[streamer]]
+name = "GEEGA"
+channel_id = "UCUERxnZSjCq-G7OfYL7Nukg"
+twitter = "GeneralGEEGA"
+aliases = ["General GEEGA"]
+
+[[streamer]]
+name = "Matara Kan"
+channel_id = "UCxx2uRmAwkhb3QJMfLssgsw"
+twitter = "MataraKan"
+aliases = ["Matara"]
+
+[[streamer]]
+name = "kson"
+channel_id = "UC9ruVYPv7yJmV0Rh0NKA-Lw"
+channel_name = "kson ONAIR"
+twitter = "ksonONAIR"
+aliases = ["kson ONAIR"]
+free_chat_streams = true

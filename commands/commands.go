@@ -23,5 +23,7 @@ func Register(b *bot.Bot) error {
 			Category:      CategoryGeneral,
 			CategoryOrder: []string{CategoryRelay, CategoryNotifications, CategoryModeration, CategoryGeneral},
 		}),
+		streamersCommand(b),
+		ownerCommand(b),
 	)
 }

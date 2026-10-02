@@ -1,0 +1,31 @@
+[group]
+id = "pixellink"
+name = "PixelLink"
+
+[[streamer]]
+name = "Lottie Shinju"
+channel_id = "UCiyzorDNw6tJWGEVItH4Smg"
+channel_name = "Lottie Shinju Ch.【PixelLink】"
+twitter = "LottieShinju"
+aliases = ["Lottie", "Shinju"]
+
+[[streamer]]
+name = "Miuna Usako"
+channel_id = "UC64DMAYXo4nwTFfvNQzkSwQ"
+channel_name = "Miuna Usako Ch.【PixelLink】"
+twitter = "MiunaUsako"
+aliases = ["Miuna", "Usako"]
+
+[[streamer]]
+name = "Raki Kazuki"
+channel_id = "UCtuoyOZhnxJ12pE294FdH8Q"
+channel_name = "Raki Kazuki Ch.【PixelLink】"
+twitter = "RakiKazuki"
+aliases = ["Raki", "Kazuki"]
+
+[[streamer]]
+name = "Nebi Nebu"
+channel_id = "UC9nd7b17bvaWJvuZFxbC2tg"
+channel_name = "Nebi Nebu Ch.【PixelLink】"
+twitter = "nebi_nebu"
+aliases = ["Nebi", "Nebu"]

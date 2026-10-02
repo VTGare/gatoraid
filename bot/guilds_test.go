@@ -2,18 +2,14 @@ package bot
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"log/slog"
-	"net/http"
 	"path/filepath"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 
 	"github.com/VTGare/gatoraid/internal/config"
+	"github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
 
@@ -21,57 +17,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type sent struct {
-	Path string
-	Body map[string]any
-}
-
-// recorder fakes Discord's API: it records requests and replies with {}.
-type recorder struct {
-	mu   sync.Mutex
-	reqs []sent
-}
-
-func (r *recorder) RoundTrip(req *http.Request) (*http.Response, error) {
-	var body map[string]any
-	if req.Body != nil {
-		raw, _ := io.ReadAll(req.Body)
-		_ = json.Unmarshal(raw, &body)
-	}
-
-	r.mu.Lock()
-	r.reqs = append(r.reqs, sent{Path: req.URL.Path, Body: body})
-	r.mu.Unlock()
-
-	return &http.Response{
-		StatusCode: http.StatusOK,
-		Header:     http.Header{"Content-Type": {"application/json"}},
-		Body:       io.NopCloser(strings.NewReader("{}")),
-		Request:    req,
-	}, nil
-}
-
-func (r *recorder) notices(channel string) []string {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	var out []string
-	for _, req := range r.reqs {
-		if strings.HasSuffix(req.Path, "/channels/"+channel+"/messages") {
-			content, _ := req.Body["content"].(string)
-			out = append(out, content)
-		}
-	}
-	return out
-}
-
 var _ = Describe("Guild lifecycle", func() {
 	const logChannel = "999"
 
 	var (
 		b   *Bot
 		s   *discordgo.Session
-		rec *recorder
+		rec *discordtest.Recorder
 		ctx context.Context
 	)
 
@@ -86,9 +38,8 @@ var _ = Describe("Guild lifecycle", func() {
 		b, err = New(cfg, slog.New(slog.DiscardHandler), st)
 		Expect(err).NotTo(HaveOccurred())
 
-		rec = &recorder{}
 		s = b.Session
-		s.Client = &http.Client{Transport: rec}
+		rec = discordtest.Attach(s)
 	})
 
 	guildCreate := func(id, name string) *discordgo.GuildCreate {
@@ -105,14 +56,14 @@ var _ = Describe("Guild lifecycle", func() {
 		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
 
 		Expect(guild("1").Active()).To(BeTrue())
-		Expect(rec.notices(logChannel)).To(ConsistOf("Joined **Pomu Fan Club** (`1`), 42 members."))
+		Expect(rec.Messages(logChannel)).To(ConsistOf("Joined **Pomu Fan Club** (`1`), 42 members."))
 	})
 
 	It("stays quiet for guilds it was already in, like on startup", func() {
 		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
 		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
 
-		Expect(rec.notices(logChannel)).To(HaveLen(1))
+		Expect(rec.Messages(logChannel)).To(HaveLen(1))
 	})
 
 	It("ignores unavailable guilds", func() {
@@ -120,7 +71,7 @@ var _ = Describe("Guild lifecycle", func() {
 
 		_, err := b.Store.Guild(ctx, "1")
 		Expect(err).To(MatchError(store.ErrGuildNotFound))
-		Expect(rec.notices(logChannel)).To(BeEmpty())
+		Expect(rec.Messages(logChannel)).To(BeEmpty())
 	})
 
 	It("soft-deletes on leave and restores on rejoin", func() {
@@ -135,7 +86,7 @@ var _ = Describe("Guild lifecycle", func() {
 		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
 
 		Expect(guild("1").Active()).To(BeTrue())
-		Expect(rec.notices(logChannel)).To(Equal([]string{
+		Expect(rec.Messages(logChannel)).To(Equal([]string{
 			"Joined **Pomu Fan Club** (`1`), 42 members.",
 			"Left **Pomu Fan Club** (`1`). Its data is kept for 30 days.",
 			"Rejoined **Pomu Fan Club** (`1`), 42 members. Settings restored.",
@@ -147,7 +98,7 @@ var _ = Describe("Guild lifecycle", func() {
 		b.onGuildDelete(s, &discordgo.GuildDelete{Guild: &discordgo.Guild{ID: "1", Unavailable: true}})
 
 		Expect(guild("1").Active()).To(BeTrue())
-		Expect(rec.notices(logChannel)).To(HaveLen(1))
+		Expect(rec.Messages(logChannel)).To(HaveLen(1))
 	})
 
 	It("marks guilds missing from READY as left", func() {
@@ -162,7 +113,7 @@ var _ = Describe("Guild lifecycle", func() {
 
 		Expect(guild("1").Active()).To(BeTrue())
 		Expect(guild("2").Active()).To(BeFalse())
-		Expect(rec.notices(logChannel)).To(ContainElement("Removed from `2` while offline. Its data is kept for 30 days."))
+		Expect(rec.Messages(logChannel)).To(ContainElement("Removed from `2` while offline. Its data is kept for 30 days."))
 	})
 
 	It("posts nothing without a log channel", func() {
@@ -170,7 +121,7 @@ var _ = Describe("Guild lifecycle", func() {
 
 		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
 
-		Expect(rec.reqs).To(BeEmpty())
+		Expect(rec.Requests()).To(BeEmpty())
 	})
 
 	It("purges only guilds past retention", func() {

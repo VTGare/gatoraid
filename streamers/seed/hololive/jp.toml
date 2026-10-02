@@ -1,0 +1,328 @@
+[group]
+id = "hololive-jp"
+name = "Hololive JP"
+parent = "hololive"
+order = 1
+
+
+# Official channels
+
+[[streamer]]
+name = "Hololive DEV_IS"
+channel_id = "UC10wVt6hoQiwySRhz7RdOUA"
+channel_name = "hololive DEV_IS"
+
+
+# 0th Generation
+
+[[streamer]]
+name = "AZKi"
+channel_id = "UC0TXe_LYZ4scaW2XMyi5_kw"
+channel_name = "AZKi Channel"
+twitter = "AZKi_VDiVA"
+
+[[streamer]]
+name = "Hoshimachi Suisei"
+channel_id = "UC5CwaMl1eIgY8h02uZw7u8A"
+channel_name = "Suisei Channel"
+twitter = "suisei_hosimati"
+aliases = ["suisei", "suichan", "sui-chan", "すいせい", "すいちゃん"]
+
+[[streamer]]
+name = "Roboco-san"
+channel_id = "UCDqI2jOz0weumE8s7paEk6g"
+channel_name = "Roboco Ch. - ロボ子"
+twitter = "robocosan"
+aliases = ["roboco", "ロボ子"]
+
+[[streamer]]
+name = "Sakura Miko"
+channel_id = "UC-hM6YJuNYVAmUWxeIr9FeA"
+channel_name = "Miko Ch. さくらみこ"
+twitter = "sakuramiko35"
+aliases = ["miko", "mikoti", "mikocchi", "みこ", "みこっち"]
+
+[[streamer]]
+name = "Tokino Sora"
+channel_id = "UCp6993wxpyDPHUpavwDFqgg"
+channel_name = "SoraCh. ときのそらチャンネル"
+twitter = "tokino_sora"
+aliases = ["sora", "そら"]
+
+
+# 1st Generation
+
+[[streamer]]
+name = "Akai Haato"
+channel_id = "UC1CfXB_kRs3C-zaeTG3oGyg"
+channel_name = "HAACHAMA Ch 赤井はあと"
+twitter = "akaihaato"
+aliases = ["haato", "haachama", "はあちゃま", "はあと"]
+
+[[streamer]]
+name = "Darkweb Haachama"
+channel_id = "UCHj_mh57PVMXhAUDphUQDFA"
+channel_name = "HAACHAMA DARKWEB CH"
+twitter = "akaihaato"
+
+[[streamer]]
+name = "Yozora Mel"
+channel_id = "UCD8HOxPs4Xvsm8H0ZxXGiBw"
+channel_name = "Mel Channel 夜空メルチャンネル"
+twitter = "yozoramel"
+aliases = ["mel", "メル"]
+
+[[streamer]]
+name = "Shirakami Fubuki"
+channel_id = "UCdn5BQ06XqgXoAxIhbqw5Rg"
+channel_name = "フブキCh。白上フブキ"
+twitter = "shirakamifubuki"
+aliases = ["fubuki", "fbk", "フブキ"]
+
+[[streamer]]
+name = "Aki Rosenthal"
+channel_id = "UCFTLzh12_nrtzqBPsTCqenA"
+channel_name = "アキロゼCh。Vtuber/ホロライブ所属"
+twitter = "akirosenthal"
+aliases = ["aki", "アキ"]
+
+[[streamer]]
+name = "Natsuiro Matsuri"
+channel_id = "UCQ0UDLQCjY0rmuxCDE38FGg"
+channel_name = "Matsuri Channel 夏色まつり"
+twitter = "natsuiromatsuri"
+aliases = ["matsuri", "まつり"]
+
+
+# 2nd Generation
+
+[[streamer]]
+name = "Minato Aqua"
+channel_id = "UC1opHUrw8rvnsadT-iGp7Cg"
+channel_name = "Aqua Ch. 湊あくあ"
+twitter = "minatoaqua"
+aliases = ["aqua", "baqua", "akutan", "あくあ", "あくたん"]
+
+[[streamer]]
+name = "Yuzuki Choco"
+channel_id = "UC1suqwovbL1kzsoaZgFZLKg"
+channel_name = "Choco Ch. 癒月ちょこ"
+twitter = "yuzukichococh"
+aliases = ["choco", "chocosen", "ちょこ"]
+
+[[streamer]]
+name = "Nakiri Ayame"
+channel_id = "UC7fk0CB07ly8oSl0aqKkqFg"
+channel_name = "Nakiri Ayame Ch. 百鬼あやめ"
+twitter = "nakiriayame"
+aliases = ["ayame", "nakiri", "あやめ"]
+
+[[streamer]]
+name = "Oozora Subaru"
+channel_id = "UCvzGlP9oQwU--Y0r9id_jnA"
+channel_name = "Subaru Ch. 大空スバル"
+twitter = "oozorasubaru"
+aliases = ["subaru", "shuba", "スバル"]
+
+[[streamer]]
+name = "Murasaki Shion"
+channel_id = "UCXTpFs_3PqI41qX2d9tL2Rw"
+channel_name = "Shion Ch. 紫咲シオン"
+twitter = "murasakishionch"
+aliases = ["shion", "シオン", "kusogaki", "クソガキ"]
+
+
+# GAMERS
+
+[[streamer]]
+name = "Inugami Korone"
+channel_id = "UChAnqc_AY5_I3Px5dig3X1Q"
+channel_name = "Korone Ch. 戌神ころね"
+twitter = "inugamikorone"
+aliases = ["korone", "korosan", "ころね", "ころさん"]
+
+[[streamer]]
+name = "Ookami Mio"
+channel_id = "UCp-5t9SrOQwXMU7iIjQfARg"
+channel_name = "Mio Channel 大神ミオ"
+twitter = "ookamimio"
+aliases = ["mio", "みお"]
+
+[[streamer]]
+name = "Nekomata Okayu"
+channel_id = "UCvaTdHTWBGv3MKj3KVqJVCw"
+channel_name = "Okayu Ch. 猫又おかゆ"
+twitter = "nekomataokayu"
+aliases = ["okayu", "おかゆ"]
+
+
+# 3rd Generation
+
+[[streamer]]
+name = "Usada Pekora"
+channel_id = "UC1DCedRgGHBdm81E1llLhOQ"
+channel_name = "Pekora Ch. 兎田ぺこら"
+twitter = "usadapekora"
+aliases = ["peko", "ペコ", "ぺこ"]
+
+[[streamer]]
+name = "Houshou Marine"
+channel_id = "UCCzUftO8KOVkV4wQG1vkUvg"
+channel_name = "Marine Ch. 宝鐘マリン"
+twitter = "houshoumarine"
+aliases = ["marine", "船長", "senchou", "sentyo", "mari-tan", "maripi"]
+
+[[streamer]]
+name = "Shirogane Noel"
+channel_id = "UCdyqAaZDKHXg4Ahi7VENThQ"
+channel_name = "Noel Ch. 白銀ノエル"
+twitter = "shiroganenoel"
+aliases = ["noel", "ノエル", "danchou", "団長"]
+
+[[streamer]]
+name = "Shiranui Flare"
+channel_id = "UCvInZx9h3jC2JzsIzoOebWg"
+channel_name = "Flare Ch. 不知火フレア"
+twitter = "shiranuiflare"
+aliases = ["flare", "フレア"]
+
+
+# 4th Generation
+
+[[streamer]]
+name = "Tokoyami Towa"
+channel_id = "UC1uv2Oq6kNxgATlCiez59hw"
+channel_name = "Towa Ch. 常闇トワ"
+twitter = "tokoyamitowa"
+aliases = ["towa", "トワ"]
+
+[[streamer]]
+name = "Himemori Luna"
+channel_id = "UCa9Y57gfeY0Zro_noHRVrnw"
+channel_name = "Luna Ch. 姫森ルーナ"
+twitter = "himemoriluna"
+aliases = ["ルーナ", "luna"]
+free_chat_streams = true
+
+[[streamer]]
+name = "Tsunomaki Watame"
+channel_id = "UCqm3BQLlJfvkTsX_hvm0UmA"
+channel_name = "Watame Ch. 角巻わため"
+twitter = "tsunomakiwatame"
+aliases = ["watame", "わため"]
+
+[[streamer]]
+name = "Amane Kanata"
+channel_id = "UCZlDXzGoo7d44bwdNObFacg"
+channel_name = "Kanata Ch. 天音かなた"
+twitter = "amanekanatach"
+aliases = ["kanata", "かなた", "pp tenshi", "かなごり", "kanataso", "kanatan", "kanakana", "kanata-senpai", "kanata-san"]
+
+
+# 5th Generation
+
+[[streamer]]
+name = "Momosuzu Nene"
+channel_id = "UCAWSyEs_Io8MtpY3m-zqILA"
+channel_name = "Nene Ch.桃鈴ねね"
+twitter = "momosuzunene"
+aliases = ["nene", "ねね", "nenechi"]
+free_chat_streams = true
+
+[[streamer]]
+name = "Yukihana Lamy"
+channel_id = "UCFKOVgVbGmX65RxO3EtH3iw"
+channel_name = "Lamy Ch. 雪花ラミィ"
+twitter = "yukihanalamy"
+aliases = ["lamy", "らみ", "ラミィ"]
+
+[[streamer]]
+name = "Omaru Polka"
+channel_id = "UCK9V2B22uJYu3N7eR_BT9QA"
+channel_name = "Polka Ch. 尾丸ポルカ"
+twitter = "omarupolka"
+aliases = ["polka", "omaru", "ポル", "おまる", "omarun"]
+free_chat_streams = true
+
+[[streamer]]
+name = "Shishiro Botan"
+channel_id = "UCUKD-uaobj9jiqB-VXt71mA"
+channel_name = "Botan Ch.獅白ぼたん"
+twitter = "shishirobotan"
+aliases = ["botan", "ぼたん", "shishiron", "bossan"]
+
+
+# 6th Generation (holoX)
+
+[[streamer]]
+name = "Laplus Darkness"
+channel_id = "UCENwRMx5Yh42zWpzURebzTw"
+channel_name = "Laplus ch. ラプラス・ダークネス - holoX -"
+twitter = "LaplusDarknesss"
+aliases = ["Laplus"]
+
+[[streamer]]
+name = "Takane Lui"
+channel_id = "UCs9_O1tRPMQTHQ-N_L6FU2g"
+channel_name = "Lui ch. 鷹嶺ルイ - holoX -"
+twitter = "takanelui"
+aliases = ["Lui"]
+
+[[streamer]]
+name = "Hakui Koyori"
+channel_id = "UC6eWCld0KwmyHFbAqK3V-Rw"
+channel_name = "Koyori ch. 博衣こより - holoX -"
+twitter = "hakuikoyori"
+aliases = ["Koyori"]
+
+[[streamer]]
+name = "Sakamata Chloe"
+channel_id = "UCIBY1ollUsauvVi4hW4cumw"
+channel_name = "Chloe ch. 沙花叉クロヱ - holoX -"
+twitter = "sakamatachloe"
+aliases = ["Chloe"]
+
+[[streamer]]
+name = "Kazama Iroha"
+channel_id = "UC_vMYWcDjmfdpH6r4TTn1MQ"
+channel_name = "Iroha ch. 風真いろは - holoX -"
+twitter = "kazamairohach"
+aliases = ["Iroha"]
+
+
+# DEV_IS ReGLOSS
+
+[[streamer]]
+name = "Hiodoshi Ao"
+channel_id = "UCMGfV7TVTmHhEErVJg1oHBQ"
+channel_name = "Ao Ch. 火威青 ‐ ReGLOSS"
+twitter = "hiodoshiao"
+aliases = ["Hiodoshi", "Ao"]
+
+[[streamer]]
+name = "Otonose Kanade"
+channel_id = "UCWQtYtq9EOB4-I5P-3fh8lA"
+channel_name = "Kanade Ch. 音乃瀬奏 ‐ ReGLOSS"
+twitter = "otonosekanade"
+aliases = ["Otonose", "Kanade"]
+
+[[streamer]]
+name = "Ichijou Ririka"
+channel_id = "UCtyWhCj3AqKh2dXctLkDtng"
+channel_name = "Ririka Ch. 一条莉々華 ‐ ReGLOSS"
+twitter = "ichijouririka"
+aliases = ["Ichijou", "Ririka"]
+
+[[streamer]]
+name = "Juufuutei Raden"
+channel_id = "UCdXAk5MpyLD8594lm_OvtGQ"
+channel_name = "Raden Ch. 儒烏風亭らでん ‐ ReGLOSS"
+twitter = "juufuuteiraden"
+aliases = ["Juufuutei", "Raden"]
+
+[[streamer]]
+name = "Todoroki Hajime"
+channel_id = "UC1iA6_NT4mtAcIII6ygrvCw"
+channel_name = "Hajime Ch. 轟はじめ ‐ ReGLOSS"
+twitter = "todoroki_hajime"
+aliases = ["Todoroki", "Hajime"]

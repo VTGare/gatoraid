@@ -15,6 +15,7 @@ import (
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/internal/logging"
 	"github.com/VTGare/gatoraid/store/sqlite"
+	"github.com/VTGare/gatoraid/streamers"
 )
 
 func main() {
@@ -56,6 +57,23 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
+	seed, err := streamers.LoadSeed()
+	if err != nil {
+		return err
+	}
+
+	res, err := b.Streamers.Sync(ctx, seed)
+	if err != nil {
+		return fmt.Errorf("sync streamer seed: %w", err)
+	}
+	log.Info("synced streamer seed",
+		slog.Int("streamers", len(b.Streamers.Streamers())),
+		slog.Int("added", res.Added),
+		slog.Int("updated", res.Updated),
+		slog.Int("removed", res.Removed),
+		slog.Int("kept_owner_edits", res.Kept),
+		slog.Int("returned_to_seed", res.Returned))
 
 	if err := commands.Register(b); err != nil {
 		return err

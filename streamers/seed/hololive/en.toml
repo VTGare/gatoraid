@@ -1,0 +1,160 @@
+[group]
+id = "hololive-en"
+name = "Hololive EN"
+parent = "hololive"
+order = 2
+
+
+# Official channels
+
+[[streamer]]
+name = "Hololive English"
+channel_id = "UCotXwY6s8pWmuWd_snKYjhg"
+channel_name = "hololive English"
+twitter = "hololive_En"
+
+
+# Myth
+
+[[streamer]]
+name = "Watson Amelia"
+channel_id = "UCyl1z3jo3XHR1riLFKG5UAg"
+channel_name = "Watson Amelia Ch. hololive-EN"
+twitter = "watsonameliaen"
+aliases = ["amelia", "ame"]
+
+[[streamer]]
+name = "Takanashi Kiara"
+channel_id = "UCHsx4Hqa-1ORjQTh9TYDhww"
+channel_name = "Takanashi Kiara Ch. hololive-EN"
+twitter = "takanashikiara"
+aliases = ["kiara", "tenchou", "きあら", "キアラ", "店長"]
+
+[[streamer]]
+name = "Takanashi Kiara SubCh"
+channel_id = "UCq4ky2drohLT7W0DmDEw1dQ"
+channel_name = "Takanashi Kiara SubCh."
+twitter = "takanashikiara"
+
+[[streamer]]
+name = "Mori Calliope"
+channel_id = "UCL_qhgtOy0dy1Agp8vkySQg"
+channel_name = "Mori Calliope Ch. hololive-EN"
+twitter = "moricalliope"
+aliases = ["calliope", "calli", "mori"]
+
+[[streamer]]
+name = "Ninomae Ina’nis"
+channel_id = "UCMwGHR0BTZuLsmjY_NT5Pwg"
+channel_name = "Ninomae Ina'nis Ch. hololive-EN"
+twitter = "ninomaeinanis"
+aliases = ["ina"]
+
+[[streamer]]
+name = "Gawr Gura"
+channel_id = "UCoSrY_IQQVpmIRZ9Xf-y93g"
+channel_name = "Gawr Gura Ch. hololive-EN"
+twitter = "gawrgura"
+aliases = ["gura"]
+
+
+# Project: HOPE
+
+[[streamer]]
+name = "IRyS"
+channel_id = "UC8rcEBzJSleTkf_-agPM20g"
+channel_name = "IRyS Ch. hololive-EN"
+twitter = "irys_en"
+
+
+# Promise
+
+[[streamer]]
+name = "Hakos Baelz"
+channel_id = "UCgmPnx-EEeOrZSg5Tiw7ZRQ"
+channel_name = "Hakos Baelz Ch. hololive-EN"
+twitter = "hakosbaelz"
+aliases = ["baelz", "hakos"]
+
+[[streamer]]
+name = "Nanashi Mumei"
+channel_id = "UC3n5uGu18FoCy23ggWWp8tA"
+channel_name = "Nanashi Mumei Ch. hololive-EN"
+twitter = "nanashimumei_en"
+aliases = ["nanashi", "mumei"]
+
+[[streamer]]
+name = "Ouro Kronii"
+channel_id = "UCmbs8T6MWqUHP1tIQvSgKrg"
+channel_name = "Ouro Kronii Ch. hololive-EN"
+twitter = "ourokronii"
+aliases = ["kronii"]
+
+[[streamer]]
+name = "Ceres Fauna"
+channel_id = "UCO_aKKYxn4tvrqPjcTzZ6EQ"
+channel_name = "Ceres Fauna Ch. hololive-EN"
+twitter = "ceresfauna"
+aliases = ["fauna"]
+
+
+# Advent
+
+[[streamer]]
+name = "FUWAMOCO"
+channel_id = "UCt9H_RpQzhxzlyBxFqrdHqA"
+channel_name = "FUWAMOCO Ch. hololive-EN"
+twitter = "fuwamoco_en"
+aliases = ["Fuwa", "Fuwawa", "Moco", "Mococo"]
+
+[[streamer]]
+name = "Shiori Novella"
+channel_id = "UCgnfPPb9JI3e9A4cXHnWbyg"
+channel_name = "Shiori Novella Ch. hololive-EN"
+twitter = "shiorinovella"
+aliases = ["Shiori", "Shio", "Novella"]
+
+[[streamer]]
+name = "Koseki Bijou"
+channel_id = "UC9p_lqQ0FEDz327Vgf5JwqA"
+channel_name = "Koseki Bijou Ch. hololive-EN"
+twitter = "kosekibijou"
+aliases = ["Bijou", "Koseki"]
+
+[[streamer]]
+name = "Nerissa Ravencroft"
+channel_id = "UC_sFNM0z0MWm9A6WlKPuMMg"
+channel_name = "Nerissa Ravencroft Ch. hololive-EN"
+twitter = "nerissa_en"
+aliases = ["Nerissa", "Ravencroft"]
+
+
+# Justice
+
+[[streamer]]
+name = "Cecilia Immergreen"
+channel_id = "UCvN5h1ShZtc7nly3pezRayg"
+channel_name = "Cecilia Immergreen Ch. hololive-EN"
+twitter = "ceciliaimmergreen"
+aliases = ["Cecilia", "Immergreen"]
+
+[[streamer]]
+name = "Elizabeth Rose Bloodflame"
+channel_id = "UCW5uhrG1eCBYditmhL0Ykjw"
+channel_name = "Elizabeth Rose Bloodflame Ch. hololive-EN"
+twitter = "erbloodflame"
+aliases = ["Elizabeth", "Rose", "Bloodflame"]
+
+[[streamer]]
+name = "Gigi Murin"
+channel_id = "UCDHABijvPBnJm7F-KlNME3w"
+channel_name = "Gigi Murin Ch. hololive-EN"
+twitter = "gigimurin"
+aliases = ["Gigi", "Murin"]
+
+[[streamer]]
+name = "Raora Panthera"
+channel_id = "UCl69AEx4MdqMZH7Jtsm7Tig"
+channel_name = "Raora Panthera Ch. hololive-EN"
+twitter = "raorapanthera"
+aliases = ["Raora", "Panthera"]

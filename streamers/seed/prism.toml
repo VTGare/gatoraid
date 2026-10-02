@@ -1,0 +1,136 @@
+[group]
+id = "prism"
+name = "PRISM Project"
+
+[[streamer]]
+name = "Iku Hoshifuri"
+channel_id = "UC2hWFlqMew61Jy6A8zu5HzQ"
+channel_name = "Iku Hoshifuri / 星降いく [PRISM Project]"
+twitter = "IkuHoshifuri"
+aliases = ["Hoshifuri", "Iku"]
+
+[[streamer]]
+name = "Aoi Tokimori"
+channel_id = "UCRWF6QSuklmwY3UJHyVTQ1w"
+channel_name = "Aoi Tokimori / 時守あおい [PRISM Project]"
+twitter = "AoiTokimori"
+aliases = ["Tokimori", "Aoi"]
+
+[[streamer]]
+name = "Menu Ibuki"
+channel_id = "UCZfQRuwSLty74QAj55BaKlA"
+channel_name = "Meno Ibuki / 伊吹めの [PRISM Project]"
+twitter = "ibukimeno"
+aliases = ["Ibuki", "Meno"]
+
+[[streamer]]
+name = "Luto Araka"
+channel_id = "UCnYhIk9aGEx_bIgheVjs53w"
+channel_name = "Luto Araka / 新火ると [PRISM Project]"
+twitter = "LutoAraka"
+aliases = ["Araka", "Luto"]
+
+[[streamer]]
+name = "Rita Kamishiro"
+channel_id = "UCBJFsaCvgBa1a9BnEaxu97Q"
+channel_name = "Rita Kamishiro / 神代りた [PRISM Project]"
+twitter = "RitaKamishiro"
+aliases = ["Kamishiro", "Rita"]
+
+[[streamer]]
+name = "Shiki Miyoshino"
+channel_id = "UCswvd6_YWmd6riRk-8oT-sA"
+channel_name = "Shiki Miyoshino / 美吉野しき [PRISM Project]"
+twitter = "ShikiMiyoshino"
+aliases = ["Miyoshino", "Shiki"]
+
+[[streamer]]
+name = "Nia Suzune"
+channel_id = "UCw1KNjVqfrJSfcFd6zlcSzA"
+channel_name = "Nia Suzune / 鈴音にあ [PRISM Project]"
+twitter = "NiaSuzune"
+aliases = ["Suzune", "Nia"]
+
+[[streamer]]
+name = "Yura Rikudou"
+channel_id = "UC0ZTVxCHkZanT5dnP2FZD4Q"
+channel_name = "Yura Rikudou / 六道ユラ [PRISM Project]"
+twitter = "YuraRikudo"
+aliases = ["Rikudou", "Yura"]
+
+[[streamer]]
+name = "Pina Pengin"
+channel_id = "UCpeRj9-GaLGNUoKdI5I7vZA"
+channel_name = "Pina Pengin / 辺銀ピナ [PRISM Project]"
+twitter = "PinaPengin"
+aliases = ["Pengin", "Pina"]
+
+[[streamer]]
+name = "Naki Kamizuki"
+channel_id = "UCgM1sly6rnxqWe8GLbceEag"
+channel_name = "Naki Kamizuki / 上月なき [PRISM Project]"
+twitter = "nakikamizuki"
+aliases = ["Kamizuki", "Naki"]
+
+[[streamer]]
+name = "Sara Nagare"
+channel_id = "UCkJ64W0J7R0zCSAsZfRIhVQ"
+channel_name = "Sara Nagare / 流サラ [PRISM Project]"
+twitter = "saranagare"
+aliases = ["Nagare", "Sara"]
+
+[[streamer]]
+name = "Non Anon"
+channel_id = "UCx_A6fns9qKjybu-6k0ur1g"
+channel_name = "Non Anon / 亜音ノン [PRISM Project]"
+twitter = "non_a_non"
+aliases = ["Anon", "Non"]
+
+[[streamer]]
+name = "Ami Amami"
+channel_id = "UCkjP_w607B-n4kWJrZAsHMQ"
+channel_name = "Ami Amami / 雨海あみ [PRISM Project]"
+twitter = "itsAmiAmami"
+aliases = ["Amami", "Ami"]
+
+[[streamer]]
+name = "Kou Tsubame"
+channel_id = "UCC2VYZ_sgiCII711gd6gHnA"
+channel_name = "Kou Tsubame / 燕こう [PRISM Project]"
+twitter = "KouTsubame"
+aliases = ["Tsubame", "Kou"]
+
+[[streamer]]
+name = "Lana Shikami"
+channel_id = "UCbwtBGLYpea4eIk-gocqJuw"
+channel_name = "Lana Shikami / 獅守ラナ [PRISM Project]"
+twitter = "LanaShikami"
+aliases = ["Shikami", "Lana"]
+
+[[streamer]]
+name = "Jun Akane"
+channel_id = "UCuTNHY_b7EvqhRO7COboxsQ"
+channel_name = "Jun Akane / 赤金ジュン [PRISM Project]"
+twitter = "akanejun_"
+aliases = ["Akane", "Jun"]
+
+[[streamer]]
+name = "Mako Sameshima"
+channel_id = "UCqVwRGYcVavZ49rGmPB1DKA"
+channel_name = "Mako Sameshima / 鮫島メイコ [PRISM Project]"
+twitter = "sharksprite"
+aliases = ["Sameshima", "Mako"]
+
+[[streamer]]
+name = "Nana Asteria"
+channel_id = "UCJwnGUjoniJA3It-P2snc-A"
+channel_name = "Nana Asteria Ch. アステリアなな [PRISM Project]"
+twitter = "NanaAsteria"
+aliases = ["Asteria", "Nana"]
+
+[[streamer]]
+name = "Emma Oumiya"
+channel_id = "UCDdmoA79bfI8DHDnE_Yy2dg"
+channel_name = "Oumiya Emma / 大宮エマ [PRISM Project]"
+twitter = "OumiyaEmma"
+aliases = ["Oumiya", "Emma"]

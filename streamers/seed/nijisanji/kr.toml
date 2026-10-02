@@ -1,0 +1,82 @@
+[group]
+id = "nijisanji-kr"
+name = "Nijisanji KR"
+parent = "nijisanji"
+order = 4
+
+[[streamer]]
+name = "Suha 민수하"
+channel_id = "UCUtKkGKef8BYMs3h-3zQm9A"
+channel_name = "민수하 /Suhaスハ【NIJISANJI】"
+twitter = "SuhaMin2434"
+aliases = ["Suha", "민수하", "スハ"]
+
+[[streamer]]
+name = "GAON 가온"
+channel_id = "UCpRXCTyNNa-MnjhK6gisnRw"
+channel_name = "가온 ガオン GAON 【にじさんじ】"
+twitter = "Gaon2434"
+aliases = ["가온", "GAON", "ガオン"]
+
+[[streamer]]
+name = "ナギ / Nagi"
+channel_id = "UC5ek2GWKvUKFgnKSHuuCFrw"
+channel_name = "ナギ / Nagi 【にじさんじ】"
+twitter = "NagiSo2434"
+aliases = ["ナギ", "Nagi"]
+
+[[streamer]]
+name = "LeeRoha"
+channel_id = "UCClwIqTUn5LDpFucHyaAhHg"
+channel_name = "イ・ロハ / LeeRoha【にじさんじ】"
+twitter = "RohaLee2434"
+aliases = ["イ・ロハ"]
+
+[[streamer]]
+name = "Yang Nari"
+channel_id = "UCCHH0nWYXFZmtDS_4tvMxHQ"
+channel_name = "ヤン・ナリ / Yang Nari 【にじさんじ】"
+twitter = "NariYang2434"
+aliases = ["Yang", "Nari", "ヤン・ナリ", "ヤン"]
+
+[[streamer]]
+name = "Ryu Hari"
+channel_id = "UClS6k3w1sPwlVFqK3-yID5A"
+channel_name = "ハリ / Ryu Hari 【にじさんじ】"
+twitter = "HariRyu2434"
+aliases = ["Ryu", "Hari", "ハリ"]
+
+[[streamer]]
+name = "ジユ / Jiyu"
+channel_id = "UCnzZmBOSrQf2wDBbnsDajVw"
+channel_name = "ジユ / Jiyu 【にじさんじ】"
+twitter = "JiyuOh2434"
+aliases = ["ジユ", "Jiyu"]
+
+[[streamer]]
+name = "Seffyna"
+channel_id = "UCeGendL8CO5RkffB6IFwHow"
+channel_name = "セフィナ / Seffyna【にじさんじ】"
+twitter = "Seffyna2434"
+aliases = ["セフィナ"]
+
+[[streamer]]
+name = "Ban Hada"
+channel_id = "UCLjx3lqIkYkPCBJop8czJ2A"
+channel_name = "반하다 / Ban Hada 【NIJISANJI KR】"
+twitter = "BanHada2434"
+aliases = ["Hada"]
+
+[[streamer]]
+name = "Na Sera"
+channel_id = "UCX88Pe54pxbJDSGIyGrzNdg"
+channel_name = "ナ セラ / Na Sera【にじさんじ】"
+twitter = "NaSera2434"
+aliases = ["Sera"]
+
+[[streamer]]
+name = "HaYun"
+channel_id = "UCrhhJPNsOqzNIkUfTABoSpg"
+channel_name = "ハユン / HaYun 【にじさんじ】"
+twitter = "HaYun2434"
+aliases = ["ハユン"]

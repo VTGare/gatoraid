@@ -12,6 +12,7 @@ import (
 
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/streamers"
 )
 
 const (
@@ -21,11 +22,12 @@ const (
 )
 
 type Bot struct {
-	Config  *config.Config
-	Log     *slog.Logger
-	Store   store.Store
-	Session *discordgo.Session
-	Router  *gumi.Router
+	Config    *config.Config
+	Log       *slog.Logger
+	Store     store.Store
+	Streamers *streamers.Registry
+	Session   *discordgo.Session
+	Router    *gumi.Router
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -43,11 +45,12 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	discordgo.Logger = discordLogger(log.With("component", "discordgo"))
 
 	b := &Bot{
-		Config:  cfg,
-		Log:     log,
-		Store:   st,
-		Session: s,
-		ctx:     context.Background(),
+		Config:    cfg,
+		Log:       log,
+		Store:     st,
+		Streamers: streamers.New(st),
+		Session:   s,
+		ctx:       context.Background(),
 	}
 
 	b.Router = gumi.New(gumi.Config{

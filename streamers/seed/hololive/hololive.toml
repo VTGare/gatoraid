@@ -1,0 +1,12 @@
+[group]
+id = "hololive"
+name = "Hololive"
+
+
+# Official channels
+
+[[streamer]]
+name = "Hololive VTuber Group"
+channel_id = "UCJFZiqLMntJufDCHc6bQixg"
+channel_name = "hololive ホロライブ - VTuber Group"
+twitter = "hololivetv"

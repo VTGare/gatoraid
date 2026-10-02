@@ -1,0 +1,770 @@
+[group]
+id = "nijisanji-jp"
+name = "Nijisanji JP"
+parent = "nijisanji"
+order = 1
+
+[[streamer]]
+name = "Tsukino Mito"
+channel_id = "UCD-miitqNY3nyukJ4Fnf4_A"
+channel_name = "月ノ美兎"
+twitter = "MitoTsukino"
+aliases = ["Tsukino", "Mito", "月ノ美兎"]
+
+[[streamer]]
+name = "Shibuya Hajime"
+channel_id = "UCeK9HFcRZoTrvqcUCtccMoQ"
+channel_name = "渋谷ハジメのはじめ支部"
+twitter = "sibuya_hajime"
+aliases = ["Shibuya", "Hajime", "渋谷ハジメ"]
+
+[[streamer]]
+name = "Higuchi Kaede"
+channel_id = "UCsg-YqdqQ-KFF0LNk23BY4A"
+channel_name = "樋口楓【にじさんじ所属】"
+twitter = "HiguchiKaede"
+aliases = ["Higuchi", "Kaede", "樋口楓"]
+
+[[streamer]]
+name = "Yuki Chihiro"
+channel_id = "UCLO9QDxVL4bnvRRsz6K4bsQ"
+channel_name = "勇気ちひろ"
+twitter = "Chihiro_yuki23"
+aliases = ["勇気ちひろ", "Yuki", "Chihiro"]
+
+[[streamer]]
+name = "Shizuka Rin"
+channel_id = "UC6oDys1BGgBsIC3WhG1BovQ"
+channel_name = "Shizuka Rin Official"
+twitter = "ShizuRin23"
+aliases = ["Shizuka", "Rin", "静凛"]
+
+[[streamer]]
+name = "Moira"
+channel_id = "UCvmppcdYf4HOv-tFQhHHJMA"
+channel_name = "《にじさんじ所属の女神》モイラ"
+twitter = "Moiramoimoimoi"
+aliases = ["モイラ"]
+
+[[streamer]]
+name = "Suzuya Aki"
+channel_id = "UCpnvhOIJ6BN-vPkYU9ls-Eg"
+channel_name = "鈴谷アキの陽だまりの庭"
+twitter = "aki_suzuya"
+aliases = ["鈴谷アキ", "アキ", "鈴谷", "Aki", "Suzuya"]
+
+[[streamer]]
+name = "Elu"
+channel_id = "UCYKP16oMX9KKPbrNgo_Kgag"
+channel_name = "える / Elu【にじさんじ】"
+twitter = "Elu_World"
+aliases = ["える", "エルフのえる"]
+
+[[streamer]]
+name = "Ienaga Mugi"
+channel_id = "UC_GCs6GARLxEHxy1w40d6VQ"
+channel_name = "家長むぎ【にじさんじ所属】"
+twitter = "ienaga_mugi23"
+aliases = ["Ienaga", "Mugi", "家長むぎ", "家長", "むぎ"]
+
+[[streamer]]
+name = "Mononobe Alice"
+channel_id = "UCt0clH12Xk1-Ej5PXKGfdPA"
+channel_name = "♥️♠️物述有栖♦️♣️"
+twitter = "AliceMononobe"
+aliases = ["Mononobe", "Alice", "物述", "有栖", "物述有栖"]
+
+[[streamer]]
+name = "Kenmochi Toya"
+channel_id = "UCv1fFr156jc65EMiLbaLImw"
+channel_name = "剣持刀也"
+twitter = "rei_Toya_rei"
+aliases = ["Kenmochi", "Toya", "剣持", "刀也", "剣持刀也"]
+
+[[streamer]]
+name = "Morinaka Kazaki"
+channel_id = "UCtpB6Bvhs1Um93ziEDACQ8g"
+channel_name = "森中花咲"
+twitter = "KazakiMorinaka"
+aliases = ["Morinaka", "Kazaki", "森中花咲"]
+
+[[streamer]]
+name = "Fushimi Gaku"
+channel_id = "UCXU7YYxy_iQd3ulXyO-zC2w"
+channel_name = "伏見ガク【にじさんじ所属】"
+twitter = "gaku_fushimi"
+aliases = ["Fushimi", "Gaku", "伏見ガク"]
+
+[[streamer]]
+name = "Utako Suzuka"
+channel_id = "UCwokZsOK_uEre70XayaFnzA"
+channel_name = "鈴鹿詩子 Utako Suzuka"
+twitter = "suzukautako"
+aliases = ["Suzuka", "鈴鹿詩子"]
+
+[[streamer]]
+name = "Fumino Tamaki"
+channel_id = "UCBiqkFJljoxAj10SoP2w2Cg"
+channel_name = "文野環【にじさんじの野良猫】ふみのたまき"
+twitter = "nekokan_chu"
+aliases = ["Fumino", "Tamaki", "Noraneko", "文野環"]
+
+[[streamer]]
+name = "Ushimi Ichigo"
+channel_id = "UCmUjjW5zF1MMOhYUwwwQv9Q"
+channel_name = "宇志海いちご"
+twitter = "ushimi_ichigo"
+aliases = ["Ushimi", "Ichigo", "宇志海いちご"]
+
+[[streamer]]
+name = "Yuhi Riri"
+channel_id = "UC48jH1ul-6HOrcSSfoR02fQ"
+channel_name = "Yuhi Riri Official"
+twitter = "Yuuhi_Riri"
+aliases = ["Yuhi", "Riri", "(夕陽リリ"]
+
+[[streamer]]
+name = "Kanae"
+channel_id = "UCspv01oxUFf_MTSipURRhkA"
+channel_name = "Kanae Channel"
+twitter = "Kanae_2434"
+aliases = ["叶＠にじさんじ"]
+
+[[streamer]]
+name = "Akabane Youko"
+channel_id = "UCBi8YaVyZpiKWN3_Z0dCTfQ"
+channel_name = "赤羽葉子ちゃんねる"
+twitter = "Youko_Akabane"
+aliases = ["Akabane", "Youko", "赤羽葉子"]
+
+[[streamer]]
+name = "Sasaki Saku"
+channel_id = "UCoztvTULBYd3WmStqYeoHcA"
+channel_name = "笹木咲 / Sasaki Saku"
+twitter = "saku_sasaki"
+aliases = ["Sasaki", "Saku", "笹木 咲"]
+
+[[streamer]]
+name = "Honma Himawari"
+channel_id = "UC0g1AE0DOjBYnLhkgoRWN1w"
+channel_name = "本間ひまわり - Himawari Honma -"
+twitter = "honmahimawari"
+aliases = ["Honma", "Himawari", "本間ひまわり"]
+
+[[streamer]]
+name = "Makaino Ririmu"
+channel_id = "UC9EjSJ8pvxtvPdxLOElv73w"
+channel_name = "魔界ノりりむ"
+twitter = "makaino_ririmu"
+aliases = ["Makaino", "Ririmu", "魔界ノりりむ"]
+
+[[streamer]]
+name = "Kuzuha"
+channel_id = "UCSFCh5NL4qXrAy9u-u2lX3g"
+channel_name = "Kuzuha Channel"
+twitter = "Vamp_Kuzu"
+aliases = ["Vamp_Kuzu"]
+
+[[streamer]]
+name = "Shiina Yuika"
+channel_id = "UC_4tXjqecqox5Uc05ncxpxg"
+channel_name = "椎名唯華 / Shiina Yuika"
+twitter = "yuika_siina"
+aliases = ["Shiina", "Yuika", "椎名唯華"]
+
+[[streamer]]
+name = "Dola"
+channel_id = "UC53UDnhAAYwvNO7j_2Ju1cQ"
+channel_name = "ドーラ"
+twitter = "___Dola"
+
+[[streamer]]
+name = "Hanabatake Chaika"
+channel_id = "UCsFn_ueskBkMCEyzCEqAOvg"
+channel_name = "花畑チャイカ"
+twitter = "ZulmIhP1nlMOT5y"
+aliases = ["Hanabatake", "Chaika", "花畑チャイカ"]
+
+[[streamer]]
+name = "Azuchi Momo"
+channel_id = "UC6TfqY40Xt1Y0J-N18c85qQ"
+channel_name = "安土桃"
+twitter = "momo_azuchi_"
+aliases = ["Azuchi", "Momo", "安土桃"]
+
+[[streamer]]
+name = "Ryushen"
+channel_id = "UCt5-0i4AVHXaWJrL8Wql3mw"
+channel_name = "緑仙 / Ryushen"
+twitter = "midori_2434"
+aliases = ["緑仙"]
+
+[[streamer]]
+name = "SisterClaire"
+channel_id = "UC1zFJrfEKvCixhsjNSb1toQ"
+channel_name = "シスター・クレア -SisterClaire-"
+twitter = "SisterCleaire"
+aliases = ["Sister Claire", "Claire", "シスタ", "シスター・クレア", "クレア"]
+
+[[streamer]]
+name = "Suzuki Masaru"
+channel_id = "UCryOPk2GZ1meIDt53tL30Tw"
+channel_name = "鈴木勝 / Suzuki Masaru【Nijisanji】"
+twitter = "Darkness_Eater"
+aliases = ["Suzuki", "Masaru", "鈴木勝"]
+
+[[streamer]]
+name = "Todoroki Kyoko"
+channel_id = "UCRV9d6YCYIMUszK-83TwxVA"
+channel_name = "轟京子/kyoko todoroki【にじさんじ】"
+twitter = "KT_seeds"
+aliases = ["Kyoko", "轟京子"]
+
+[[streamer]]
+name = "Uzuki Kou"
+channel_id = "UC3lNFeJiTq6L3UWoz4g1e-A"
+channel_name = "卯月コウ"
+twitter = "udukikohh"
+aliases = ["Uzuki", "Kou", "卯月コウ"]
+
+[[streamer]]
+name = "Yashiro Kizuku"
+channel_id = "UCKMYISTJAQ8xTplUPHiABlA"
+channel_name = "社築"
+twitter = "846kizuQ"
+aliases = ["Yashiro", "Kizuku", "社築"]
+
+[[streamer]]
+name = "Harusaki Air"
+channel_id = "UCtAvQ5U0aXyKwm2i4GqFgJg"
+channel_name = "春崎エアル"
+twitter = "harusakiair2434"
+aliases = ["Air", "Harusaki", "春崎エアル"]
+
+[[streamer]]
+name = "Naruse Naru"
+channel_id = "UCoM_XmK45j504hfUWvN06Qg"
+channel_name = "成瀬 鳴 / Naruse Naru【にじさんじ】"
+twitter = "narusenaru_2434"
+aliases = ["Naruse", "Naru", "成瀬鳴"]
+
+[[streamer]]
+name = "Kanda Shoichi"
+channel_id = "UCWz0CSYCxf4MhRKPDm220AQ"
+channel_name = "神田笑一 / Kanda Shoichi【 にじさんじ 】"
+twitter = "Gaon2434"
+aliases = ["Kanda", "Shoichi", "神田笑一"]
+
+[[streamer]]
+name = "Amemori Sayo"
+channel_id = "UCRWOdwLRsenx2jLaiCAIU4A"
+channel_name = "雨森小夜"
+twitter = "Sayo_Amemori"
+aliases = ["Amemori", "Sayo", "雨森小夜"]
+
+[[streamer]]
+name = "Takamiya Rion"
+channel_id = "UCV5ZZlLjk5MKGg3L0n0vbzw"
+channel_name = "鷹宮リオン / Rion Takamiya"
+twitter = "TakamiyaRion"
+aliases = ["Takamiya", "Rion", "鷹宮リオン"]
+
+[[streamer]]
+name = "Asuka Hina"
+channel_id = "UCiSRx1a2k-0tOg-fs6gAolQ"
+channel_name = "飛鳥ひな【にじさんじ所属】"
+twitter = "hina__asuka"
+aliases = ["Asuka", "Hina", "飛鳥ひな"]
+
+[[streamer]]
+name = "Maimoto Keisuke"
+channel_id = "UCJubINhCcFXlsBwnHp0wl_g"
+channel_name = "舞元啓介"
+twitter = "maimoto_k"
+aliases = ["Maimoto", "Keisuke", "舞元啓介"]
+
+[[streamer]]
+name = "Debidebi Debiru"
+channel_id = "UCjlmCrq4TP1I4xguOtJ-31w"
+channel_name = "でびでび・でびる"
+twitter = "debidebiru_sama"
+aliases = ["Debiru", "Debidebi", "でびでび・でびる", "Debi"]
+
+[[streamer]]
+name = "Rindou Mikoto"
+channel_id = "UCPvGypSgfDkVe7JG2KygK7A"
+channel_name = "竜胆 尊 / Rindou Mikoto"
+twitter = "RindouMikoto"
+aliases = ["Rindou", "Mikoto", "竜胆尊"]
+
+[[streamer]]
+name = "Joe Rikiichi"
+channel_id = "UChUJbHiTVeGrSkTdBzVfNCQ"
+channel_name = "ジョー・力一 Joe Rikiichi"
+twitter = "JoeRikiichi"
+aliases = ["Rikiichi", "ジョー・力一"]
+
+[[streamer]]
+name = "Machita Chima"
+channel_id = "UCo7TRj3cS-f_1D9ZDmuTsjw"
+twitter = "chima_machita23"
+aliases = ["Chima", "ちま"]
+
+[[streamer]]
+name = "Sakura Ritsuki"
+channel_id = "UCfQVs_KuXeNAlGa3fb8rlnQ"
+channel_name = "桜凛月"
+twitter = "SAKURA_RITSUKI"
+aliases = ["Sakura", "Ritsuki", "桜凛月"]
+
+[[streamer]]
+name = "Belmond Banderas"
+channel_id = "UCbc8fwhdUNlqi-J99ISYu4A"
+channel_name = "ベルモンド・バンデラス"
+twitter = "belmond_b_2434"
+aliases = ["Belmond", "Banderas", "ベルモンド・バンデラス"]
+
+[[streamer]]
+name = "Yaguruma Rine"
+channel_id = "UCvzVB-EYuHFXHZrObB8a_Og"
+channel_name = "矢車りね - Rine Yaguruma -"
+twitter = "Rine_Yaguruma"
+aliases = ["Yaguruma", "Rine", "矢車りね"]
+
+[[streamer]]
+name = "Yumeoi Kakeru"
+channel_id = "UCTIE7LM5X15NVugV7Krp9Hw"
+channel_name = "夢追翔のJUKE BOX"
+twitter = "kakeru_yumeoi"
+aliases = ["Yumeoi", "Kakeru", "夢追翔"]
+
+[[streamer]]
+name = "Kuroi Shiba"
+channel_id = "UCmeyo5pRj_6PXG-CsGUuWWg"
+channel_name = "黒井しば【にじさんじの犬】"
+twitter = "BlackShiba_chan"
+aliases = ["Kuroi", "Shiba", "黒井しば"]
+
+[[streamer]]
+name = "Gundo Mirei"
+channel_id = "UCeShTCVgZyq2lsBW9QwIJcw"
+channel_name = "【3年0組】郡道美玲の教室"
+twitter = "g9v9g_mirei"
+aliases = ["Gundo", "Mirei", "郡道美玲"]
+
+[[streamer]]
+name = "Onomachi Haruka"
+channel_id = "UCg63a3lk6PNeWhVvMRM_mrQ"
+channel_name = "Onomachi Haruka 【nijisanji】"
+twitter = "onomachi_haruka"
+aliases = ["Onomachi", "Haruka", "小野町春香"]
+
+[[streamer]]
+name = "Seto Miyako"
+channel_id = "UCHK5wkevfaGrPr7j3g56Jmw"
+channel_name = "瀬戸 美夜子 - Miyako Seto"
+twitter = "seto_miyako"
+aliases = ["Seto", "Miyako", "瀬戸美夜子"]
+
+[[streamer]]
+name = "Inui Toko"
+channel_id = "UCXRlIK3Cw_TJIQC5kSJJQMg"
+channel_name = "戌亥とこ -Inui Toko-"
+twitter = "inui_toko"
+aliases = ["Inui", "Toko"]
+
+[[streamer]]
+name = "Ange Katrina"
+channel_id = "UCHVXbQzkl3rDfsXWo8xi2qw"
+channel_name = "アンジュ・カトリーナ - Ange Katrina -"
+twitter = "Ange_Katrina_"
+aliases = ["Ange", "Katrina"]
+
+[[streamer]]
+name = "Lize Helesta"
+channel_id = "UCZ1xuCK1kNmn5RzPYIZop3w"
+channel_name = "リゼ・ヘルエスタ -Lize Helesta-"
+twitter = "Lize_Helesta"
+aliases = ["Lize", "Helesta"]
+
+[[streamer]]
+name = "Saegusa Akina"
+channel_id = "UCNW1Ex0r6HsWRD4LCtPwvoQ"
+channel_name = "三枝明那 / Saegusa Akina"
+twitter = "333akina"
+aliases = ["Saegusa", "Akina", "三枝明那"]
+
+[[streamer]]
+name = "Aizono Manami"
+channel_id = "UC0WwEfE-jOM2rzjpdfhTzZA"
+channel_name = "愛園 愛美/Aizono Manami"
+twitter = "manami_aizono"
+aliases = ["Aizono", "Manami", "愛園愛美"]
+
+[[streamer]]
+name = "Yukishiro Mahiro"
+channel_id = "UCHX7YpFG8rVwhsHCx34xt7w"
+channel_name = "雪城眞尋/Yukishiro Mahiro【にじさんじ所属】"
+twitter = "MahiroYukishiro"
+aliases = ["Yukishiro", "Mahiro", "雪城眞尋"]
+
+[[streamer]]
+name = "Ex Albio"
+channel_id = "UCIytNcoz4pWzXfLda0DoULQ"
+channel_name = "エクス・アルビオ -Ex Albio-"
+twitter = "Ex_Albio"
+aliases = ["Albio", "エクス・アルビオ"]
+
+[[streamer]]
+name = "Levi Elipha"
+channel_id = "UCtnO2N4kPTXmyvedjGWdx3Q"
+channel_name = "レヴィ・エリファ-Levi Elipha-"
+twitter = "Levi_E_2434"
+aliases = ["Levi", "Elipha", "レヴィ"]
+
+[[streamer]]
+name = "Hayama Marin"
+channel_id = "UCfipDDn7wY-C-SoUChgxCQQ"
+channel_name = "葉山舞鈴 / Ohayama Ch."
+twitter = "Hayama_Marin"
+aliases = ["Hayama", "Marin", "葉山舞鈴"]
+
+[[streamer]]
+name = "Nui Sociere"
+channel_id = "UCUc8GZfFxtmk7ZwSO7ccQ0g"
+channel_name = "ニュイ・ソシエール //[Nui Sociere]"
+twitter = "Nui_Sociere"
+aliases = ["Nui", "Sociere", "ニュイ・ソシエール"]
+
+[[streamer]]
+name = "Hakase Fuyuki"
+channel_id = "UCGYAYLDE7TZiiC8U6teciDQ"
+channel_name = "葉加瀬 冬雪 / Hakase Fuyuki"
+twitter = "Hakase_Fuyuki"
+aliases = ["Hakase", "Fuyuki", "葉加瀬冬雪"]
+
+[[streamer]]
+name = "Yorumi Rena"
+channel_id = "UCL34fAoFim9oHLbVzMKFavQ"
+channel_name = "夜見れな/yorumi rena【にじさんじ所属】"
+twitter = "rena_yorumi"
+aliases = ["Yorumi", "Rena", "夜見れな"]
+
+[[streamer]]
+name = "Kagami Hayato"
+channel_id = "UCmovZ2th3Sqpd00F5RdeigQ"
+channel_name = "加賀美 ハヤト/Hayato Kagami"
+twitter = "H_KAGAMI2434"
+aliases = ["Kagami", "Hayato", "加賀美ハヤト"]
+
+[[streamer]]
+name = "Ars Almal"
+channel_id = "UCdpUojq0KWZCN9bxXnZwz5w"
+channel_name = "アルス・アルマル -ars almal- 【にじさんじ】"
+twitter = "ars_almal"
+aliases = ["Ars", "Almal", "アルス・アルマル"]
+
+[[streamer]]
+name = "Aiba Uiha"
+channel_id = "UCnRQYHTnRLSF0cLJwMnedCg"
+channel_name = "相羽ういは〖Aiba Uiha〗にじさんじ所属"
+twitter = "AibaUiha"
+aliases = ["Aiba", "Uiha", "相羽ういは"]
+
+[[streamer]]
+name = "Amamiya Kokoro"
+channel_id = "UCkIimWZ9gBJRamKF0rmPU8w"
+channel_name = "天宮 こころ / Amamya Ch."
+twitter = "amamiya_kokoro"
+aliases = ["Kokoro", "Amamiya", "天宮 こころ", "Mya", "Amamya"]
+
+[[streamer]]
+name = "Eli Conifer"
+channel_id = "UCpNH2Zk2gw3JBjWAKSyZcQQ"
+channel_name = "エリー・コニファー / Eli Conifer【にじさんじ】"
+twitter = "Eli_Conifer"
+aliases = ["Eli", "Conifer", "エリー・コニファー"]
+
+[[streamer]]
+name = "Ratna Petit"
+channel_id = "UCIG9rDtgR45VCZmYnd-4DUw"
+channel_name = "ラトナ・プティ -Ratna Petit -にじさんじ所属"
+twitter = "ratna_petit"
+aliases = ["Ratna", "Petit", "ラトナ・プティ"]
+
+[[streamer]]
+name = "Sukoya Kana"
+channel_id = "UC8C1LLhBhf_E2IBPLSDJXlQ"
+channel_name = "健屋花那【にじさんじ】KanaSukoya"
+twitter = "sukosuko_sukoya"
+aliases = ["Sukoya", "Kana", "健屋花那"]
+
+[[streamer]]
+name = "Hayase Sou"
+channel_id = "UC2OacIzd2UxGHRGhdHl1Rhw"
+channel_name = "早瀬 走 / Hayase Sou【にじさんじ所属】"
+twitter = "SouHayase"
+aliases = ["Hayase", "Sou", "早瀬 走"]
+
+[[streamer]]
+name = "Shellin Burgundy"
+channel_id = "UCHBhnG2G-qN0JrrWmMO2FTA"
+channel_name = "シェリン・バーガンディ -Shellin Burgundy- 【にじさんじ】"
+twitter = "ShellinBurgundy"
+aliases = ["Shellin", "Burgundy", "シェリン・バーガンディ"]
+
+[[streamer]]
+name = "Fumi"
+channel_id = "UCwrjITPwG4q71HzihV2C7Nw"
+channel_name = "フミ/にじさんじ"
+twitter = "FumiVirtual"
+aliases = ["フミ)"]
+
+[[streamer]]
+name = "Yamagami Karuta"
+channel_id = "UCllKI7VjyANuS1RXatizfLQ"
+channel_name = "山神 カルタ / Karuta Yamagami"
+twitter = "Karuta_Yamagami"
+aliases = ["Yamagami", "Karuta", "山神カルタ"]
+
+[[streamer]]
+name = "Sara Hoshikawa"
+channel_id = "UC9V3Y3_uzU5e-usObb6IE1w"
+channel_name = "星川サラ / Sara Hoshikawa"
+twitter = "Sara_Hoshikawa"
+aliases = ["Sara", "Hoshikawa", "星川サラ", "星川", "サラ"]
+
+[[streamer]]
+name = "Emma★August"
+channel_id = "UCl1oLKcAq93p-pwKfDGhiYQ"
+channel_name = "えま★おうがすと / Emma★August【にじさんじ】"
+twitter = "emma_august_"
+aliases = ["Emma", "August", "えま★おうがすと"]
+
+[[streamer]]
+name = "Luis Cammy"
+channel_id = "UCb6ObE-XGCctO3WrjRZC-cw"
+channel_name = "ルイス・キャミー"
+twitter = "Luis_Cammy"
+aliases = ["Luis", "Cammy", "ルイス・キャミー"]
+
+[[streamer]]
+name = "Matsukai Mao"
+channel_id = "UCerkculBD7YLc_vOGrF7tKg"
+channel_name = "魔使マオ -matsukai mao-"
+twitter = "matsukai_mao"
+aliases = ["Matsukai", "Mao", "魔使マオ"]
+
+[[streamer]]
+name = "Gwelu Os Ga"
+channel_id = "UC1QgXt46-GEvtNjEC1paHnw"
+channel_name = "Gwelu Os Gar 【nijisanji】"
+twitter = "Gwelu_os_gar"
+aliases = ["Gwelu", "Os Ga", "グウェル・オス・ガール"]
+
+[[streamer]]
+name = "Shirayuki Tomoe"
+channel_id = "UCuvk5PilcvDECU7dDZhQiEw"
+channel_name = "白雪 巴/Shirayuki Tomoe"
+twitter = "Tomoe_Shirayuki"
+aliases = ["Shirayuki", "Tomoe", "白雪巴"]
+
+[[streamer]]
+name = "Fuwa Minato"
+channel_id = "UC6wvdADTJ88OfIbJYIpAaDA"
+channel_name = "不破 湊 / Fuwa Minato【にじさんじ】"
+twitter = "Fuwa_Minato"
+aliases = ["Fuwa", "Minato", "不破 湊", "湊", "不破"]
+
+[[streamer]]
+name = "Kurusu Natsume"
+channel_id = "UCRcLAVTbmx2-iNcXSsupdNA"
+channel_name = "来栖 夏芽-kurusu natsume-【にじさんじ】"
+twitter = "kurusu72me"
+aliases = ["Kurusu", "Natsume", "来栖夏芽"]
+
+[[streamer]]
+name = "Naraka"
+channel_id = "UC-o-E6I3IC2q8sAoAuM6Umg"
+channel_name = "奈羅花 - Naraka -"
+twitter = "Naraka_2434"
+
+[[streamer]]
+name = "Mashiro Meme"
+channel_id = "UCS-XXTgVkotkbkDnGEprXpg"
+channel_name = "ましろ"
+twitter = "mashiro2434"
+aliases = ["Mashiro", "Meme", "ましろ爻"]
+
+[[streamer]]
+name = "Furen E Lustario"
+channel_id = "UCuep1JCrMvSxOGgGhBfJuYw"
+channel_name = "フレン・E・ルスタリオ"
+twitter = "furen_2434"
+aliases = ["Furen", "Lustario", "フレン・E・ルスタリオ"]
+
+[[streamer]]
+name = "Ibrahim"
+channel_id = "UCmZ1Rbthn-6Jm_qOGjYsh5A"
+channel_name = "フイブラヒム【にじさんじ】"
+twitter = "honmono_ibrahim"
+aliases = ["イブラヒム"]
+
+[[streamer]]
+name = "Genzuki Tojiro"
+channel_id = "UCGw7lrT-rVZCWHfdG9Frcgg"
+channel_name = "弦月 藤士郎 / Genzuki Tojiro【にじさんじ"
+twitter = "1O46V"
+aliases = ["Genzuki", "Tojiro", "弦月藤士郎"]
+
+[[streamer]]
+name = "Nagao Kei"
+channel_id = "UCXW4MqCQn-jCaxlX-nn-BYg"
+channel_name = "長尾 景 / Nagao Kei【にじさんじ】"
+twitter = "kei_nagao2434"
+aliases = ["Nagao", "長尾 景", "Kei"]
+
+[[streamer]]
+name = "Kaida Haru"
+channel_id = "UCo2N7C-Z91waaR6lF3LL_jw"
+channel_name = "甲斐田 晴 / Kaida Haru【にじさんじ】"
+twitter = "Kaida_Haru"
+aliases = ["Kaida", "Haru", "甲斐田晴"]
+
+[[streamer]]
+name = "Sorahoshi Kirame"
+channel_id = "UC_82HBGtvwN1hcGeOGHzUBQ"
+channel_name = "空星きらめ/Sorahoshi Kirame【にじさんじ】"
+twitter = "kirame_2434"
+aliases = ["Sorahoshi", "Kirame", "空星きらめ"]
+
+[[streamer]]
+name = "Suo Sango"
+channel_id = "UCL_O_HXgLJx3Auteer0n0pA"
+channel_name = "周央 サンゴ / Suo Sango【にじさんじ】"
+twitter = "Suo_Sango"
+aliases = ["Suo", "Sango", "周央サンゴ"]
+
+[[streamer]]
+name = "Kitakoji Hisui"
+channel_id = "UCRqBKoKuX30ruKAq05pCeRQ"
+channel_name = "北小路ヒスイ / Kitakoji Hisui 【にじさんじ】"
+twitter = "Hisui_Kitakoji"
+aliases = ["Kitakoji", "Hisui", "北小路ヒスイ"]
+
+[[streamer]]
+name = "Asahina Akane"
+channel_id = "UCe_p3YEuYJb8Np0Ip9dk-FQ"
+channel_name = "Asahina Akane / Virtual YouTuber【Nijisanji】"
+twitter = "Akane_Asahina__"
+aliases = ["Asahina", "Akane"]
+
+[[streamer]]
+name = "Todo Kohaku"
+channel_id = "UCebT4Aq-3XWb5je1S1FvR_A"
+channel_name = "東堂コハク/ Todo Kohaku [にじさんじ]"
+twitter = "kohaku_todo"
+aliases = ["Todo", "Kohaku", "東堂コハク"]
+
+[[streamer]]
+name = "Nishizono Chigusa"
+channel_id = "UCkngxfPbmGyGl_RIq4FA3MQ"
+channel_name = "西園チグサ / Nishizono Chigusa"
+twitter = "Chigusa_24zono"
+aliases = ["Chigusa", "Nishizono", "西園チグサ"]
+
+[[streamer]]
+name = "Axia Krone"
+channel_id = "UC8oPnditPSp5lZu45fnXWCA"
+channel_name = "アクシア・クローネ / Axia Krone 【にじさんじ】"
+twitter = "AXIA_96NE"
+aliases = ["Axia", "Krone", "アクシア・クローネ"]
+
+[[streamer]]
+name = "Lauren Iroas"
+channel_id = "UCgmFrRcyH7d1zR9sIVQhFow"
+channel_name = "ローレン・イロアス / Lauren Iroas【にじさんじ】"
+twitter = "Lauren_iroas"
+aliases = ["Lauren", "Iroas", "ローレン・イロアス"]
+
+[[streamer]]
+name = "Leos Vincent"
+channel_id = "UC-6rZgmxZSIbq786j3RD5ow"
+channel_name = "レオス・ヴィンセント / Leos.Vincent【にじさんじ】"
+twitter = "Leos_Vincent"
+aliases = ["Leos", "Vincent", "レオス・ヴィンセント"]
+
+[[streamer]]
+name = "Oliver Evans"
+channel_id = "UCqjTqdVlvIipZXIKeCkHKUA"
+channel_name = "オリバー・エバンス / Oliver Evans 【にじさんじ】"
+twitter = "oliverD_23"
+aliases = ["Oliver", "Evans", "オリバー・エバンス"]
+
+[[streamer]]
+name = "Lain Paterson"
+channel_id = "UCRm6lqtdxs_Qo6HeL-SRQ-w"
+channel_name = "レイン・パターソン／Lain Paterson【にじさんじ】"
+twitter = "Lain_Paterson"
+aliases = ["Lain", "Paterson", "レイン", "パターソン"]
+
+[[streamer]]
+name = "Umise Yotsuha"
+channel_id = "UCtHY-tP0dyykhTRMmnfPs_g"
+channel_name = "海妹四葉 / Umise Yotsuha 【にじさんじ】"
+twitter = "Yotsuha_Umise"
+aliases = ["Umise", "Yotsuha", "海妹四葉", "海妹", "四葉"]
+
+[[streamer]]
+name = "Amagase Muyu"
+channel_id = "UCAQDFeCTVdx90GtwohwjHzQ"
+channel_name = "天ヶ瀬 むゆ / Amagase Muyu 【にじさんじ】"
+twitter = "Muyu_Amagase"
+aliases = ["Amagase", "Muyu", "天ヶ瀬むゆ"]
+
+[[streamer]]
+name = "Ponto Nei"
+channel_id = "UCe22Bcwd_GCpTjLxn83zl7A"
+channel_name = "先斗寧 / Ponto Nei 【にじさんじ】"
+twitter = "ponto_nei"
+aliases = ["Ponto", "Nei", "先斗寧"]
+
+[[streamer]]
+name = "Hyakumantenbara Salome"
+channel_id = "UCgIfLpQvelloDi8I0Ycbwpg"
+channel_name = "壱百満天原サロメ / Hyakumantenbara Salome"
+twitter = "1000000lome"
+aliases = ["Hyakumantenbara", "Salome", "壱百満天原サロメ"]
+
+[[streamer]]
+name = "Fura Kanato"
+channel_id = "UCC7rRD6P7RQcx0hKv9RQP4w"
+channel_name = "風楽奏斗 / Fura Kanato"
+twitter = "KNTFR2434"
+aliases = ["Fura", "Kanato", "風楽奏斗"]
+
+[[streamer]]
+name = "Watarai Hibari"
+channel_id = "UC4l9gz3q65lTBFfFtW5LLeA"
+channel_name = "渡会雲雀 / Watarai Hibari"
+twitter = "watarai_hibari"
+aliases = ["Watarai", "Hibari", "渡会雲雀"]
+
+[[streamer]]
+name = "Shikinagi Akira"
+channel_id = "UCcDDxnoQcezyTUzHg5uHaKg"
+channel_name = "四季凪アキラ / Shikinagi Akira"
+twitter = "Shikinagi_2434"
+aliases = ["Shikinagi", "Akira", "四季凪アキラ"]
+
+[[streamer]]
+name = "Seraph Dazzlegarden"
+channel_id = "UC5dJFf4m-mEcoyJRfhBljoA"
+channel_name = "セラフ・ダズルガーデン / Seraph Dazzlegarden"
+twitter = "SerAph_DazZ"
+aliases = ["Seraph", "Dazzlegarden", "セラフ・ダズルガーデン"]
+
+[[streamer]]
+name = "ChroNoiR"
+channel_id = "UCz6vnIbgiqFT9xUcD6Bp65Q"
+twitter = "Vamp_Kuzu"
