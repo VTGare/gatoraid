@@ -100,6 +100,29 @@ func scanLine(row scanner) (*store.Line, error) {
 	return &l, nil
 }
 
+func (s *Store) VideoChannels(ctx context.Context, videoID string) ([]store.VideoChannel, error) {
+	rows, err := s.read.QueryContext(ctx, `
+		SELECT DISTINCT guild_id, discord_channel_id FROM relayed_lines
+		WHERE video_id = ? AND guild_id IS NOT NULL AND discord_channel_id IS NOT NULL
+			AND kind IN ('owner', 'tl', 'vtuber', 'mod')
+		ORDER BY guild_id, discord_channel_id`, videoID)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	var out []store.VideoChannel
+	for rows.Next() {
+		var vc store.VideoChannel
+		if err := rows.Scan(&vc.GuildID, &vc.ChannelID); err != nil {
+			return nil, err
+		}
+		out = append(out, vc)
+	}
+
+	return out, rows.Err()
+}
+
 func (s *Store) PruneLines(ctx context.Context, guildBefore, archiveBefore time.Time) (int, error) {
 	r, err := s.write.ExecContext(ctx, `
 		DELETE FROM relayed_lines

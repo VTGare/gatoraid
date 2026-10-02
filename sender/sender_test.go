@@ -2,7 +2,9 @@ package sender_test
 
 import (
 	"errors"
+	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -51,11 +53,21 @@ func (f *fakePoster) ChannelMessageSendComplex(channelID string, data *discordgo
 	f.calls++
 	if errs := f.errs[channelID]; len(errs) > 0 {
 		f.errs[channelID] = errs[1:]
+		// Like a request that died partway through the upload.
+		for _, file := range data.Files {
+			_, _ = io.ReadAll(file.Reader)
+		}
 		return nil, errs[0]
 	}
 
+	content := data.Content
+	for _, file := range data.Files {
+		body, _ := io.ReadAll(file.Reader)
+		content += " " + file.Name + "=" + string(body)
+	}
+
 	f.nextID++
-	f.sent[channelID] = append(f.sent[channelID], data.Content)
+	f.sent[channelID] = append(f.sent[channelID], content)
 	return &discordgo.Message{ID: string(rune('a' + f.nextID - 1)), ChannelID: channelID}, nil
 }
 
@@ -137,6 +149,16 @@ var _ = Describe("Sender", func() {
 		Expect(s.Send(msg("a", "1"))).To(BeTrue())
 		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"1"}))
 		Expect(fake.callCount()).To(Equal(3))
+	})
+
+	It("sends attachments whole when retrying", func() {
+		fake.errs["a"] = []error{status(http.StatusInternalServerError)}
+		start()
+
+		m := msg("a", "log")
+		m.Send.Files = []*discordgo.File{{Name: "v.txt", Reader: strings.NewReader("lines")}}
+		Expect(s.Send(m)).To(BeTrue())
+		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"log v.txt=lines"}))
 	})
 
 	It("gives up after the retries", func() {

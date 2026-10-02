@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-// How long sent notices are remembered. Far longer than any stream.
+// How long sent notices and posted logs are remembered. Far longer than
+// any stream.
 const NoticeRetention = 30 * 24 * time.Hour
 
 type NoticeKind string
@@ -25,6 +26,13 @@ type Notice struct {
 	Kind      NoticeKind
 	ChannelID string
 	MessageID string
+}
+
+type LogStore interface {
+	// Records that a log is being posted and reports whether it's new.
+	// Claim before posting, like notices.
+	ClaimLog(ctx context.Context, guildID, videoID, channelID string) (bool, error)
+	PruneLogs(ctx context.Context, before time.Time) (int, error)
 }
 
 type NoticeStore interface {

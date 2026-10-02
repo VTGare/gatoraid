@@ -37,6 +37,11 @@ type Line struct {
 	SaidAt          time.Time
 }
 
+type VideoChannel struct {
+	GuildID   string
+	ChannelID string
+}
+
 type LineStore interface {
 	SaveLines(ctx context.Context, lines []Line) error
 	VideoLines(ctx context.Context, videoID, guildID string) ([]Line, error)
@@ -45,6 +50,9 @@ type LineStore interface {
 	// Authors of the guild's lines whose name contains query, most recent
 	// first, one line each.
 	RecentAuthors(ctx context.Context, guildID, query string, limit int) ([]Line, error)
+	// The Discord channels each guild relayed the video's chat into. Cameo
+	// and gossip lines don't count.
+	VideoChannels(ctx context.Context, videoID string) ([]VideoChannel, error)
 	// Guild lines and archive lines have separate cutoffs.
 	PruneLines(ctx context.Context, guildBefore, archiveBefore time.Time) (int, error)
 }

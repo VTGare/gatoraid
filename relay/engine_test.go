@@ -119,6 +119,7 @@ var _ = Describe("Engine", func() {
 		done    chan struct{}
 		engine  *relay.Engine
 		rules   map[string]*relay.Moderation
+		ended   chan stream.Stream
 	)
 
 	BeforeEach(func() {
@@ -149,6 +150,7 @@ var _ = Describe("Engine", func() {
 		snd = &fakeSender{}
 		streams = make(chan stream.Event, 16)
 		rules = map[string]*relay.Moderation{}
+		ended = make(chan stream.Stream, 4)
 	})
 
 	start := func() {
@@ -161,6 +163,7 @@ var _ = Describe("Engine", func() {
 			Sender:     snd,
 			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
 			Moderation: func(guildID string) *relay.Moderation { return rules[guildID] },
+			OnEnded:    func(s stream.Stream) { ended <- s },
 		})
 
 		var runCtx context.Context
@@ -366,6 +369,27 @@ var _ = Describe("Engine", func() {
 			"c2: 💬 ||@viewer:|| `[EN] big SPOILER`",
 		))
 		Expect(snd.lines()).NotTo(ContainElement(HavePrefix("c2: 💬 ||@viewer:|| `ES:")))
+	})
+
+	It("reports streams that ended after going live, with TLdex's start", func() {
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+		tldexStart := time.Date(2026, 10, 2, 12, 0, 5, 0, time.UTC)
+
+		// Stream and chat events come in on separate channels, so each is
+		// waited for before the next.
+		streams <- live("calli-live", calliID)
+		Eventually(chats.Running).Should(HaveLen(1))
+		chats.events <- chat.Event{Kind: chat.EventStarted, VideoID: "calli-live", StartedAt: tldexStart}
+		Eventually(func() int { return len(chats.events) }).Should(BeZero())
+		streams <- stream.Event{Kind: stream.EventEnded, Stream: live("calli-live", calliID).Stream, WasLive: true}
+		streams <- stream.Event{Kind: stream.EventEnded, Stream: live("cancelled", kiaraID).Stream}
+
+		var s stream.Stream
+		Eventually(ended).Should(Receive(&s))
+		Expect(s.VideoID).To(Equal("calli-live"))
+		Expect(s.StartedAt).To(Equal(tldexStart))
+		Consistently(ended, 50*time.Millisecond).ShouldNot(Receive())
 	})
 
 	It("adds the chat link when a channel relays several streamers", func() {

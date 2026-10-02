@@ -66,4 +66,23 @@ var _ = Describe("Notices", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(created).To(BeTrue())
 	})
+
+	It("claims each log once per channel and prunes old claims", func() {
+		for _, tc := range []struct {
+			channel string
+			new     bool
+		}{{"c", true}, {"c", false}, {"other", true}} {
+			created, err := db.ClaimLog(ctx, "g", "v", tc.channel)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(created).To(Equal(tc.new))
+		}
+
+		n, err := db.PruneLogs(ctx, time.Now().Add(time.Hour))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(n).To(Equal(2))
+
+		created, err := db.ClaimLog(ctx, "g", "v", "c")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(created).To(BeTrue())
+	})
 })

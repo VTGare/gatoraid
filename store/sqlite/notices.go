@@ -38,3 +38,26 @@ func (s *Store) PruneNotices(ctx context.Context, before time.Time) (int, error)
 	n, err := r.RowsAffected()
 	return int(n), err
 }
+
+func (s *Store) ClaimLog(ctx context.Context, guildID, videoID, channelID string) (bool, error) {
+	r, err := s.write.ExecContext(ctx, `
+		INSERT INTO logs_posted (guild_id, video_id, discord_channel_id, posted_at) VALUES (?, ?, ?, ?)
+		ON CONFLICT DO NOTHING`,
+		guildID, videoID, channelID, time.Now().UnixMilli())
+	if err != nil {
+		return false, err
+	}
+
+	n, err := r.RowsAffected()
+	return n > 0, err
+}
+
+func (s *Store) PruneLogs(ctx context.Context, before time.Time) (int, error) {
+	r, err := s.write.ExecContext(ctx, `DELETE FROM logs_posted WHERE posted_at < ?`, before.UnixMilli())
+	if err != nil {
+		return 0, err
+	}
+
+	n, err := r.RowsAffected()
+	return int(n), err
+}

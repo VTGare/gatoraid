@@ -21,6 +21,7 @@ import (
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/subs"
+	"github.com/VTGare/gatoraid/tllog"
 	"github.com/VTGare/gatoraid/youtube/channel"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 )
@@ -57,6 +58,7 @@ type Bot struct {
 	// Nil without a Holodex API key, since nothing would tell it about
 	// streams.
 	Relay *relay.Engine
+	Logs  *tllog.Writer
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -129,6 +131,13 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 
 	b.Sender = sender.New(sender.Config{Poster: s, Log: log.With("component", "sender")})
 
+	b.Logs = tllog.NewWriter(tllog.Config{
+		Store:      st,
+		Sender:     b.Sender,
+		Moderation: b.Moderation.For,
+		Log:        log.With("component", "tllog"),
+	})
+
 	if b.Streams != nil {
 		b.Relay = relay.NewEngine(relay.Config{
 			Streams:  b.Streams.Events(),
@@ -143,6 +152,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 				Color:   Color,
 			},
 			Moderation: b.Moderation.For,
+			OnEnded:    b.Logs.StreamEnded,
 			Log:        log.With("component", "relay"),
 		})
 	}
@@ -215,6 +225,7 @@ func (b *Bot) Start(ctx context.Context) error {
 	b.Log.Info("shutting down")
 
 	<-relayDone
+	b.Logs.Close()
 	// Messages the sender finishes still add lines for the relay to save.
 	b.Sender.Close()
 	if b.Relay != nil {
@@ -282,6 +293,9 @@ func (b *Bot) purge(ctx context.Context) {
 
 	if _, err := b.Store.PruneNotices(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
 		b.Log.Error("failed to prune stream notices", slog.Any("error", err))
+	}
+	if _, err := b.Store.PruneLogs(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
+		b.Log.Error("failed to prune posted logs", slog.Any("error", err))
 	}
 }
 

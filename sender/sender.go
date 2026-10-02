@@ -10,6 +10,7 @@ package sender
 import (
 	"context"
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 	"sync"
@@ -172,6 +173,7 @@ func (s *Sender) post(msg Message) {
 	backoff := s.cfg.Backoff
 
 	for attempt := 0; ; attempt++ {
+		rewind(msg.Send)
 		sent, err := s.cfg.Poster.ChannelMessageSendComplex(msg.ChannelID, msg.Send, discordgo.WithContext(s.ctx))
 		if err == nil {
 			if msg.OnSent != nil {
@@ -215,6 +217,16 @@ func (s *Sender) refuse(channelID string, err error) {
 
 	if s.cfg.OnRefused != nil {
 		s.cfg.OnRefused(channelID, err)
+	}
+}
+
+// A failed attempt may have read attachments partway, and a retry would
+// upload what's left.
+func rewind(m *discordgo.MessageSend) {
+	for _, f := range m.Files {
+		if s, ok := f.Reader.(io.Seeker); ok {
+			_, _ = s.Seek(0, io.SeekStart)
+		}
 	}
 }
 

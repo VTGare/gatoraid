@@ -117,4 +117,29 @@ var _ = Describe("Relayed lines", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(authors).To(HaveLen(1))
 	})
+
+	It("lists the channels each guild relayed a video into", func() {
+		_, _, err := db.JoinGuild(ctx, "h")
+		Expect(err).NotTo(HaveOccurred())
+
+		in := func(guild, channel string, kind store.LineKind) store.Line {
+			l := line(guild, "x", time.Now())
+			l.ChannelID, l.Kind = channel, kind
+			return l
+		}
+		Expect(db.SaveLines(ctx, []store.Line{
+			in("g", "c1", store.LineTL),
+			in("g", "c1", store.LineOwner),
+			in("g", "c2", store.LineMod),
+			in("h", "c3", store.LineVTuber),
+			in("h", "c4", store.LineCameo),
+			in("", "", store.LineTL),
+		})).To(Succeed())
+
+		channels, err := db.VideoChannels(ctx, "v")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(channels).To(Equal([]store.VideoChannel{
+			{GuildID: "g", ChannelID: "c1"}, {GuildID: "g", ChannelID: "c2"}, {GuildID: "h", ChannelID: "c3"},
+		}))
+	})
 })

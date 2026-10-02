@@ -95,15 +95,22 @@ type Moderation struct {
 	Wanted []string
 }
 
+// Blocks reports whether the blacklist or a banned word drops a line.
+func (m *Moderation) Blocks(authorChannelID, text string) bool {
+	return m.blocksLower(authorChannelID, strings.ToLower(text))
+}
+
 func (m *Moderation) blocks(c *Comment) bool {
+	return m.blocksLower(c.AuthorChannelID, c.lowerText())
+}
+
+func (m *Moderation) blocksLower(authorChannelID, text string) bool {
 	if m == nil {
 		return false
 	}
-	if m.Blacklist[c.AuthorChannelID] {
+	if m.Blacklist[authorChannelID] {
 		return true
 	}
-
-	text := c.lowerText()
 	return slices.ContainsFunc(m.Banned, func(b string) bool { return strings.Contains(text, b) })
 }
 

@@ -49,7 +49,9 @@ type Config struct {
 	Formatter *Formatter
 	// A guild's blacklist and filters. Optional.
 	Moderation func(guildID string) *Moderation
-	Log        *slog.Logger
+	// Called when a stream that went live ends. Optional.
+	OnEnded func(stream.Stream)
+	Log     *slog.Logger
 }
 
 // Engine decides which chats to read and sends their lines where the
@@ -137,6 +139,13 @@ func (e *Engine) onStream(ctx context.Context, ev stream.Event) {
 	id := s.VideoID
 
 	if ev.Kind == stream.EventEnded {
+		if ev.WasLive && e.cfg.OnEnded != nil {
+			// TLdex may know the real start better than the tracker.
+			if prev, ok := e.streams[id]; ok && !prev.StartedAt.IsZero() {
+				s.StartedAt = prev.StartedAt
+			}
+			e.cfg.OnEnded(s)
+		}
 		if e.running[id] {
 			e.cfg.Chats.Stop(id)
 			delete(e.running, id)
