@@ -25,15 +25,21 @@ const (
 
 type feature struct {
 	store.Feature
+	// The command's full path, e.g. "relay" or "notify youtube".
 	command     string
 	description string
 	add         string
 	// What the bot does with a target, e.g. "relaying %s".
 	doing string
+	// "relay" as in "2 relay subscriptions".
+	noun  string
+	title string
 	// Gossip matches a streamer's aliases, so it takes single streamers only.
 	streamersOnly bool
-	// Relays ping a role in their live and prechat notices.
-	role bool
+	// What pings the role, e.g. "Relay notices". Empty for features
+	// without a role.
+	pings    string
+	roleHelp string
 }
 
 var (
@@ -43,7 +49,10 @@ var (
 		description: "Relay translations, the streamer and other VTubers from a stream's chat",
 		add:         "Start relaying a streamer, a group or everyone",
 		doing:       "relaying %s",
-		role:        true,
+		noun:        "relay",
+		title:       "Relays",
+		pings:       "Relay notices",
+		roleHelp:    "Role to ping when a relay starts",
 	}
 	cameosFeature = feature{
 		Feature:     store.FeatureCameos,
@@ -51,6 +60,8 @@ var (
 		description: "Post what a streamer says in other streamers' chats",
 		add:         "Start posting cameos by a streamer, a group or everyone",
 		doing:       "posting cameos by %s",
+		noun:        "cameos",
+		title:       "Cameos",
 	}
 	gossipFeature = feature{
 		Feature:       store.FeatureGossip,
@@ -58,7 +69,31 @@ var (
 		description:   "Post translations and VTuber messages that mention a streamer in other chats",
 		add:           "Start posting messages about a streamer",
 		doing:         "posting messages about %s",
+		noun:          "gossip",
+		title:         "Gossip",
 		streamersOnly: true,
+	}
+	youtubeFeature = feature{
+		Feature:     store.FeatureYouTube,
+		command:     "notify youtube",
+		description: "Notifications when streamers go live",
+		add:         "Notify when a streamer, a group or anyone goes live",
+		doing:       "posting live notifications for %s",
+		noun:        "live notification",
+		title:       "Live notifications",
+		pings:       "Notifications",
+		roleHelp:    "Role to ping",
+	}
+	postsFeature = feature{
+		Feature:     store.FeaturePosts,
+		command:     "notify posts",
+		description: "Notifications for community posts",
+		add:         "Notify when a streamer, a group or anyone makes a post",
+		doing:       "posting new posts by %s",
+		noun:        "post notification",
+		title:       "Post notifications",
+		pings:       "Notifications",
+		roleHelp:    "Role to ping",
 	}
 )
 
@@ -72,8 +107,34 @@ var textChannels = []discordgo.ChannelType{
 }
 
 func subscriptionCommand(b *bot.Bot, f feature) *gumi.Command {
-	manage := int64(discordgo.PermissionManageGuild)
+	cmd := managerCommand(f.command, f.description)
+	cmd.Subcommands = subscriptionSubcommands(b, f)
+	return cmd
+}
 
+func notifyCommand(b *bot.Bot) *gumi.Command {
+	cmd := managerCommand("notify", "Notifications for live streams and community posts")
+	cmd.Category = CategoryNotifications
+	cmd.Subcommands = []*gumi.Command{
+		{Name: "youtube", Description: youtubeFeature.description, Subcommands: subscriptionSubcommands(b, youtubeFeature)},
+		{Name: "posts", Description: postsFeature.description, Subcommands: subscriptionSubcommands(b, postsFeature)},
+	}
+	return cmd
+}
+
+func managerCommand(name, description string) *gumi.Command {
+	manage := int64(discordgo.PermissionManageGuild)
+	return &gumi.Command{
+		Name:                     name,
+		Description:              description,
+		Category:                 CategoryRelay,
+		Checks:                   []gumi.Check{gumi.GuildOnly, gumi.HasPermissions(manage)},
+		DefaultMemberPermissions: &manage,
+		Contexts:                 []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+	}
+}
+
+func subscriptionSubcommands(b *bot.Bot, f feature) []*gumi.Command {
 	targetHelp := "Streamer, group or all"
 	if f.streamersOnly {
 		targetHelp = "Streamer"
@@ -83,46 +144,38 @@ func subscriptionCommand(b *bot.Bot, f feature) *gumi.Command {
 		targetOption(b, f, targetHelp).Require(),
 		gumi.Channel("channel", "Where to post; default is this channel").WithChannelTypes(textChannels...),
 	}
-	if f.role {
-		addOptions = append(addOptions, gumi.Role("role", "Role to ping when a relay starts"))
+	if f.pings != "" {
+		addOptions = append(addOptions, gumi.Role("role", f.roleHelp))
 	}
 
-	return &gumi.Command{
-		Name:                     f.command,
-		Description:              f.description,
-		Category:                 CategoryRelay,
-		Checks:                   []gumi.Check{gumi.GuildOnly, gumi.HasPermissions(manage)},
-		DefaultMemberPermissions: &manage,
-		Contexts:                 []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
-		Subcommands: []*gumi.Command{
-			{
-				Name:        "add",
-				Description: f.add,
-				Options:     addOptions,
-				Handler:     func(ctx *gumi.Context) error { return subscriptionAdd(b, f, ctx) },
+	return []*gumi.Command{
+		{
+			Name:        "add",
+			Description: f.add,
+			Options:     addOptions,
+			Handler:     func(ctx *gumi.Context) error { return subscriptionAdd(b, f, ctx) },
+		},
+		{
+			Name:        "remove",
+			Description: "Stop one",
+			Options: []*gumi.Option{
+				subscribedOption(b, f, "target", targetHelp).Require(),
+				gumi.Channel("channel", "Which channel; default is this one").WithChannelTypes(textChannels...),
 			},
-			{
-				Name:        "remove",
-				Description: "Stop one",
-				Options: []*gumi.Option{
-					subscribedOption(b, f, "target", targetHelp).Require(),
-					gumi.Channel("channel", "Which channel; default is this one").WithChannelTypes(textChannels...),
-				},
-				Handler: func(ctx *gumi.Context) error { return subscriptionRemove(b, f, ctx) },
+			Handler: func(ctx *gumi.Context) error { return subscriptionRemove(b, f, ctx) },
+		},
+		{
+			Name:        "clear",
+			Description: "Stop everything in a channel",
+			Options: []*gumi.Option{
+				gumi.Channel("channel", "Which channel; default is this one").WithChannelTypes(textChannels...),
 			},
-			{
-				Name:        "clear",
-				Description: "Stop everything in a channel",
-				Options: []*gumi.Option{
-					gumi.Channel("channel", "Which channel; default is this one").WithChannelTypes(textChannels...),
-				},
-				Handler: func(ctx *gumi.Context) error { return subscriptionClear(b, f, ctx) },
-			},
-			{
-				Name:        "list",
-				Description: "Show this server's " + f.command,
-				Handler:     func(ctx *gumi.Context) error { return subscriptionList(b, f, ctx) },
-			},
+			Handler: func(ctx *gumi.Context) error { return subscriptionClear(b, f, ctx) },
+		},
+		{
+			Name:        "list",
+			Description: "Show this server's " + strings.ToLower(f.title),
+			Handler:     func(ctx *gumi.Context) error { return subscriptionList(b, f, ctx) },
 		},
 	}
 }
@@ -162,9 +215,9 @@ func subscriptionAdd(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		msg = "Already " + doing + " in <#" + sub.ChannelID + ">."
 	}
 	if sub.RoleID != "" {
-		msg += " Relay notices ping <@&" + sub.RoleID + ">."
-	} else if !created && f.role {
-		msg += " Relay notices don't ping anyone."
+		msg += " " + f.pings + " ping <@&" + sub.RoleID + ">."
+	} else if !created && f.pings != "" {
+		msg += " " + f.pings + " don't ping anyone."
 	}
 
 	return reply(ctx, msg)
@@ -204,7 +257,7 @@ func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		return err
 	}
 
-	noun := f.command + " subscription"
+	noun := f.noun + " subscription"
 	if n != 1 {
 		noun += "s"
 	}
@@ -221,7 +274,7 @@ func subscriptionList(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		return err
 	}
 
-	e := &discordgo.MessageEmbed{Title: capitalize(f.command), Color: Color}
+	e := &discordgo.MessageEmbed{Title: f.title, Color: Color}
 	if len(list) == 0 {
 		e.Description = fmt.Sprintf("Nothing yet. Add one with `/%s add`.", f.command)
 		return ctx.ReplyEmbed(e)

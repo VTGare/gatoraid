@@ -148,4 +148,26 @@ var _ = Describe("Subscription commands", func() {
 		Expect(suggest("gossip", "add", dt.Focused("target", "hololive en"))).
 			NotTo(ContainElement(ContainSubstring("group")))
 	})
+
+	It("subscribes to live and post notifications under /notify", func() {
+		notify := func(group, sub string, opts ...*discordgo.ApplicationCommandInteractionDataOption) string {
+			GinkgoHelper()
+			data := h.run(dt.WithPermissions(dt.Command(user, "notify", dt.Group(group, dt.Sub(sub, opts...))), discordgo.PermissionManageGuild))
+			if s, _ := data["content"].(string); s != "" {
+				return s
+			}
+			return embed(data)["description"].(string)
+		}
+
+		Expect(notify("youtube", "add", dt.String("target", "calli"), dt.Role("role", "123"))).
+			To(Equal("Now posting live notifications for **Mori Calliope** in <#channel>. Notifications ping <@&123>."))
+		Expect(notify("posts", "add", dt.String("target", "group:hololive-en"))).
+			To(Equal("Now posting new posts by everyone in **Hololive EN** in <#channel>."))
+		Expect(notify("posts", "list")).To(Equal("<#channel>\n- everyone in **Hololive EN**"))
+		Expect(notify("youtube", "clear")).To(Equal("Removed 1 live notification subscription from <#channel>."))
+		Expect(notify("youtube", "list")).To(Equal("Nothing yet. Add one with `/notify youtube add`."))
+
+		Expect(h.b.Subs.Match(store.FeaturePosts, calliID)).To(HaveLen(1))
+		Expect(h.b.Subs.Match(store.FeatureYouTube, calliID)).To(BeEmpty())
+	})
 })

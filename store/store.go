@@ -14,6 +14,7 @@ type Store interface {
 	LineStore
 	LogStore
 	ModerationStore
+	DedupeStore
 	Close() error
 }
 

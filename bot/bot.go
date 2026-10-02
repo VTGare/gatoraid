@@ -15,6 +15,7 @@ import (
 	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/moderation"
+	"github.com/VTGare/gatoraid/notify"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
@@ -24,6 +25,7 @@ import (
 	"github.com/VTGare/gatoraid/tllog"
 	"github.com/VTGare/gatoraid/youtube/channel"
 	"github.com/VTGare/gatoraid/youtube/livechat"
+	"github.com/VTGare/gatoraid/youtube/posts"
 )
 
 const (
@@ -31,6 +33,7 @@ const (
 	commandTimeout = 2 * time.Minute
 	pruneInterval  = time.Hour
 	purgeInterval  = 24 * time.Hour
+	streamBuffer   = 256
 )
 
 // Embed color for everything the bot posts.
@@ -59,6 +62,12 @@ type Bot struct {
 	// streams.
 	Relay *relay.Engine
 	Logs  *tllog.Writer
+	// Nil without a Holodex API key.
+	Live  *notify.Live
+	Posts *notify.Posts
+
+	// The tracker's events, copied to the relay and the live notifier.
+	relayStreams, liveStreams chan stream.Event
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -138,9 +147,32 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		Log:        log.With("component", "tllog"),
 	})
 
+	b.Posts = notify.NewPosts(notify.PostsConfig{
+		Source:   posts.New(),
+		Registry: b.Streamers,
+		Subs:     b.Subs,
+		Store:    st,
+		Sender:   b.Sender,
+		Color:    Color,
+		Log:      log.With("component", "posts"),
+	})
+
 	if b.Streams != nil {
+		b.relayStreams = make(chan stream.Event, streamBuffer)
+		b.liveStreams = make(chan stream.Event, streamBuffer)
+
+		b.Live = notify.NewLive(notify.LiveConfig{
+			Streams:  b.liveStreams,
+			Registry: b.Streamers,
+			Subs:     b.Subs,
+			Store:    st,
+			Sender:   b.Sender,
+			Color:    Color,
+			Log:      log.With("component", "live"),
+		})
+
 		b.Relay = relay.NewEngine(relay.Config{
-			Streams:  b.Streams.Events(),
+			Streams:  b.relayStreams,
 			Chats:    b.Chats,
 			Registry: b.Streamers,
 			Subs:     b.Subs,
@@ -209,9 +241,13 @@ func (b *Bot) Start(ctx context.Context) error {
 		go func() { _ = b.TLdex.Run(ctx) }()
 	}
 
+	go func() { _ = b.Posts.Run(ctx) }()
+
 	relayDone := make(chan struct{})
 	if b.Streams != nil {
 		go func() { _ = b.Streams.Run(ctx) }()
+		go b.fanOutStreams(ctx)
+		go func() { _ = b.Live.Run(ctx) }()
 		go func() {
 			defer close(relayDone)
 			_ = b.Relay.Run(ctx)
@@ -233,6 +269,25 @@ func (b *Bot) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// The tracker has one events channel, and both the relay and the live
+// notifier need every event.
+func (b *Bot) fanOutStreams(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case e := <-b.Streams.Events():
+			for _, out := range []chan stream.Event{b.relayStreams, b.liveStreams} {
+				select {
+				case out <- e:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}
 }
 
 func (b *Bot) purgeLoop(ctx context.Context) {
@@ -296,6 +351,9 @@ func (b *Bot) purge(ctx context.Context) {
 	}
 	if _, err := b.Store.PruneLogs(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
 		b.Log.Error("failed to prune posted logs", slog.Any("error", err))
+	}
+	if _, err := b.Store.PruneSeen(ctx, time.Now().Add(-store.DedupeRetention)); err != nil {
+		b.Log.Error("failed to prune seen posts", slog.Any("error", err))
 	}
 }
 

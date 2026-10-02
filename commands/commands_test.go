@@ -92,7 +92,7 @@ var _ = Describe("Register", func() {
 		for _, c := range global {
 			names = append(names, c.Name)
 		}
-		Expect(names).To(ConsistOf("help", "relay", "cameos", "gossip", "log", "blacklist", "Blacklist author", "filter", "streamers", "owner"))
+		Expect(names).To(ConsistOf("help", "relay", "cameos", "gossip", "notify", "log", "blacklist", "Blacklist author", "filter", "streamers", "owner"))
 	})
 })
 
