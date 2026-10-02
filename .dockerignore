@@ -1,0 +1,12 @@
+.git
+.github
+.env*
+config.json
+*.db
+*.db-shm
+*.db-wal
+out/
+docs/
+AGENTS.md
+Dockerfile
+compose.yaml

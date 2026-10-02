@@ -1,0 +1,11 @@
+services:
+  bot:
+    image: ghcr.io/vtgare/gatoraid:${GATORAID_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - data:/data
+    mem_limit: 1g
+
+volumes:
+  data:
