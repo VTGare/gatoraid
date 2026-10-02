@@ -1,0 +1,251 @@
+{
+ "continuationContents": {
+  "liveChatContinuation": {
+   "continuations": [
+    {
+     "invalidationContinuationData": {
+      "continuation": "reload-next",
+      "timeoutMs": 10000
+     }
+    }
+   ],
+   "actions": [
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatMembershipItemRenderer": {
+        "id": "membership-1"
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-reload-1",
+        "authorName": {
+         "simpleText": "@viewer1"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000001",
+        "timestampUsec": "1790903813320582",
+        "message": {
+         "runs": [
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          },
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (1 year)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-reload-2",
+        "authorName": {
+         "simpleText": "@viewer2"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000002",
+        "timestampUsec": "1790903816362702",
+        "message": {
+         "runs": [
+          {
+           "text": "message reload-2 "
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "New member",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-reload-3",
+        "authorName": {
+         "simpleText": "@viewer3"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000003",
+        "timestampUsec": "1790903817549134",
+        "message": {
+         "runs": [
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          },
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (2 years)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-reload-4",
+        "authorName": {
+         "simpleText": "@viewer4"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000004",
+        "timestampUsec": "1790903828815377",
+        "message": {
+         "runs": [
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          },
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZfaJGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_MachiPat:",
+             ":MachiPat:"
+            ],
+            "isCustomEmoji": true
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (2 months)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-reload-5",
+        "authorName": {
+         "simpleText": "@viewer5"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000005",
+        "timestampUsec": "1790903831138613",
+        "message": {
+         "runs": [
+          {
+           "text": "message reload-5 "
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (1 year)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

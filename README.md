@@ -49,13 +49,22 @@ task check      # format check, vet, lint, race tests
 task build      # static binary in out/bin/
 ```
 
+To see live chat the way the bot reads it, without Discord or any API key:
+
+```sh
+go run ./cmd/chatwatch [-tldex] VIDEO_ID...
+```
+
 ## Layout
 
 ```
-cmd/gatoraid/      entry point
-bot/               Discord session, router wiring, guild lifecycle
+cmd/gatoraid/         entry point
+cmd/chatwatch/        prints live chat as the bot reads it
+bot/                  Discord session, router wiring, guild lifecycle
+chat/                 one reader per stream, YouTube chat merged with TLdex
 commands/             slash commands
 holodex/              Holodex API client
+holodex/tldex/        Holodex's TLdex translation feed
 stream/               stream tracker: Holodex polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup
@@ -63,6 +72,7 @@ internal/discordtest/ fake Discord API for tests
 store/                persistence interfaces and models
 store/sqlite/         SQLite implementation and migrations
 streamers/            streamer registry; seed/ holds the curated list
+youtube/livechat/     YouTube live chat reader
 ```
 
 ### Streamer registry

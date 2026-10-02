@@ -1,0 +1,291 @@
+{
+ "continuationContents": {
+  "liveChatContinuation": {
+   "continuations": [
+    {
+     "invalidationContinuationData": {
+      "continuation": "poll-next",
+      "timeoutMs": 10000
+     }
+    }
+   ],
+   "actions": [
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatPaidMessageRenderer": {
+        "id": "msg-superchat",
+        "authorName": {
+         "simpleText": "@supporter"
+        },
+        "authorExternalChannelId": "UCsupporter0000000000000",
+        "timestampUsec": "1790903998000000",
+        "purchaseAmountText": {
+         "simpleText": "$5.00"
+        },
+        "message": {
+         "runs": [
+          {
+           "text": "happy birthday!"
+          }
+         ]
+        }
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-poll-1",
+        "authorName": {
+         "simpleText": "@viewer6"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000006",
+        "timestampUsec": "1790903996224413",
+        "message": {
+         "runs": [
+          {
+           "text": "message poll-1 "
+          },
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/lKl-ZJGdLJKA_9EP46WlwAQ",
+            "shortcuts": [
+             ":_MachiWOW:",
+             ":MachiWOW:"
+            ],
+            "isCustomEmoji": true
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (2 years)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-poll-2",
+        "authorName": {
+         "simpleText": "@viewer7"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000007",
+        "timestampUsec": "1790903998905325",
+        "message": {
+         "runs": [
+          {
+           "text": "message poll-2 "
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (1 year)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-poll-3",
+        "authorName": {
+         "simpleText": "@viewer8"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000008",
+        "timestampUsec": "1790903999204392",
+        "message": {
+         "runs": [
+          {
+           "text": "message poll-3 "
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "Member (2 months)",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-poll-4",
+        "authorName": {
+         "simpleText": "@viewer9"
+        },
+        "authorExternalChannelId": "UCviewer0000000000000009",
+        "timestampUsec": "1790904009211730",
+        "message": {
+         "runs": [
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZeGGGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_RoonHappy:",
+             ":RoonHappy:"
+            ],
+            "isCustomEmoji": true
+           }
+          },
+          {
+           "emoji": {
+            "emojiId": "UC060r4zABV18vcahAWR1n7w/kEq3ZeGGGe6I_9EPyua0-AQ",
+            "shortcuts": [
+             ":_RoonHappy:",
+             ":RoonHappy:"
+            ],
+            "isCustomEmoji": true
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "tooltip": "New member",
+           "customThumbnail": {
+            "thumbnails": [
+             {
+              "url": "https://example.com/badge.png"
+             }
+            ]
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-owner",
+        "authorName": {
+         "simpleText": "@streamer"
+        },
+        "authorExternalChannelId": "UCstreamer00000000000000",
+        "timestampUsec": "1790903999000000",
+        "message": {
+         "runs": [
+          {
+           "text": "thanks for coming "
+          },
+          {
+           "emoji": {
+            "emojiId": "😊",
+            "shortcuts": [
+             ":smiling_face:"
+            ],
+            "isCustomEmoji": false
+           }
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "icon": {
+            "iconType": "OWNER"
+           },
+           "tooltip": "Owner"
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "addChatItemAction": {
+      "item": {
+       "liveChatTextMessageRenderer": {
+        "id": "msg-mod",
+        "authorName": {
+         "simpleText": "@moderator"
+        },
+        "authorExternalChannelId": "UCmoderator0000000000000",
+        "timestampUsec": "1790903999500000",
+        "message": {
+         "runs": [
+          {
+           "text": "[EN] Translation here"
+          }
+         ]
+        },
+        "authorBadges": [
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "icon": {
+            "iconType": "MODERATOR"
+           },
+           "tooltip": "Moderator"
+          }
+         },
+         {
+          "liveChatAuthorBadgeRenderer": {
+           "customThumbnail": {
+            "thumbnails": []
+           },
+           "tooltip": "Member (1 year)"
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "markChatItemAsDeletedAction": {
+      "targetItemId": "msg-poll-1"
+     }
+    }
+   ]
+  }
+ }
+}

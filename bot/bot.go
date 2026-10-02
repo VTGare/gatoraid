@@ -10,11 +10,14 @@ import (
 	"github.com/VTGare/gumi/middleware"
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/VTGare/gatoraid/chat"
 	"github.com/VTGare/gatoraid/holodex"
+	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
+	"github.com/VTGare/gatoraid/youtube/livechat"
 )
 
 const (
@@ -33,6 +36,9 @@ type Bot struct {
 	// Nil without a Holodex API key.
 	Holodex *holodex.Client
 	Streams *stream.Tracker
+	Chats   *chat.Manager
+	// Nil unless holodex.tldex is on.
+	TLdex *tldex.Client
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -95,7 +101,32 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		})
 	}
 
+	if cfg.Holodex.TLdex {
+		b.TLdex = tldex.New(tldex.WithLogger(log.With("component", "tldex")))
+	}
+	b.Chats = NewChatManager(b.TLdex, log.With("component", "chat"))
+
 	return b, nil
+}
+
+// NewChatManager reads YouTube chat, merged with TLdex when tl isn't nil.
+func NewChatManager(tl *tldex.Client, log *slog.Logger) *chat.Manager {
+	youtube := livechat.New()
+	cfg := chat.Config{
+		Open: func(ctx context.Context, videoID string) (chat.Reader, error) {
+			c, err := youtube.Open(ctx, videoID)
+			if err != nil {
+				return nil, err
+			}
+			return c, nil
+		},
+		Log: log,
+	}
+	// A nil *tldex.Client in the interface would look like TLdex is on.
+	if tl != nil {
+		cfg.TLdex = tl
+	}
+	return chat.NewManager(cfg)
 }
 
 // Start blocks until ctx is done. Closing the store is up to the caller.
@@ -129,6 +160,11 @@ func (b *Bot) Start(ctx context.Context) error {
 	} else {
 		b.Log.Warn("no Holodex API key, so stream discovery is off")
 	}
+
+	if b.TLdex != nil {
+		go func() { _ = b.TLdex.Run(ctx) }()
+	}
+	go b.watchChats(ctx)
 
 	<-ctx.Done()
 	b.Log.Info("shutting down")
@@ -165,6 +201,21 @@ func (b *Bot) watchStreams(ctx context.Context) {
 				slog.String("title", e.Stream.Title),
 				slog.Bool("members_only", e.Stream.MembersOnly),
 				slog.Bool("free_chat", e.Stream.FreeChat))
+		}
+	}
+}
+
+// Relays will start sessions and read comments here. Until then only
+// stopped sessions are logged.
+func (b *Bot) watchChats(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case e := <-b.Chats.Events():
+			if e.Kind == chat.EventStopped {
+				b.Log.Info("chat stopped", slog.String("video_id", e.VideoID), slog.Any("reason", e.Err))
+			}
 		}
 	}
 }
