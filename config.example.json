@@ -1,0 +1,27 @@
+{
+  "discord": {
+    "token": "",
+    "owner_ids": [],
+    "dev_guild_id": "",
+    "log_channel_id": ""
+  },
+  "database": {
+    "path": "gatoraid.db"
+  },
+  "holodex": {
+    "api_key": "",
+    "tldex": false
+  },
+  "deepl": {
+    "api_key": "",
+    "monthly_character_budget": 500000
+  },
+  "log": {
+    "level": "info",
+    "format": "json"
+  },
+  "emojis": {
+    "deepl": "<:deepL:000000000000000000>",
+    "youtube": "<:YouTube:000000000000000000>"
+  }
+}

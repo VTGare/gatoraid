@@ -1,0 +1,76 @@
+version: "3"
+
+dotenv: ['.env']
+
+vars:
+  BINARY_NAME: gatoraid
+  GOLANGCI_LINT_VERSION: v2.14.0
+  # Go's default is 10 minutes. Fail hung tests sooner.
+  TEST_TIMEOUT: 60s
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  build:
+    desc: Build the bot into out/bin/
+    cmds:
+      - mkdir -p out/bin
+      - CGO_ENABLED=0 go build -o out/bin/{{.BINARY_NAME}} ./cmd/gatoraid
+
+  run:
+    desc: Run the bot (reads .env and config.json; extra args after --)
+    cmds:
+      - go run ./cmd/gatoraid {{.CLI_ARGS}}
+
+  test:
+    desc: Run the tests (extra go test args after --, e.g. task test -- ./store/...)
+    cmds:
+      - go test -timeout {{.TEST_TIMEOUT}} {{.CLI_ARGS | default "./..."}}
+
+  test:race:
+    desc: Run the tests with the race detector (slower cold build; run before committing)
+    cmds:
+      - go test -race -timeout {{.TEST_TIMEOUT}} {{.CLI_ARGS | default "./..."}}
+
+  cover:
+    desc: Run the tests with coverage and print a per-function summary
+    cmds:
+      - mkdir -p out
+      - go test -timeout {{.TEST_TIMEOUT}} -coverprofile=out/profile.cov ./...
+      - go tool cover -func out/profile.cov
+
+  fmt:
+    desc: Format the code
+    cmds:
+      - gofmt -w .
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  lint:
+    desc: Run golangci-lint (pinned version, built on first use)
+    cmds:
+      - go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}} run ./...
+
+  tidy:
+    desc: Tidy go.mod and go.sum
+    cmds:
+      - go mod tidy
+
+  check:
+    desc: Everything to run before committing (format check, vet, lint, race tests)
+    cmds:
+      - test -z "$(gofmt -l .)" || (echo "Unformatted files:"; gofmt -l .; exit 1)
+      - task: vet
+      - task: lint
+      - task: test:race
+
+  clean:
+    desc: Remove build output
+    cmds:
+      - rm -rf ./out

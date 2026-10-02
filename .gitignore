@@ -1,0 +1,20 @@
+# Design notes stay local
+/docs/
+
+# Local configuration and data
+/config.json
+*.db
+*.db-shm
+*.db-wal
+
+# Build output
+/gatoraid
+/bin/
+*.test
+*.out
+
+# Local environment for task run
+/.env
+
+# Task output
+/out/

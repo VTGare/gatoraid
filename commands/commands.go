@@ -1,0 +1,27 @@
+package commands
+
+import (
+	"github.com/VTGare/gumi"
+
+	"github.com/VTGare/gatoraid/bot"
+)
+
+const Color = 0x4C9A2A
+
+const (
+	CategoryRelay         = "Relay"
+	CategoryNotifications = "Notifications"
+	CategoryModeration    = "Moderation"
+	CategoryGeneral       = "General"
+)
+
+func Register(b *bot.Bot) error {
+	return b.Router.Register(
+		gumi.HelpCommand(gumi.HelpConfig{
+			Title:         "GatorAid commands",
+			Color:         Color,
+			Category:      CategoryGeneral,
+			CategoryOrder: []string{CategoryRelay, CategoryNotifications, CategoryModeration, CategoryGeneral},
+		}),
+	)
+}
