@@ -54,15 +54,18 @@ task run
 - **A DeepL API key** (`GATORAID_DEEPL_API_KEY`) for translation. Optional. Free keys end in `:fx`
   and allow 500,000 characters a month.
 
-Invite the bot with the `bot` and `applications.commands` scopes:
+Invite GatorAid to a server with this link:
 
 ```
-https://discord.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot+applications.commands&permissions=274878090240
+https://discord.com/oauth2/authorize?client_id=1030909405950115930&permissions=274878352384&integration_type=0&scope=bot+applications.commands
 ```
 
-That asks for View Channel, Send Messages, Send Messages in Threads, Embed Links, Attach Files and
-Mention All Roles. The last one lets relay notices and notifications ping roles that aren't set
-as mentionable. The bot only ever pings the role a subscription names.
+It asks for View Channels, Send Messages, Send Messages in Threads, Embed Links, Attach Files, Use
+External Emojis and Mention Everyone. Mention Everyone lets relay notices and notifications ping
+roles that aren't set as mentionable. The bot only ever pings the role a subscription names, never
+@everyone or @here.
+
+For your own instance, use your application's ID as `client_id`.
 
 During development, set `GATORAID_DISCORD_DEV_GUILD_ID` so commands register in one server
 instantly instead of globally.
