@@ -6,7 +6,7 @@ import (
 	"github.com/VTGare/gatoraid/bot"
 )
 
-const Color = 0x4C9A2A
+const Color = bot.Color
 
 const (
 	CategoryRelay         = "Relay"

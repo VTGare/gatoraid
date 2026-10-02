@@ -73,7 +73,7 @@ type Video struct {
 	TopicID string `json:"topic_id"`
 	Status  Status `json:"status"`
 	// Once a stream is live, this is when it actually started. Before that
-	// it's the scheduled time. Holodex doesn't send start_actual anymore.
+	// it's the scheduled time. Holodex doesn't send start_actual.
 	AvailableAt    time.Time `json:"available_at"`
 	StartScheduled time.Time `json:"start_scheduled"`
 	// Seconds, once the stream is over.

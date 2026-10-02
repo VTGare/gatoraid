@@ -1,0 +1,122 @@
+package relay
+
+import (
+	"strings"
+	"unicode/utf8"
+
+	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/stream"
+)
+
+// Emoji keys in the config, with the Unicode fallbacks used when one isn't
+// set. Group IDs are keys too, for agency emojis.
+const (
+	EmojiPrechat = "prechat"
+	EmojiVTuber  = "vtuber"
+	EmojiPeek    = "peek"
+
+	fallbackPrechat = "⏳"
+	fallbackVTuber  = "🎙️"
+	fallbackPeek    = "👀"
+	iconTL          = "💬"
+	iconOther       = "🛠️"
+)
+
+// YouTube caps chat lines at 200 characters but TLdex doesn't, and the
+// message has to fit Discord's 2000 with names and links around it.
+const maxText = 1500
+
+type Formatter struct {
+	// Returns fallback when the key isn't configured.
+	Emoji func(key, fallback string) string
+	// A group and its parents, nearest first.
+	Lineage func(groupID string) []*store.Group
+	// For notice embeds.
+	Color int
+}
+
+// Relay formats a relayed line. showChat adds a link to the chat, for
+// Discord channels that relay more than one streamer.
+func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool) string {
+	var sb strings.Builder
+
+	if c.Stream.Status == stream.Upcoming {
+		sb.WriteString(f.Emoji(EmojiPrechat, fallbackPrechat) + " ")
+	}
+
+	name := escapeMarkdown(c.AuthorName)
+	switch {
+	case kind == KindTL:
+		sb.WriteString(iconTL + " ||" + name + ":||")
+	case c.fromVTuber() || kind == KindOwner:
+		sb.WriteString(f.agencyEmoji(c.Author, EmojiVTuber, fallbackVTuber) + " **" + name + ":**")
+	default:
+		sb.WriteString(iconOther + " **" + name + ":**")
+	}
+
+	sb.WriteString(" " + code(c.Text))
+
+	if showChat {
+		sb.WriteString("\n**Chat:** [" + escapeMarkdown(hostName(c)) + "](<" + c.Stream.URL() + ">)")
+	}
+
+	return sb.String()
+}
+
+// Cameo formats a VTuber's line from someone else's chat.
+func (f *Formatter) Cameo(c *Comment) string {
+	return f.elsewhere(c, c.Author.Name)
+}
+
+// Gossip formats a line that mentions a streamer in another chat.
+func (f *Formatter) Gossip(c *Comment) string {
+	name := c.AuthorName
+	if c.Author != nil {
+		name = c.Author.Name
+	}
+	return f.elsewhere(c, name)
+}
+
+func (f *Formatter) elsewhere(c *Comment, author string) string {
+	return f.agencyEmoji(c.Author, EmojiPeek, fallbackPeek) + " **" + escapeMarkdown(author) + "** in [**" +
+		escapeMarkdown(hostName(c)) + "**'s chat](<" + c.Stream.URL() + ">): " + code(c.Text)
+}
+
+// The nearest group with an emoji wins, so Hololive EN falls back to
+// Hololive's.
+func (f *Formatter) agencyEmoji(st *store.Streamer, key, fallback string) string {
+	if st != nil && f.Lineage != nil {
+		for _, g := range f.Lineage(st.GroupID) {
+			if e := f.Emoji(g.ID, ""); e != "" {
+				return e
+			}
+		}
+	}
+	return f.Emoji(key, fallback)
+}
+
+func hostName(c *Comment) string {
+	if c.Host != nil {
+		return c.Host.Name
+	}
+	return c.Stream.ChannelName
+}
+
+// Inline code can't hold backticks.
+func code(text string) string {
+	text = strings.ReplaceAll(strings.TrimSpace(text), "`", "'")
+	if len(text) > maxText {
+		cut := maxText
+		for !utf8.RuneStart(text[cut]) {
+			cut--
+		}
+		text = text[:cut] + "…"
+	}
+	return "`" + text + "`"
+}
+
+var markdown = strings.NewReplacer(
+	`\`, `\\`, `*`, `\*`, `_`, `\_`, `~`, `\~`, `|`, `\|`, "`", "\\`", `>`, `\>`, `[`, `\[`, `]`, `\]`,
+)
+
+func escapeMarkdown(s string) string { return markdown.Replace(s) }

@@ -14,6 +14,8 @@ import (
 	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
+	"github.com/VTGare/gatoraid/relay"
+	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
@@ -24,8 +26,12 @@ import (
 const (
 	eventTimeout   = 10 * time.Second
 	commandTimeout = 2 * time.Minute
+	pruneInterval  = time.Hour
 	purgeInterval  = 24 * time.Hour
 )
+
+// Embed color for everything the bot posts.
+const Color = 0x4C9A2A
 
 type Bot struct {
 	Config    *config.Config
@@ -40,7 +46,11 @@ type Bot struct {
 	Streams *stream.Tracker
 	Chats   *chat.Manager
 	// Nil unless holodex.tldex is on.
-	TLdex *tldex.Client
+	TLdex  *tldex.Client
+	Sender *sender.Sender
+	// Nil without a Holodex API key, since nothing would tell it about
+	// streams.
+	Relay *relay.Engine
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -109,6 +119,25 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	}
 	b.Chats = NewChatManager(b.TLdex, log.With("component", "chat"))
 
+	b.Sender = sender.New(sender.Config{Poster: s, Log: log.With("component", "sender")})
+
+	if b.Streams != nil {
+		b.Relay = relay.NewEngine(relay.Config{
+			Streams:  b.Streams.Events(),
+			Chats:    b.Chats,
+			Registry: b.Streamers,
+			Subs:     b.Subs,
+			Store:    st,
+			Sender:   b.Sender,
+			Formatter: &relay.Formatter{
+				Emoji:   cfg.Emoji,
+				Lineage: b.Streamers.Lineage,
+				Color:   Color,
+			},
+			Log: log.With("component", "relay"),
+		})
+	}
+
 	return b, nil
 }
 
@@ -157,30 +186,46 @@ func (b *Bot) Start(ctx context.Context) error {
 
 	go b.purgeLoop(ctx)
 
-	if b.Streams != nil {
-		go func() { _ = b.Streams.Run(ctx) }()
-		go b.watchStreams(ctx)
-	} else {
-		b.Log.Warn("no Holodex API key, so stream discovery is off")
-	}
-
 	if b.TLdex != nil {
 		go func() { _ = b.TLdex.Run(ctx) }()
 	}
-	go b.watchChats(ctx)
+
+	relayDone := make(chan struct{})
+	if b.Streams != nil {
+		go func() { _ = b.Streams.Run(ctx) }()
+		go func() {
+			defer close(relayDone)
+			_ = b.Relay.Run(ctx)
+		}()
+	} else {
+		close(relayDone)
+		b.Log.Warn("no Holodex API key, so stream discovery and relays are off")
+	}
 
 	<-ctx.Done()
 	b.Log.Info("shutting down")
+
+	<-relayDone
+	// Messages the sender finishes still add lines for the relay to save.
+	b.Sender.Close()
+	if b.Relay != nil {
+		b.Relay.Close()
+	}
 
 	return nil
 }
 
 func (b *Bot) purgeLoop(ctx context.Context) {
-	ticker := time.NewTicker(purgeInterval)
+	ticker := time.NewTicker(pruneInterval)
 	defer ticker.Stop()
 
+	var lastPurge time.Time
 	for {
-		b.purge(ctx)
+		b.pruneLines(ctx)
+		if time.Since(lastPurge) >= purgeInterval {
+			b.purge(ctx)
+			lastPurge = time.Now()
+		}
 
 		select {
 		case <-ctx.Done():
@@ -190,36 +235,17 @@ func (b *Bot) purgeLoop(ctx context.Context) {
 	}
 }
 
-// Relays and notifications will hook in here. Until then the events are
-// only logged.
-func (b *Bot) watchStreams(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case e := <-b.Streams.Events():
-			b.Log.Info("stream "+e.Kind.String(),
-				slog.String("video_id", e.Stream.VideoID),
-				slog.String("channel", e.Stream.ChannelName),
-				slog.String("title", e.Stream.Title),
-				slog.Bool("members_only", e.Stream.MembersOnly),
-				slog.Bool("free_chat", e.Stream.FreeChat))
-		}
-	}
-}
+func (b *Bot) pruneLines(ctx context.Context) {
+	ctx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
 
-// Relays will start sessions and read comments here. Until then only
-// stopped sessions are logged.
-func (b *Bot) watchChats(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case e := <-b.Chats.Events():
-			if e.Kind == chat.EventStopped {
-				b.Log.Info("chat stopped", slog.String("video_id", e.VideoID), slog.Any("reason", e.Err))
-			}
-		}
+	now := time.Now()
+	n, err := b.Store.PruneLines(ctx, now.Add(-store.GuildLineRetention), now.Add(-store.ArchiveLineRetention))
+	switch {
+	case err != nil:
+		b.Log.Error("failed to prune relayed lines", slog.Any("error", err))
+	case n > 0:
+		b.Log.Debug("pruned relayed lines", slog.Int("count", n))
 	}
 }
 
@@ -243,6 +269,10 @@ func (b *Bot) purge(ctx context.Context) {
 		b.Log.Error("failed to purge hidden streamers", slog.Any("error", err))
 	case n > 0:
 		b.Log.Info("purged hidden streamers", slog.Int("count", n))
+	}
+
+	if _, err := b.Store.PruneNotices(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
+		b.Log.Error("failed to prune stream notices", slog.Any("error", err))
 	}
 }
 

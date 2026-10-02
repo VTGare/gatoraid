@@ -33,7 +33,7 @@ var (
 type Message struct {
 	ID              string
 	AuthorChannelID string
-	// YouTube shows @handles in chat now, not display names.
+	// The @handle, which is what YouTube shows in chat.
 	AuthorName string
 	Text       string
 	Time       time.Time

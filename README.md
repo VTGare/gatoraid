@@ -3,8 +3,8 @@
 A Discord bot that relays VTuber YouTube live chat — translations, streamer messages and mod
 messages — into Discord channels, and sends stream and community post notifications.
 
-> Work in progress. The skeleton (config, database, guild lifecycle, `/help`) is in place; relays and
-> notifications are next.
+> Work in progress. Relays (`/relay`, `/cameos`, `/gossip`) work. Moderation, TL logs, notifications
+> and `/settings` are next.
 
 ## Running
 
@@ -37,6 +37,12 @@ option.
 | `GATORAID_LOG_FORMAT` | `log.format` | `json` |
 | `GATORAID_EMOJIS` | `emojis` | |
 
+`emojis` maps keys to custom emoji markup such as `<:holo:123>`. Keys: `deepl`, `youtube`, `prechat`
+(prefixes waiting room lines), `vtuber` and `peek` (fallbacks for VTubers without a group emoji, in
+relays and in cameos or gossip), and any streamer group ID, like `hololive`, for that group's agency
+emoji. Subgroups use their parent's emoji unless they have their own. Missing keys fall back to
+plain Unicode emojis.
+
 ## Development
 
 ```sh
@@ -63,6 +69,8 @@ cmd/chatwatch/        prints live chat as the bot reads it
 bot/                  Discord session, router wiring, guild lifecycle
 chat/                 one reader per stream, YouTube chat merged with TLdex
 commands/             slash commands
+relay/                which chats to read and where their lines go: rules, formatting, engine
+sender/               Discord send queue per channel
 subs/                 in-memory subscription index
 holodex/              Holodex API client
 holodex/tldex/        Holodex's TLdex translation feed

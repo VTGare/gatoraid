@@ -45,7 +45,7 @@ type EventKind int
 const (
 	EventComment EventKind = iota
 	// TLdex knows when a stream actually started, which Holodex's REST API
-	// no longer says.
+	// doesn't say.
 	EventStarted
 	// The chat is over or can't be read. Err says why.
 	EventStopped

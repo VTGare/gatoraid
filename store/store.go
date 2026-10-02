@@ -10,6 +10,8 @@ type Store interface {
 	GuildStore
 	StreamerStore
 	SubscriptionStore
+	NoticeStore
+	LineStore
 	Close() error
 }
 
