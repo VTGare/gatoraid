@@ -39,7 +39,7 @@ func newHarness(seed *streamers.Seed) *harness {
 	DeferCleanup(db.Close)
 
 	cfg := &config.Config{
-		Discord: config.Discord{Token: "test", OwnerIDs: []string{owner}},
+		Discord: config.Discord{Token: "test", OwnerIDs: []string{owner}, OwnerGuildID: "guild"},
 		Limits:  config.Limits{UserChannels: config.DefaultUserChannels},
 	}
 	b, err := bot.New(cfg, slog.New(slog.DiscardHandler), db)
@@ -97,18 +97,48 @@ func choices(data map[string]any) []string {
 }
 
 var _ = Describe("Register", func() {
-	It("registers valid slash commands", func() {
-		b, err := bot.New(&config.Config{Discord: config.Discord{Token: "test"}}, slog.New(slog.DiscardHandler), nil)
+	register := func(discord config.Discord) ([]string, map[string][]string) {
+		GinkgoHelper()
+		discord.Token = "test"
+		b, err := bot.New(&config.Config{Discord: discord}, slog.New(slog.DiscardHandler), nil)
 		Expect(err).NotTo(HaveOccurred())
-
 		Expect(commands.Register(b)).To(Succeed())
 
-		global, _ := b.Router.ApplicationCommands()
-		names := make([]string, 0, len(global))
-		for _, c := range global {
-			names = append(names, c.Name)
+		global, byGuild := b.Router.ApplicationCommands()
+		names := func(cmds []*discordgo.ApplicationCommand) []string {
+			out := make([]string, 0, len(cmds))
+			for _, c := range cmds {
+				out = append(out, c.Name)
+			}
+			return out
 		}
-		Expect(names).To(ConsistOf("help", "relay", "cameos", "gossip", "notify", "log", "settings", "blacklist", "Blacklist author", "filter", "streamers", "owner"))
+		guilds := map[string][]string{}
+		for id, cmds := range byGuild {
+			guilds[id] = names(cmds)
+		}
+		return names(global), guilds
+	}
+
+	everyone := []string{"help", "relay", "cameos", "gossip", "notify", "log", "settings", "blacklist",
+		"Blacklist author", "filter", "streamers"}
+
+	It("registers everything but /owner globally", func() {
+		global, guilds := register(config.Discord{OwnerGuildID: "owner-guild"})
+
+		Expect(global).To(ConsistOf(everyone))
+		Expect(guilds).To(Equal(map[string][]string{"owner-guild": {"owner"}}))
+	})
+
+	It("puts /owner in the dev guild when there's no owner guild", func() {
+		_, guilds := register(config.Discord{DevGuildID: "dev"})
+		Expect(guilds).To(Equal(map[string][]string{"dev": {"owner"}}))
+	})
+
+	It("leaves /owner out without a guild for it", func() {
+		global, guilds := register(config.Discord{})
+
+		Expect(global).To(ConsistOf(everyone))
+		Expect(guilds).To(BeEmpty())
 	})
 })
 

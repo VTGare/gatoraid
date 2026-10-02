@@ -3,6 +3,7 @@
     "token": "",
     "owner_ids": [],
     "dev_guild_id": "",
+    "owner_guild_id": "",
     "log_channel_id": ""
   },
   "database": {

@@ -16,7 +16,7 @@ const (
 )
 
 func Register(b *bot.Bot) error {
-	return b.Router.Register(
+	cmds := []*gumi.Command{
 		gumi.HelpCommand(gumi.HelpConfig{
 			Title:         "GatorAid commands",
 			Color:         Color,
@@ -33,6 +33,9 @@ func Register(b *bot.Bot) error {
 		blacklistAuthorCommand(b),
 		filterCommand(b),
 		streamersCommand(b),
-		ownerCommand(b),
-	)
+	}
+	if guild := b.Config.OwnerGuild(); guild != "" {
+		cmds = append(cmds, ownerCommand(b, guild))
+	}
+	return b.Router.Register(cmds...)
 }

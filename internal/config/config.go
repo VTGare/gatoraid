@@ -48,6 +48,8 @@ type Discord struct {
 	// Registers all commands in this one guild instead of globally, for
 	// development.
 	DevGuildID string `json:"dev_guild_id" env:"DEV_GUILD_ID"`
+	// The only guild /owner is registered in. Defaults to DevGuildID.
+	OwnerGuildID string `json:"owner_guild_id" env:"OWNER_GUILD_ID"`
 	// Gets guild join and leave notices.
 	LogChannelID string `json:"log_channel_id" env:"LOG_CHANNEL_ID"`
 }
@@ -158,6 +160,15 @@ func (c *Config) Validate() error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// OwnerGuild is where /owner goes. Empty means nowhere: owner tools are
+// never registered globally.
+func (c *Config) OwnerGuild() string {
+	if c.Discord.OwnerGuildID != "" {
+		return c.Discord.OwnerGuildID
+	}
+	return c.Discord.DevGuildID
 }
 
 func (c *Config) Emoji(key, fallback string) string {

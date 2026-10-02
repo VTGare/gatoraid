@@ -16,15 +16,10 @@ var channelInURL = regexp.MustCompile(`UC[\w-]{22}`)
 // Typing this into an optional text field clears it.
 const clearValue = "-"
 
-func ownerCommand(b *bot.Bot) *gumi.Command {
-	// Zero permissions hides the command from everyone but admins. OwnerOnly
-	// is what actually keeps them out.
+func ownerCommand(b *bot.Bot, guildID string) *gumi.Command {
+	// Zero permissions hides the command from everyone but the guild's admins.
+	// OwnerOnly is what actually keeps them out.
 	hidden := int64(0)
-
-	var guilds []string
-	if b.Config.Discord.DevGuildID != "" {
-		guilds = []string{b.Config.Discord.DevGuildID}
-	}
 
 	return &gumi.Command{
 		Name:                     "owner",
@@ -33,7 +28,7 @@ func ownerCommand(b *bot.Bot) *gumi.Command {
 		Hidden:                   true,
 		Checks:                   []gumi.Check{gumi.OwnerOnly},
 		DefaultMemberPermissions: &hidden,
-		GuildIDs:                 guilds,
+		GuildIDs:                 []string{guildID},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "streamers",

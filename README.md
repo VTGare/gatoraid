@@ -30,7 +30,7 @@ curated streamer list.
 | `/log <video>` | Everyone | A stream's relayed lines as a file |
 | `/streamers list`, `/streamers info` | Everyone | Browse the streamer list |
 | `/help` | Everyone | Every command |
-| `/owner` | Bot owner, in the dev server | Edit the streamer list, look at tracked streams |
+| `/owner` | Bot owner, only in the owner server | Edit the streamer list, look at tracked streams |
 
 Managers have Manage Server or a Manager role. Blacklisters have Manage Messages, a Blacklister
 role or a Manager role. Both roles are set in `/settings`. Administrators can always do everything.
@@ -68,7 +68,9 @@ roles that aren't set as mentionable. The bot only ever pings the role a subscri
 For your own instance, use your application's ID as `client_id`.
 
 During development, set `GATORAID_DISCORD_DEV_GUILD_ID` so commands register in one server
-instantly instead of globally.
+instantly instead of globally. `/owner` is never registered globally: it only exists in
+`GATORAID_DISCORD_OWNER_GUILD_ID`, or the dev server when that's unset. In production, set the
+owner server to your own server.
 
 ### Configuration
 
@@ -82,6 +84,7 @@ option.
 | `GATORAID_DISCORD_TOKEN` | `discord.token` | required |
 | `GATORAID_DISCORD_OWNER_IDS` | `discord.owner_ids` | |
 | `GATORAID_DISCORD_DEV_GUILD_ID` | `discord.dev_guild_id` | |
+| `GATORAID_DISCORD_OWNER_GUILD_ID` | `discord.owner_guild_id` | the dev guild |
 | `GATORAID_DISCORD_LOG_CHANNEL_ID` | `discord.log_channel_id` | |
 | `GATORAID_DATABASE_PATH` | `database.path` | `gatoraid.db` |
 | `GATORAID_HOLODEX_API_KEY` | `holodex.api_key` | |

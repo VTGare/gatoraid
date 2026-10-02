@@ -22,6 +22,7 @@ var _ = Describe("Config", func() {
 			"GATORAID_DISCORD_TOKEN=t",
 			"GATORAID_DISCORD_OWNER_IDS=1,2",
 			"GATORAID_DISCORD_DEV_GUILD_ID=3",
+			"GATORAID_DISCORD_OWNER_GUILD_ID=5",
 			"GATORAID_DISCORD_LOG_CHANNEL_ID=4",
 			"GATORAID_DATABASE_PATH=data/bot.db",
 			"GATORAID_HOLODEX_API_KEY=h",
@@ -36,7 +37,10 @@ var _ = Describe("Config", func() {
 		})
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(cfg.Discord).To(Equal(config.Discord{Token: "t", OwnerIDs: []string{"1", "2"}, DevGuildID: "3", LogChannelID: "4"}))
+		Expect(cfg.Discord).To(Equal(config.Discord{
+			Token: "t", OwnerIDs: []string{"1", "2"}, DevGuildID: "3", OwnerGuildID: "5", LogChannelID: "4",
+		}))
+		Expect(cfg.OwnerGuild()).To(Equal("5"))
 		Expect(cfg.Database.Path).To(Equal("data/bot.db"))
 		Expect(cfg.Holodex).To(Equal(config.Holodex{APIKey: "h", TLdex: true}))
 		Expect(cfg.DeepL).To(Equal(config.DeepL{APIKey: "d:fx", MonthlyCharacterBudget: 1000}))
@@ -124,5 +128,11 @@ var _ = Describe("Config", func() {
 			Expect(os.WriteFile(config.DefaultPath, []byte(`{}`), 0o600)).To(Succeed())
 			Expect(config.Path("", nil)).To(Equal(config.DefaultPath))
 		})
+	})
+
+	It("puts /owner in the dev guild unless an owner guild is set", func() {
+		Expect((&config.Config{Discord: config.Discord{DevGuildID: "dev"}}).OwnerGuild()).To(Equal("dev"))
+		Expect((&config.Config{Discord: config.Discord{DevGuildID: "dev", OwnerGuildID: "own"}}).OwnerGuild()).To(Equal("own"))
+		Expect((&config.Config{}).OwnerGuild()).To(BeEmpty())
 	})
 })
