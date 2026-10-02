@@ -281,7 +281,9 @@ var _ = Describe("Manager", func() {
 			tl.send("v", tldex.Update{Message: &tldex.Message{VideoID: "v", Name: "mchad user", Text: "TL line", Source: "MChad", TL: true}})
 			tl.send("v", tldex.Update{Message: &tldex.Message{VideoID: "v", Name: "mchad user", Text: "TL line", Source: "MChad", TL: true}})
 
-			Expect(nextEvent().Comment.Source).To(Equal(SourceMChad))
+			first := nextEvent().Comment
+			Expect(first.Source).To(Equal(SourceMChad))
+			Expect(first.AuthorChannelID).To(Equal("mchad:mchad user"))
 			Expect(nextEvent().Comment.Source).To(Equal(SourceMChad))
 		})
 

@@ -40,6 +40,10 @@ const (
 	SourceMChad Source = "mchad"
 )
 
+// MChad authors have no YouTube channel, so their author ID is this prefix
+// and their name. The blacklist and logs key authors by that ID.
+const MChadAuthorPrefix = "mchad:"
+
 type EventKind int
 
 const (
@@ -298,14 +302,16 @@ func fromYouTube(videoID string, m livechat.Message) *Comment {
 
 func fromTLdex(m *tldex.Message) *Comment {
 	source := SourceTLdex
+	author := m.ChannelID
 	if m.ChannelID == "" || strings.EqualFold(m.Source, "MChad") {
 		source = SourceMChad
+		author = MChadAuthorPrefix + m.Name
 	}
 
 	return &Comment{
 		VideoID:         m.VideoID,
-		ID:              "tldex:" + m.ChannelID + ":" + m.Time.Format(time.RFC3339Nano),
-		AuthorChannelID: m.ChannelID,
+		ID:              "tldex:" + author + ":" + m.Time.Format(time.RFC3339Nano),
+		AuthorChannelID: author,
 		AuthorName:      m.Name,
 		Text:            m.Text,
 		Time:            m.Time,

@@ -25,8 +25,9 @@ func newDeduper(window time.Duration) *deduper {
 	return &deduper{window: window, now: time.Now, seen: map[string]time.Time{}}
 }
 
+// MChad lines are only on TLdex, so there's nothing to drop.
 func (d *deduper) first(c *Comment) bool {
-	if c.AuthorChannelID == "" {
+	if c.Source == SourceMChad || c.AuthorChannelID == "" {
 		return true
 	}
 

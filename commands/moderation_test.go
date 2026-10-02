@@ -122,6 +122,19 @@ var _ = Describe("Moderation commands", func() {
 		Expect(data["content"]).To(ContainSubstring("That's not a line I relayed"))
 	})
 
+	It("blacklists MChad authors by name, not every MChad line", func() {
+		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
+			VideoID: "v", GuildID: "guild", MessageID: "m1", AuthorChannelID: "mchad:Some TLer", AuthorName: "Some TLer",
+			Body: "TL line", Kind: store.LineTL, SaidAt: time.Now(),
+		}})).To(Succeed())
+
+		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
+		Expect(data["content"]).To(HavePrefix("Blacklisted **Some TLer**."))
+		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Some TLer")).To(BeTrue())
+		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Someone Else")).To(BeFalse())
+		Expect(h.b.Moderation.Blacklisted("guild", "")).To(BeFalse())
+	})
+
 	It("mentions that streamers' own lines are still relayed", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
 			VideoID: "v", GuildID: "guild", MessageID: "m1", AuthorChannelID: "UCstreamer", AuthorName: "@streamer",
