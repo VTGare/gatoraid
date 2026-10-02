@@ -36,6 +36,9 @@ func (b *Bot) onReady(s *discordgo.Session, r *discordgo.Ready) {
 		b.Log.Info("left guild while offline", slog.String("guild_id", id))
 		b.notify(s, fmt.Sprintf("Removed from `%s` while offline. Its data is kept for 30 days.", id))
 	}
+	if len(left) > 0 {
+		b.reloadSubs(ctx)
+	}
 }
 
 // Discord sends GUILD_CREATE for every guild on startup and after outages,
@@ -52,6 +55,10 @@ func (b *Bot) onGuildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
 	if err != nil {
 		b.Log.Error("failed to record guild", slog.String("guild_id", g.ID), slog.Any("error", err))
 		return
+	}
+
+	if kind == store.JoinRestored {
+		b.reloadSubs(ctx)
 	}
 
 	switch kind {
@@ -82,6 +89,7 @@ func (b *Bot) onGuildDelete(s *discordgo.Session, g *discordgo.GuildDelete) {
 		b.Log.Error("failed to record leaving guild", slog.String("guild_id", g.ID), slog.Any("error", err))
 		return
 	}
+	b.reloadSubs(ctx)
 
 	name := g.ID
 	if g.BeforeDelete != nil && g.BeforeDelete.Name != "" {
@@ -90,6 +98,12 @@ func (b *Bot) onGuildDelete(s *discordgo.Session, g *discordgo.GuildDelete) {
 
 	b.Log.Info("left guild", slog.String("guild_id", g.ID), slog.String("guild", name))
 	b.notify(s, fmt.Sprintf("Left **%s** (`%s`). Its data is kept for 30 days.", name, g.ID))
+}
+
+func (b *Bot) reloadSubs(ctx context.Context) {
+	if err := b.Subs.Reload(ctx); err != nil {
+		b.Log.Error("failed to reload subscriptions", slog.Any("error", err))
+	}
 }
 
 func (b *Bot) notify(s *discordgo.Session, msg string) {

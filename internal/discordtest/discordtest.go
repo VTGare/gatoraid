@@ -123,6 +123,13 @@ func Attach(s *discordgo.Session) *Recorder {
 	return rec
 }
 
+// WithPermissions sets the invoker's permissions, which interactions carry
+// and permission checks read.
+func WithPermissions(i *discordgo.InteractionCreate, perms int64) *discordgo.InteractionCreate {
+	i.Member.Permissions = perms
+	return i
+}
+
 func Command(userID, name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.InteractionCreate {
 	return interaction(discordgo.InteractionApplicationCommand, userID, name, opts)
 }
@@ -160,6 +167,15 @@ func String(name, value string) *discordgo.ApplicationCommandInteractionDataOpti
 
 func Bool(name string, value bool) *discordgo.ApplicationCommandInteractionDataOption {
 	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionBoolean, Value: value}
+}
+
+// The ID option types (channel, role, user) carry the ID as a string.
+func Channel(name, id string) *discordgo.ApplicationCommandInteractionDataOption {
+	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionChannel, Value: id}
+}
+
+func Role(name, id string) *discordgo.ApplicationCommandInteractionDataOption {
+	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionRole, Value: id}
 }
 
 func Focused(name, value string) *discordgo.ApplicationCommandInteractionDataOption {

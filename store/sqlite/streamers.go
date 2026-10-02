@@ -240,6 +240,20 @@ func (s *Store) RemoveStreamer(ctx context.Context, channelID string) error {
 	return nil
 }
 
+func (s *Store) PurgeStreamers(ctx context.Context, removedBefore time.Time) (int, error) {
+	r, err := s.write.ExecContext(ctx, `
+		DELETE FROM streamers
+		WHERE removed_at < ? AND NOT EXISTS (
+			SELECT 1 FROM subscriptions WHERE target_kind = 'channel' AND target = streamers.channel_id)`,
+		removedBefore.UnixMilli())
+	if err != nil {
+		return 0, err
+	}
+
+	n, err := r.RowsAffected()
+	return int(n), err
+}
+
 func streamerSources(ctx context.Context, tx *sql.Tx) (map[string]store.StreamerSource, error) {
 	rows, err := tx.QueryContext(ctx, `SELECT channel_id, source FROM streamers`)
 	if err != nil {

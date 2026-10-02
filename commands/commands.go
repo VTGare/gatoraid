@@ -23,6 +23,9 @@ func Register(b *bot.Bot) error {
 			Category:      CategoryGeneral,
 			CategoryOrder: []string{CategoryRelay, CategoryNotifications, CategoryModeration, CategoryGeneral},
 		}),
+		subscriptionCommand(b, relayFeature),
+		subscriptionCommand(b, cameosFeature),
+		subscriptionCommand(b, gossipFeature),
 		streamersCommand(b),
 		ownerCommand(b),
 	)

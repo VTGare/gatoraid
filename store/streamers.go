@@ -8,6 +8,9 @@ import (
 
 var ErrStreamerNotFound = errors.New("streamer not found")
 
+// How long PurgeStreamers keeps hidden streamers nothing subscribes to.
+const StreamerRetention = 30 * 24 * time.Hour
+
 type Group struct {
 	ID                string
 	Name              string
@@ -75,4 +78,7 @@ type StreamerStore interface {
 	UpdateAvatars(ctx context.Context, avatars map[string]string) (int, error)
 	// Hides the streamer. Saving it again brings it back.
 	RemoveStreamer(ctx context.Context, channelID string) error
+	// Deletes streamers hidden before the cutoff that no subscription
+	// points at. Subscriptions of guilds the bot has left still count.
+	PurgeStreamers(ctx context.Context, removedBefore time.Time) (int, error)
 }

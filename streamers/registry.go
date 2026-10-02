@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"github.com/VTGare/gatoraid/store"
 )
@@ -335,4 +336,14 @@ func (r *Registry) Remove(ctx context.Context, channelID string) error {
 		return err
 	}
 	return r.Reload(ctx)
+}
+
+// Purge deletes streamers hidden before the cutoff that nothing subscribes
+// to.
+func (r *Registry) Purge(ctx context.Context, removedBefore time.Time) (int, error) {
+	n, err := r.store.PurgeStreamers(ctx, removedBefore)
+	if err != nil || n == 0 {
+		return n, err
+	}
+	return n, r.Reload(ctx)
 }

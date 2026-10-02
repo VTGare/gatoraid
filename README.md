@@ -63,6 +63,7 @@ cmd/chatwatch/        prints live chat as the bot reads it
 bot/                  Discord session, router wiring, guild lifecycle
 chat/                 one reader per stream, YouTube chat merged with TLdex
 commands/             slash commands
+subs/                 in-memory subscription index
 holodex/              Holodex API client
 holodex/tldex/        Holodex's TLdex translation feed
 stream/               stream tracker: Holodex polls into live/prechat/ended events
@@ -80,7 +81,8 @@ youtube/livechat/     YouTube live chat reader
 [`streamers/seed/`](streamers/seed/README.md) is the curated list of streamers, one TOML file per
 group. It's synced into the database on
 startup: new entries are added, changed ones updated and removed ones hidden, so subscriptions to
-them come back if they return. Streamers edited with `/owner streamers` belong to the owner from then
-on and the seed leaves them alone.
+them come back if they return. Hidden streamers nothing subscribes to are deleted after 30 days.
+Streamers edited with `/owner streamers` belong to the owner from then on and the seed leaves them
+alone.
 
 Commands are built on [gumi](https://github.com/VTGare/gumi).

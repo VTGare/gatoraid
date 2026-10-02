@@ -116,6 +116,22 @@ var _ = Describe("Guild lifecycle", func() {
 		Expect(rec.Messages(logChannel)).To(ContainElement("Removed from `2` while offline. Its data is kept for 30 days."))
 	})
 
+	It("drops a guild's subscriptions while it's gone", func() {
+		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		_, err := b.Subs.Add(ctx, store.Subscription{
+			GuildID: "1", Feature: store.FeatureGossip, Target: store.Target{Kind: store.TargetChannel, ID: "UCpomu"},
+			ChannelID: "c", CreatedBy: "u",
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(b.Subs.All(store.FeatureGossip)).To(HaveLen(1))
+
+		b.onGuildDelete(s, &discordgo.GuildDelete{Guild: &discordgo.Guild{ID: "1"}})
+		Expect(b.Subs.All(store.FeatureGossip)).To(BeEmpty())
+
+		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		Expect(b.Subs.All(store.FeatureGossip)).To(HaveLen(1))
+	})
+
 	It("posts nothing without a log channel", func() {
 		b.Config.Discord.LogChannelID = ""
 
@@ -130,7 +146,7 @@ var _ = Describe("Guild lifecycle", func() {
 		Expect(b.Store.LeaveGuild(ctx, "old", time.Now().Add(-store.GuildRetention-time.Hour))).To(Succeed())
 		Expect(b.Store.LeaveGuild(ctx, "recent", time.Now())).To(Succeed())
 
-		b.purgeGuilds(ctx)
+		b.purge(ctx)
 
 		_, err := b.Store.Guild(ctx, "old")
 		Expect(err).To(MatchError(store.ErrGuildNotFound))

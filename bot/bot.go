@@ -17,6 +17,7 @@ import (
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
+	"github.com/VTGare/gatoraid/subs"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 )
 
@@ -31,6 +32,7 @@ type Bot struct {
 	Log       *slog.Logger
 	Store     store.Store
 	Streamers *streamers.Registry
+	Subs      *subs.Service
 	Session   *discordgo.Session
 	Router    *gumi.Router
 	// Nil without a Holodex API key.
@@ -63,6 +65,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		Session:   s,
 		ctx:       context.Background(),
 	}
+	b.Subs = subs.New(st, b.Streamers)
 
 	b.Router = gumi.New(gumi.Config{
 		DisablePrefixCommands: true,
@@ -177,7 +180,7 @@ func (b *Bot) purgeLoop(ctx context.Context) {
 	defer ticker.Stop()
 
 	for {
-		b.purgeGuilds(ctx)
+		b.purge(ctx)
 
 		select {
 		case <-ctx.Done():
@@ -220,7 +223,9 @@ func (b *Bot) watchChats(ctx context.Context) {
 	}
 }
 
-func (b *Bot) purgeGuilds(ctx context.Context) {
+// Guilds go first, so hidden streamers only their subscriptions kept can
+// go in the same run.
+func (b *Bot) purge(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
@@ -230,6 +235,14 @@ func (b *Bot) purgeGuilds(ctx context.Context) {
 		b.Log.Error("failed to purge left guilds", slog.Any("error", err))
 	case n > 0:
 		b.Log.Info("purged left guilds", slog.Int("count", n))
+	}
+
+	n, err = b.Streamers.Purge(ctx, time.Now().Add(-store.StreamerRetention))
+	switch {
+	case err != nil:
+		b.Log.Error("failed to purge hidden streamers", slog.Any("error", err))
+	case n > 0:
+		b.Log.Info("purged hidden streamers", slog.Int("count", n))
 	}
 }
 
