@@ -1,7 +1,8 @@
 # Streamer seed
 
 The curated list of streamers GatorAid knows about. It's built into the binary and synced into the
-database on startup: new entries are added, changed ones updated, and removed ones deleted.
+database on startup: new entries are added, changed ones updated, and removed ones hidden, so
+subscriptions to them come back if they return.
 Streamers edited with `/owner streamers` belong to the owner from then on, and the seed leaves them
 alone.
 

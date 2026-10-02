@@ -31,7 +31,7 @@ var _ = Describe("Config", func() {
 			"GATORAID_LIMITS_USER_CHANNELS=5",
 			"GATORAID_LOG_LEVEL=debug",
 			"GATORAID_LOG_FORMAT=text",
-			"GATORAID_EMOJIS=deepl=<:deepL:1>,youtube=<:YouTube:2>",
+			"GATORAID_EMOJIS=deepl=<:deepL:1>,hololive=<:holo:2>",
 			"UNRELATED=x",
 		})
 
@@ -42,7 +42,7 @@ var _ = Describe("Config", func() {
 		Expect(cfg.DeepL).To(Equal(config.DeepL{APIKey: "d:fx", MonthlyCharacterBudget: 1000}))
 		Expect(cfg.Limits.UserChannels).To(Equal(5))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "debug", Format: "text"}))
-		Expect(cfg.Emojis).To(Equal(map[string]string{"deepl": "<:deepL:1>", "youtube": "<:YouTube:2>"}))
+		Expect(cfg.Emojis).To(Equal(map[string]string{"deepl": "<:deepL:1>", "hololive": "<:holo:2>"}))
 	})
 
 	It("falls back to the file for anything the environment leaves unset", func() {

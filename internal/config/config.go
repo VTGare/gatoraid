@@ -34,9 +34,9 @@ type Config struct {
 	DeepL    DeepL    `json:"deepl" envPrefix:"DEEPL_"`
 	Limits   Limits   `json:"limits" envPrefix:"LIMITS_"`
 	Log      Log      `json:"log" envPrefix:"LOG_"`
-	// Emojis maps keys like "deepl" or "youtube" to custom emoji markup
+	// Emojis maps keys like "deepl" or "hololive" to custom emoji markup
 	// ("<:deepL:123>"). Missing keys use plain Unicode emojis. From the
-	// environment it's GATORAID_EMOJIS="deepl=<:deepL:1>,youtube=<:YouTube:2>",
+	// environment it's GATORAID_EMOJIS="deepl=<:deepL:1>,hololive=<:holo:2>",
 	// which replaces the file's map instead of merging with it.
 	Emojis map[string]string `json:"emojis" env:"EMOJIS" envKeyValSeparator:"="`
 }
