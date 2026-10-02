@@ -81,4 +81,7 @@ type StreamerStore interface {
 	// Deletes streamers hidden before the cutoff that no subscription
 	// points at. Subscriptions of guilds the bot has left still count.
 	PurgeStreamers(ctx context.Context, removedBefore time.Time) (int, error)
+	// Hides user streamers no subscription points at anymore, so they stop
+	// being polled.
+	HideUnusedUserStreamers(ctx context.Context) (int, error)
 }

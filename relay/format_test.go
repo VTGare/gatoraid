@@ -30,7 +30,7 @@ var _ = Describe("Formatter", func() {
 
 	DescribeTable("relay lines",
 		func(c *relay.Comment, kind relay.Kind, showChat bool, want string) {
-			Expect(f.Relay(c, kind, showChat)).To(Equal(want))
+			Expect(f.Relay(c, kind, showChat, "")).To(Equal(want))
 		},
 		Entry("a translation, spoilered", comment("[EN] hi"), relay.KindTL, false,
 			"💬 ||@viewer:|| `[EN] hi`"),
@@ -66,7 +66,7 @@ var _ = Describe("Formatter", func() {
 	})
 
 	It("keeps long lines under Discord's limit", func() {
-		line := f.Relay(comment(strings.Repeat("あ", 2000)), relay.KindTL, true)
+		line := f.Relay(comment(strings.Repeat("あ", 2000)), relay.KindTL, true, "")
 		Expect(len(line)).To(BeNumerically("<", 2000))
 		Expect(line).To(ContainSubstring("あ…`\n**Chat:**"))
 	})

@@ -16,6 +16,9 @@
     "api_key": "",
     "monthly_character_budget": 500000
   },
+  "limits": {
+    "user_channels": 25
+  },
   "log": {
     "level": "info",
     "format": "json"

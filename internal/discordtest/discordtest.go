@@ -130,6 +130,12 @@ func WithPermissions(i *discordgo.InteractionCreate, perms int64) *discordgo.Int
 	return i
 }
 
+// WithRoles gives the invoker roles in the guild.
+func WithRoles(i *discordgo.InteractionCreate, roleIDs ...string) *discordgo.InteractionCreate {
+	i.Member.Roles = roleIDs
+	return i
+}
+
 func Command(userID, name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.InteractionCreate {
 	return interaction(discordgo.InteractionApplicationCommand, userID, name, opts)
 }
@@ -161,6 +167,39 @@ func MessageCommand(userID, name, messageID string) *discordgo.InteractionCreate
 	}
 	i.Data = data
 	return i
+}
+
+// Component is a click on a button, or a pick in a select menu when values
+// are given, in the interaction's guild and channel.
+func Component(userID, customID string, values ...string) *discordgo.InteractionCreate {
+	kind := discordgo.ButtonComponent
+	if values != nil {
+		kind = discordgo.SelectMenuComponent
+	}
+
+	return &discordgo.InteractionCreate{Interaction: &discordgo.Interaction{
+		ID: "1", AppID: "app", Token: "token", Type: discordgo.InteractionMessageComponent,
+		GuildID: "guild", ChannelID: "channel",
+		Member: &discordgo.Member{User: &discordgo.User{ID: userID}},
+		Data:   discordgo.MessageComponentInteractionData{CustomID: customID, ComponentType: kind, Values: values},
+	}}
+}
+
+// ModalSubmit submits a modal with text inputs by custom ID.
+func ModalSubmit(userID, customID string, inputs map[string]string) *discordgo.InteractionCreate {
+	var rows []discordgo.MessageComponent
+	for id, value := range inputs {
+		rows = append(rows, &discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+			&discordgo.TextInput{CustomID: id, Value: value},
+		}})
+	}
+
+	return &discordgo.InteractionCreate{Interaction: &discordgo.Interaction{
+		ID: "1", AppID: "app", Token: "token", Type: discordgo.InteractionModalSubmit,
+		GuildID: "guild", ChannelID: "channel",
+		Member: &discordgo.Member{User: &discordgo.User{ID: userID}},
+		Data:   discordgo.ModalSubmitInteractionData{CustomID: customID, Components: rows},
+	}}
 }
 
 func Sub(name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.ApplicationCommandInteractionDataOption {

@@ -347,3 +347,12 @@ func (r *Registry) Purge(ctx context.Context, removedBefore time.Time) (int, err
 	}
 	return n, r.Reload(ctx)
 }
+
+// HideUnused hides user-added channels nothing subscribes to anymore.
+func (r *Registry) HideUnused(ctx context.Context) (int, error) {
+	n, err := r.store.HideUnusedUserStreamers(ctx)
+	if err != nil || n == 0 {
+		return n, err
+	}
+	return n, r.Reload(ctx)
+}

@@ -15,6 +15,7 @@ type Store interface {
 	LogStore
 	ModerationStore
 	DedupeStore
+	RoleStore
 	Close() error
 }
 

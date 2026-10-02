@@ -38,7 +38,10 @@ func newHarness(seed *streamers.Seed) *harness {
 	Expect(err).NotTo(HaveOccurred())
 	DeferCleanup(db.Close)
 
-	cfg := &config.Config{Discord: config.Discord{Token: "test", OwnerIDs: []string{owner}}}
+	cfg := &config.Config{
+		Discord: config.Discord{Token: "test", OwnerIDs: []string{owner}},
+		Limits:  config.Limits{UserChannels: config.DefaultUserChannels},
+	}
 	b, err := bot.New(cfg, slog.New(slog.DiscardHandler), db)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -92,7 +95,7 @@ var _ = Describe("Register", func() {
 		for _, c := range global {
 			names = append(names, c.Name)
 		}
-		Expect(names).To(ConsistOf("help", "relay", "cameos", "gossip", "notify", "log", "blacklist", "Blacklist author", "filter", "streamers", "owner"))
+		Expect(names).To(ConsistOf("help", "relay", "cameos", "gossip", "notify", "log", "settings", "blacklist", "Blacklist author", "filter", "streamers", "owner"))
 	})
 })
 

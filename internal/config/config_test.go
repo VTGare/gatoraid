@@ -28,6 +28,7 @@ var _ = Describe("Config", func() {
 			"GATORAID_HOLODEX_TLDEX=true",
 			"GATORAID_DEEPL_API_KEY=d:fx",
 			"GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET=1000",
+			"GATORAID_LIMITS_USER_CHANNELS=5",
 			"GATORAID_LOG_LEVEL=debug",
 			"GATORAID_LOG_FORMAT=text",
 			"GATORAID_EMOJIS=deepl=<:deepL:1>,youtube=<:YouTube:2>",
@@ -39,6 +40,7 @@ var _ = Describe("Config", func() {
 		Expect(cfg.Database.Path).To(Equal("data/bot.db"))
 		Expect(cfg.Holodex).To(Equal(config.Holodex{APIKey: "h", TLdex: true}))
 		Expect(cfg.DeepL).To(Equal(config.DeepL{APIKey: "d:fx", MonthlyCharacterBudget: 1000}))
+		Expect(cfg.Limits.UserChannels).To(Equal(5))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "debug", Format: "text"}))
 		Expect(cfg.Emojis).To(Equal(map[string]string{"deepl": "<:deepL:1>", "youtube": "<:YouTube:2>"}))
 	})
@@ -80,6 +82,7 @@ var _ = Describe("Config", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cfg.Database.Path).To(Equal(config.DefaultDatabasePath))
 		Expect(cfg.DeepL.MonthlyCharacterBudget).To(Equal(config.DefaultDeepLBudget))
+		Expect(cfg.Limits.UserChannels).To(Equal(config.DefaultUserChannels))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "info", Format: "json"}))
 	})
 
@@ -100,6 +103,7 @@ var _ = Describe("Config", func() {
 		Entry("bad log level", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LOG_LEVEL=loud"}, "log level"),
 		Entry("bad log format", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LOG_FORMAT=xml"}, "log format"),
 		Entry("negative budget", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET=-1"}, "cannot be negative"),
+		Entry("negative user channel limit", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LIMITS_USER_CHANNELS=-1"}, "user channel limit cannot be negative"),
 	)
 
 	It("reports a missing file that was asked for", func() {

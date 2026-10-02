@@ -14,10 +14,12 @@ const (
 	EmojiPrechat = "prechat"
 	EmojiVTuber  = "vtuber"
 	EmojiPeek    = "peek"
+	EmojiDeepL   = "deepl"
 
 	fallbackPrechat = "⏳"
 	fallbackVTuber  = "🎙️"
 	fallbackPeek    = "👀"
+	fallbackDeepL   = "🌐"
 	iconTL          = "💬"
 	iconOther       = "🛠️"
 )
@@ -35,9 +37,10 @@ type Formatter struct {
 	Color int
 }
 
-// Relay formats a relayed line. showChat adds a link to the chat, for
-// Discord channels that relay more than one streamer.
-func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool) string {
+// Relay formats a relayed line. translation adds a DeepL line, and showChat
+// a link to the chat for Discord channels that relay more than one
+// streamer.
+func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation string) string {
 	var sb strings.Builder
 
 	if c.Stream.Status == stream.Upcoming {
@@ -55,6 +58,10 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool) string {
 	}
 
 	sb.WriteString(" " + code(c.Text))
+
+	if translation != "" {
+		sb.WriteString("\n" + f.Emoji(EmojiDeepL, fallbackDeepL) + " **DeepL:** " + code(translation))
+	}
 
 	if showChat {
 		sb.WriteString("\n**Chat:** [" + EscapeMarkdown(hostName(c)) + "](<" + c.Stream.URL() + ">)")

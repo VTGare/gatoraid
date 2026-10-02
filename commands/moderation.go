@@ -10,6 +10,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 
 	"github.com/VTGare/gatoraid/bot"
+	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/youtube/channel"
@@ -21,24 +22,17 @@ const (
 	maxFieldLength = 1024
 )
 
-var moderatorChecks = []gumi.Check{
-	gumi.GuildOnly,
-	gumi.HasPermissions(discordgo.PermissionManageMessages),
-}
-
-func moderatorPermissions() *int64 {
-	p := int64(discordgo.PermissionManageMessages)
-	return &p
+func moderatorChecks(b *bot.Bot) []gumi.Check {
+	return []gumi.Check{perms.Check(b.Store, perms.Blacklister)}
 }
 
 func blacklistCommand(b *bot.Bot) *gumi.Command {
 	return &gumi.Command{
-		Name:                     "blacklist",
-		Description:              "Stop relaying someone's messages in this server",
-		Category:                 CategoryModeration,
-		Checks:                   moderatorChecks,
-		DefaultMemberPermissions: moderatorPermissions(),
-		Contexts:                 []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Name:        "blacklist",
+		Description: "Stop relaying someone's messages in this server",
+		Category:    CategoryModeration,
+		Checks:      moderatorChecks(b),
+		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "add",
@@ -70,13 +64,12 @@ func blacklistCommand(b *bot.Bot) *gumi.Command {
 
 func blacklistAuthorCommand(b *bot.Bot) *gumi.Command {
 	return &gumi.Command{
-		Name:                     "Blacklist author",
-		Type:                     gumi.MessageContext,
-		Category:                 CategoryModeration,
-		Checks:                   moderatorChecks,
-		DefaultMemberPermissions: moderatorPermissions(),
-		Contexts:                 []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
-		Ephemeral:                true,
+		Name:      "Blacklist author",
+		Type:      gumi.MessageContext,
+		Category:  CategoryModeration,
+		Checks:    moderatorChecks(b),
+		Contexts:  []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Ephemeral: true,
 		Handler: func(ctx *gumi.Context) error {
 			line, err := b.Store.LineByMessage(ctx.Context(), ctx.GuildID(), ctx.TargetMessage.ID)
 			if errors.Is(err, store.ErrLineNotFound) {
@@ -273,12 +266,11 @@ func filterCommand(b *bot.Bot) *gumi.Command {
 	}
 
 	return &gumi.Command{
-		Name:                     "filter",
-		Description:              "Drop lines with banned words, or mark lines with a prefix as translations",
-		Category:                 CategoryModeration,
-		Checks:                   moderatorChecks,
-		DefaultMemberPermissions: moderatorPermissions(),
-		Contexts:                 []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Name:        "filter",
+		Description: "Drop lines with banned words, or mark lines with a prefix as translations",
+		Category:    CategoryModeration,
+		Checks:      moderatorChecks(b),
+		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "add",

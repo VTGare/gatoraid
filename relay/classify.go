@@ -224,3 +224,10 @@ func japanese(s string) bool {
 		return unicode.In(r, unicode.Hiragana, unicode.Katakana, unicode.Han)
 	})
 }
+
+// YouTube writes its own emojis as :name:, which aren't worth translating.
+var shortcode = regexp.MustCompile(`:[^:\s]+:`)
+
+func hasWords(text string) bool {
+	return strings.ContainsFunc(shortcode.ReplaceAllString(text, ""), unicode.IsLetter)
+}

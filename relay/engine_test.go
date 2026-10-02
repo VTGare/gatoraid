@@ -2,11 +2,14 @@ package relay_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -18,6 +21,7 @@ import (
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/subs"
+	"github.com/VTGare/gatoraid/translate"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -60,6 +64,32 @@ func (f *fakeChats) Running() []string {
 	}
 	slices.Sort(ids)
 	return ids
+}
+
+type fakeTranslator struct {
+	mu    sync.Mutex
+	calls []string
+	err   error
+}
+
+func (f *fakeTranslator) Translate(_ context.Context, text, target string) (translate.Result, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.calls = append(f.calls, target+":"+text)
+	if f.err != nil {
+		return translate.Result{}, f.err
+	}
+	detected := "JA"
+	if !strings.ContainsFunc(text, func(r rune) bool { return r > unicode.MaxASCII }) {
+		detected = "EN"
+	}
+	return translate.Result{Text: "<" + text + " in " + target + ">", DetectedSource: detected}, nil
+}
+
+func (f *fakeTranslator) callList() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]string(nil), f.calls...)
 }
 
 type sent struct {
@@ -120,6 +150,7 @@ var _ = Describe("Engine", func() {
 		engine  *relay.Engine
 		rules   map[string]*relay.Moderation
 		ended   chan stream.Stream
+		tl      *fakeTranslator
 	)
 
 	BeforeEach(func() {
@@ -131,11 +162,15 @@ var _ = Describe("Engine", func() {
 
 		reg = streamers.New(db)
 		_, err = reg.Sync(ctx, &streamers.Seed{
-			Groups: []store.Group{{ID: "holo-en", Name: "Hololive EN"}, {ID: "niji", Name: "Nijisanji"}},
+			Groups: []store.Group{
+				{ID: "holo-en", Name: "Hololive EN"}, {ID: "niji", Name: "Nijisanji"},
+				{ID: "holo-id", Name: "Hololive ID", SkipAutoTranslate: true},
+			},
 			Streamers: []store.Streamer{
 				{ChannelID: calliID, Name: "Mori Calliope", GroupID: "holo-en", Aliases: []string{"calli"}},
 				{ChannelID: kiaraID, Name: "Takanashi Kiara", GroupID: "holo-en", Aliases: []string{"kiara"}},
 				{ChannelID: eliraID, Name: "Elira Pendora", GroupID: "niji", Aliases: []string{"elira"}},
+				{ChannelID: "UCrisu", Name: "Ayunda Risu", GroupID: "holo-id"},
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -151,6 +186,7 @@ var _ = Describe("Engine", func() {
 		streams = make(chan stream.Event, 16)
 		rules = map[string]*relay.Moderation{}
 		ended = make(chan stream.Stream, 4)
+		tl = &fakeTranslator{}
 	})
 
 	start := func() {
@@ -164,6 +200,7 @@ var _ = Describe("Engine", func() {
 			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
 			Moderation: func(guildID string) *relay.Moderation { return rules[guildID] },
 			OnEnded:    func(s stream.Stream) { ended <- s },
+			Translator: tl,
 		})
 
 		var runCtx context.Context
@@ -390,6 +427,64 @@ var _ = Describe("Engine", func() {
 		Expect(s.VideoID).To(Equal("calli-live"))
 		Expect(s.StartedAt).To(Equal(tldexStart))
 		Consistently(ended, 50*time.Millisecond).ShouldNot(Receive())
+	})
+
+	It("picks up changed settings", func() {
+		g, err := db.Guild(ctx, "g1")
+		Expect(err).NotTo(HaveOccurred())
+		g.Settings.Prechat = false
+		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
+
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+		streams <- stream.Event{Kind: stream.EventPrechat, Stream: stream.Stream{
+			VideoID: "calli-live", ChannelID: calliID, Status: stream.Upcoming,
+		}}
+		Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+
+		g.Settings.Prechat = true
+		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
+		engine.SettingsChanged("g1")
+		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
+	})
+
+	It("translates VTuber lines once per language and only when it's another language", func() {
+		g, err := db.Guild(ctx, "g2")
+		Expect(err).NotTo(HaveOccurred())
+		g.Settings.TargetLanguage = "JA"
+		Expect(db.UpdateGuildSettings(ctx, "g2", g.Settings)).To(Succeed())
+
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c3", "")
+		subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
+		start()
+		streams <- live("calli-live", calliID)
+		Eventually(snd.lines).Should(HaveLen(3))
+
+		say("calli-live", calliID, "@calli", "おはよう")
+		say("calli-live", "UCviewer", "@viewer", "[EN] good morning")
+		say("calli-live", "UCrisu", "@risu", "おはようございます")
+		say("calli-live", kiaraID, "@kiara", ":_kiaraWave::_hic:")
+
+		Eventually(snd.lines).Should(ContainElements(
+			"c1: 🎙️ **@calli:** `おはよう`\n🌐 **DeepL:** `<おはよう in EN-US>`",
+			"c3: 🎙️ **@calli:** `おはよう`\n🌐 **DeepL:** `<おはよう in EN-US>`",
+			"c2: 🎙️ **@calli:** `おはよう`",
+			"c1: 🎙️ **@risu:** `おはようございます`",
+			"c1: 🎙️ **@kiara:** `:_kiaraWave::_hic:`",
+		))
+		Consistently(tl.callList, 50*time.Millisecond).Should(ConsistOf("EN-US:おはよう", "JA:おはよう"))
+	})
+
+	It("posts lines without a translation when DeepL fails", func() {
+		tl.err = errors.New("down")
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+		streams <- live("calli-live", calliID)
+		Eventually(snd.lines).Should(HaveLen(1))
+
+		say("calli-live", calliID, "@calli", "おはよう")
+		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `おはよう`"))
 	})
 
 	It("adds the chat link when a channel relays several streamers", func() {

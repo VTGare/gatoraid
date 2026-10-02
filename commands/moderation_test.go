@@ -71,7 +71,20 @@ var _ = Describe("Moderation commands", func() {
 
 	It("needs Manage Messages", func() {
 		data := h.run(dt.Command(user, "filter", dt.Sub("list")))
-		Expect(data["content"]).To(ContainSubstring("You don't have permission"))
+		Expect(data["content"]).To(ContainSubstring("You need Manage Messages, or a Blacklister or Manager role"))
+	})
+
+	It("lets Blacklister and Manager roles in", func() {
+		Expect(h.b.Store.SetGuildRoles(ctx, "guild", store.RoleBlacklister, []string{"bl"})).To(Succeed())
+		Expect(h.b.Store.SetGuildRoles(ctx, "guild", store.RoleManager, []string{"mgr"})).To(Succeed())
+
+		for _, role := range []string{"bl", "mgr"} {
+			data := h.run(dt.WithRoles(dt.Command(user, "filter", dt.Sub("list")), role))
+			Expect(embed(data)["title"]).To(Equal("Filters"), role)
+		}
+
+		data := h.run(dt.WithRoles(dt.Command(user, "filter", dt.Sub("list")), "other"))
+		Expect(data["content"]).To(ContainSubstring("You need Manage Messages"))
 	})
 
 	It("blacklists a channel by handle and lists it", func() {

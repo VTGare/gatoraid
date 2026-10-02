@@ -2,6 +2,7 @@ package relay
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"sync"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/subs"
+	"github.com/VTGare/gatoraid/translate"
 )
 
 const (
@@ -21,6 +23,8 @@ const (
 	lineBatch     = 500
 	flushInterval = time.Second
 	storeTimeout  = 10 * time.Second
+	// Past this the line goes out without its translation.
+	translateTimeout = 5 * time.Second
 )
 
 type Chats interface {
@@ -31,6 +35,10 @@ type Chats interface {
 
 type Sender interface {
 	Send(sender.Message) bool
+}
+
+type Translator interface {
+	Translate(ctx context.Context, text, target string) (translate.Result, error)
 }
 
 type Store interface {
@@ -51,7 +59,9 @@ type Config struct {
 	Moderation func(guildID string) *Moderation
 	// Called when a stream that went live ends. Optional.
 	OnEnded func(stream.Stream)
-	Log     *slog.Logger
+	// Translates VTuber lines for guilds with auto-translate on. Optional.
+	Translator Translator
+	Log        *slog.Logger
 }
 
 // Engine decides which chats to read and sends their lines where the
@@ -62,6 +72,8 @@ type Engine struct {
 	quit  chan struct{}
 	saved chan struct{}
 	close sync.Once
+	// Lines waiting for their translation.
+	translating sync.WaitGroup
 
 	streams map[string]*stream.Stream
 	running map[string]bool
@@ -69,7 +81,10 @@ type Engine struct {
 	// aren't restarted until the status changes.
 	stopped  map[string]stream.Status
 	notified map[noticeKey]bool
-	settings map[string]*store.Settings
+	// Guarded by settingsMu, since SettingsChanged runs on other goroutines.
+	settingsMu sync.Mutex
+	settings   map[string]*store.Settings
+	resync     chan struct{}
 }
 
 type noticeKey struct {
@@ -100,6 +115,7 @@ func NewEngine(cfg Config) *Engine {
 		stopped:  map[string]stream.Status{},
 		notified: map[noticeKey]bool{},
 		settings: map[string]*store.Settings{},
+		resync:   make(chan struct{}, 1),
 	}
 	go e.saveLines()
 
@@ -121,12 +137,17 @@ func (e *Engine) Run(ctx context.Context) error {
 			for id := range e.running {
 				e.cfg.Chats.Stop(id)
 			}
+			e.translating.Wait()
 			return ctx.Err()
 		case ev := <-e.cfg.Streams:
 			e.onStream(ctx, ev)
 		case ev := <-e.cfg.Chats.Events():
 			e.onChat(ev)
 		case <-e.cfg.Subs.Changed():
+			for _, s := range e.streams {
+				e.update(ctx, s)
+			}
+		case <-e.resync:
 			for _, s := range e.streams {
 				e.update(ctx, s)
 			}
@@ -305,13 +326,9 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	sent := map[string]bool{}
 	post := func(sub *store.Subscription, kind Kind, content string) {
 		sent[sub.ChannelID] = true
-		msg := sender.Message{
-			ChannelID: sub.ChannelID,
-			Send:      &discordgo.MessageSend{Content: content, AllowedMentions: &discordgo.MessageAllowedMentions{}},
-			OnSent:    func(m *discordgo.Message) { e.save(c, kind, sub.GuildID, m) },
-		}
-		e.cfg.Sender.Send(msg)
+		e.post(c, sub, kind, content)
 	}
+	toTranslate := map[string][]waiting{}
 
 	for _, sub := range e.cfg.Subs.Match(store.FeatureRelay, s.ChannelID) {
 		st := e.guildSettings(sub.GuildID)
@@ -326,7 +343,12 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 
 		showChat := st.ShowChat &&
 			(sub.Target.Kind != store.TargetChannel || e.cfg.Subs.Count(store.FeatureRelay, sub.ChannelID) > 1)
-		post(sub, kind, e.cfg.Formatter.Relay(c, kind, showChat))
+		if e.translates(c, kind, st) {
+			sent[sub.ChannelID] = true
+			toTranslate[st.TargetLanguage] = append(toTranslate[st.TargetLanguage], waiting{sub, kind, showChat})
+			continue
+		}
+		post(sub, kind, e.cfg.Formatter.Relay(c, kind, showChat, ""))
 	}
 
 	if c.Author != nil {
@@ -346,12 +368,87 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 			post(sub, KindGossip, e.cfg.Formatter.Gossip(c))
 		}
 	}
+
+	for target, lines := range toTranslate {
+		e.translateAndPost(c, target, lines)
+	}
 }
 
-// Settings change only through /settings, which isn't built yet, so
-// they're loaded once per guild. Nil means the guild can't be loaded.
+func (e *Engine) post(c *Comment, sub *store.Subscription, kind Kind, content string) {
+	e.cfg.Sender.Send(sender.Message{
+		ChannelID: sub.ChannelID,
+		Send:      &discordgo.MessageSend{Content: content, AllowedMentions: &discordgo.MessageAllowedMentions{}},
+		OnSent:    func(m *discordgo.Message) { e.save(c, kind, sub.GuildID, m) },
+	})
+}
+
+type waiting struct {
+	sub      *store.Subscription
+	kind     Kind
+	showChat bool
+}
+
+// Streamer and VTuber lines with words in them get translated, unless the
+// author's group skips translation.
+func (e *Engine) translates(c *Comment, kind Kind, st *store.Settings) bool {
+	switch {
+	case e.cfg.Translator == nil || !st.AutoTranslate,
+		kind != KindOwner && kind != KindVTuber,
+		c.Author != nil && e.cfg.Registry.SkipAutoTranslate(c.Author),
+		!hasWords(c.Text):
+		return false
+	}
+	return true
+}
+
+// translateAndPost asks for the translation off the engine's goroutine, so
+// a slow DeepL never holds up other lines. A line whose translation fails
+// goes out without one.
+func (e *Engine) translateAndPost(c *Comment, target string, lines []waiting) {
+	// The engine updates its streams in place, so the goroutine gets its
+	// own copy.
+	stream := *c.Stream
+	own := *c
+	own.Stream = &stream
+
+	e.translating.Go(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), translateTimeout)
+		defer cancel()
+
+		translation := ""
+		r, err := e.cfg.Translator.Translate(ctx, own.Text, target)
+		switch {
+		case err == nil && !translate.SameLanguage(r.DetectedSource, target):
+			translation = r.Text
+		case err != nil && !errors.Is(err, translate.ErrBudget):
+			e.cfg.Log.Warn("translation failed", slog.String("video_id", own.VideoID), slog.Any("error", err))
+		}
+
+		for _, w := range lines {
+			e.post(&own, w.sub, w.kind, e.cfg.Formatter.Relay(&own, w.kind, w.showChat, translation))
+		}
+	})
+}
+
+// SettingsChanged drops the guild's cached settings and rechecks which
+// chats to read, since prechat and free chat settings decide that.
+func (e *Engine) SettingsChanged(guildID string) {
+	e.settingsMu.Lock()
+	delete(e.settings, guildID)
+	e.settingsMu.Unlock()
+
+	select {
+	case e.resync <- struct{}{}:
+	default:
+	}
+}
+
+// Nil means the guild can't be loaded.
 func (e *Engine) guildSettings(guildID string) *store.Settings {
-	if st, ok := e.settings[guildID]; ok {
+	e.settingsMu.Lock()
+	st, ok := e.settings[guildID]
+	e.settingsMu.Unlock()
+	if ok {
 		return st
 	}
 
@@ -364,7 +461,9 @@ func (e *Engine) guildSettings(guildID string) *store.Settings {
 		return nil
 	}
 
+	e.settingsMu.Lock()
 	e.settings[guildID] = &g.Settings
+	e.settingsMu.Unlock()
 	return &g.Settings
 }
 

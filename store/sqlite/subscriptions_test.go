@@ -155,4 +155,22 @@ var _ = Describe("Subscriptions", func() {
 		_, err = db.Streamer(ctx, "UCame")
 		Expect(err).NotTo(HaveOccurred())
 	})
+
+	It("hides user channels nothing subscribes to", func() {
+		Expect(db.SaveStreamer(ctx, store.Streamer{ChannelID: "UCused", Name: "Used", Source: store.SourceUser})).To(Succeed())
+		Expect(db.SaveStreamer(ctx, store.Streamer{ChannelID: "UCunused", Name: "Unused", Source: store.SourceUser})).To(Succeed())
+		Expect(db.SaveStreamer(ctx, store.Streamer{ChannelID: "UCowner", Name: "Owner", Source: store.SourceOwner})).To(Succeed())
+		_, err := db.AddSubscription(ctx, sub("g1", store.FeatureRelay, store.Target{Kind: store.TargetChannel, ID: "UCused"}, "c1"))
+		Expect(err).NotTo(HaveOccurred())
+
+		n, err := db.HideUnusedUserStreamers(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(n).To(Equal(1))
+
+		for id, hidden := range map[string]bool{"UCused": false, "UCunused": true, "UCowner": false} {
+			st, err := db.Streamer(ctx, id)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(st.Removed()).To(Equal(hidden), id)
+		}
+	})
 })

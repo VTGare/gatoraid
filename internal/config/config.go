@@ -19,9 +19,10 @@ const (
 	DefaultPath         = "config.json"
 	DefaultDatabasePath = "gatoraid.db"
 	// The DeepL API Free monthly limit.
-	DefaultDeepLBudget = 500_000
-	DefaultLogLevel    = "info"
-	DefaultLogFormat   = "json"
+	DefaultDeepLBudget  = 500_000
+	DefaultUserChannels = 25
+	DefaultLogLevel     = "info"
+	DefaultLogFormat    = "json"
 )
 
 // Variable names are the prefix, the section and the env tag put together,
@@ -31,6 +32,7 @@ type Config struct {
 	Database Database `json:"database" envPrefix:"DATABASE_"`
 	Holodex  Holodex  `json:"holodex" envPrefix:"HOLODEX_"`
 	DeepL    DeepL    `json:"deepl" envPrefix:"DEEPL_"`
+	Limits   Limits   `json:"limits" envPrefix:"LIMITS_"`
 	Log      Log      `json:"log" envPrefix:"LOG_"`
 	// Emojis maps keys like "deepl" or "youtube" to custom emoji markup
 	// ("<:deepL:123>"). Missing keys use plain Unicode emojis. From the
@@ -64,6 +66,11 @@ type DeepL struct {
 	// Empty turns translation off.
 	APIKey                 string `json:"api_key" env:"API_KEY"`
 	MonthlyCharacterBudget int    `json:"monthly_character_budget" env:"MONTHLY_CHARACTER_BUDGET"`
+}
+
+type Limits struct {
+	// YouTube channels outside the streamer registry one guild can add.
+	UserChannels int `json:"user_channels" env:"USER_CHANNELS"`
 }
 
 type Log struct {
@@ -146,6 +153,10 @@ func (c *Config) Validate() error {
 		errs = append(errs, errors.New("config: the DeepL monthly character budget cannot be negative"))
 	}
 
+	if c.Limits.UserChannels < 0 {
+		errs = append(errs, errors.New("config: the user channel limit cannot be negative"))
+	}
+
 	return errors.Join(errs...)
 }
 
@@ -164,6 +175,10 @@ func (c *Config) applyDefaults() {
 
 	if c.DeepL.MonthlyCharacterBudget == 0 {
 		c.DeepL.MonthlyCharacterBudget = DefaultDeepLBudget
+	}
+
+	if c.Limits.UserChannels == 0 {
+		c.Limits.UserChannels = DefaultUserChannels
 	}
 
 	if c.Log.Level == "" {

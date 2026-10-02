@@ -23,6 +23,7 @@ import (
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/subs"
 	"github.com/VTGare/gatoraid/tllog"
+	"github.com/VTGare/gatoraid/translate"
 	"github.com/VTGare/gatoraid/youtube/channel"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 	"github.com/VTGare/gatoraid/youtube/posts"
@@ -49,8 +50,10 @@ type Bot struct {
 	Moderation *moderation.Service
 	// Looks up YouTube channels from links and handles.
 	Channels *channel.Client
-	Session  *discordgo.Session
-	Router   *gumi.Router
+	// Nil without a DeepL API key.
+	Translator *translate.Service
+	Session    *discordgo.Session
+	Router     *gumi.Router
 	// Nil without a Holodex API key.
 	Holodex *holodex.Client
 	Streams *stream.Tracker
@@ -95,6 +98,10 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	b.Subs = subs.New(st, b.Streamers)
 	b.Moderation = moderation.New(st)
 	b.Channels = channel.New()
+	if cfg.DeepL.APIKey != "" {
+		b.Translator = translate.NewService(translate.NewDeepL(cfg.DeepL.APIKey),
+			int64(cfg.DeepL.MonthlyCharacterBudget), log.With("component", "deepl"))
+	}
 
 	b.Router = gumi.New(gumi.Config{
 		DisablePrefixCommands: true,
@@ -171,7 +178,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Log:      log.With("component", "live"),
 		})
 
-		b.Relay = relay.NewEngine(relay.Config{
+		relayCfg := relay.Config{
 			Streams:  b.relayStreams,
 			Chats:    b.Chats,
 			Registry: b.Streamers,
@@ -186,7 +193,12 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Moderation: b.Moderation.For,
 			OnEnded:    b.Logs.StreamEnded,
 			Log:        log.With("component", "relay"),
-		})
+		}
+		// A nil *Service in the interface would look like translation is on.
+		if b.Translator != nil {
+			relayCfg.Translator = b.Translator
+		}
+		b.Relay = relay.NewEngine(relayCfg)
 	}
 
 	return b, nil
@@ -242,6 +254,9 @@ func (b *Bot) Start(ctx context.Context) error {
 	}
 
 	go func() { _ = b.Posts.Run(ctx) }()
+	if b.Translator != nil {
+		go func() { _ = b.Translator.Run(ctx) }()
+	}
 
 	relayDone := make(chan struct{})
 	if b.Streams != nil {
@@ -269,6 +284,14 @@ func (b *Bot) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// SettingsChanged tells everything that caches guild settings to reload
+// them.
+func (b *Bot) SettingsChanged(guildID string) {
+	if b.Relay != nil {
+		b.Relay.SettingsChanged(guildID)
+	}
 }
 
 // The tracker has one events channel, and both the relay and the live
@@ -336,6 +359,14 @@ func (b *Bot) purge(ctx context.Context) {
 		b.Log.Error("failed to purge left guilds", slog.Any("error", err))
 	case n > 0:
 		b.Log.Info("purged left guilds", slog.Int("count", n))
+	}
+
+	n, err = b.Streamers.HideUnused(ctx)
+	switch {
+	case err != nil:
+		b.Log.Error("failed to hide unused channels", slog.Any("error", err))
+	case n > 0:
+		b.Log.Info("hid channels nothing subscribes to", slog.Int("count", n))
 	}
 
 	n, err = b.Streamers.Purge(ctx, time.Now().Add(-store.StreamerRetention))

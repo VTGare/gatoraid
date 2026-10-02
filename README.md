@@ -5,7 +5,8 @@ messages — into Discord channels, and sends stream and community post notifica
 
 > Work in progress. Relays (`/relay`, `/cameos`, `/gossip`), moderation (`/blacklist`, `/filter`,
 > the "Blacklist author" message command), TL logs (posted when streams end, and `/log`) and
-> notifications for live streams and community posts (`/notify`) work. `/settings` is next.
+> notifications for live streams and community posts (`/notify`) work, along with `/settings`,
+> Manager and Blacklister roles, DeepL translation and relaying any channel Holodex tracks.
 
 ## Running
 
@@ -34,6 +35,7 @@ option.
 | `GATORAID_HOLODEX_TLDEX` | `holodex.tldex` | `false` |
 | `GATORAID_DEEPL_API_KEY` | `deepl.api_key` | |
 | `GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET` | `deepl.monthly_character_budget` | `500000` |
+| `GATORAID_LIMITS_USER_CHANNELS` | `limits.user_channels` | `25` |
 | `GATORAID_LOG_LEVEL` | `log.level` | `info` |
 | `GATORAID_LOG_FORMAT` | `log.format` | `json` |
 | `GATORAID_EMOJIS` | `emojis` | |
@@ -74,10 +76,12 @@ relay/                which chats to read and where their lines go: rules, forma
 sender/               Discord send queue per channel
 subs/                 in-memory subscription index
 tllog/                stream logs from relayed lines, posted when streams end
+translate/            DeepL client with a cache and a monthly character budget
 holodex/              Holodex API client
 holodex/tldex/        Holodex's TLdex translation feed
 moderation/           in-memory blacklists and filters
 notify/               live stream and community post notifications
+perms/                who may manage the bot: Discord permissions or bot roles
 stream/               stream tracker: Holodex polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup

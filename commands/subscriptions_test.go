@@ -54,8 +54,19 @@ var _ = Describe("Subscription commands", func() {
 	It("needs Manage Server", func() {
 		data := h.run(dt.Command(user, "relay", dt.Sub("add", dt.String("target", "calli"))))
 
-		Expect(content(data)).To(ContainSubstring("You don't have permission"))
+		Expect(content(data)).To(ContainSubstring("You need Manage Server, or a Manager role"))
 		Expect(relays()).To(BeEmpty())
+	})
+
+	It("lets Manager roles in, but not Blacklister roles", func() {
+		Expect(h.b.Store.SetGuildRoles(context.Background(), "guild", store.RoleManager, []string{"mgr"})).To(Succeed())
+		Expect(h.b.Store.SetGuildRoles(context.Background(), "guild", store.RoleBlacklister, []string{"bl"})).To(Succeed())
+
+		data := h.run(dt.WithRoles(dt.Command(user, "relay", dt.Sub("add", dt.String("target", "calli"))), "mgr"))
+		Expect(content(data)).To(HavePrefix("Now relaying"))
+
+		data = h.run(dt.WithRoles(dt.Command(user, "relay", dt.Sub("list")), "bl"))
+		Expect(content(data)).To(ContainSubstring("You need Manage Server"))
 	})
 
 	It("relays a streamer here with a role, without pinging it", func() {
