@@ -124,10 +124,8 @@ func (m *Manager) Start(ctx context.Context, videoID string) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	m.sessions[videoID] = cancel
-	m.wg.Add(1)
 
-	go func() {
-		defer m.wg.Done()
+	m.wg.Go(func() {
 		err := m.run(ctx, videoID)
 
 		m.mu.Lock()
@@ -139,7 +137,7 @@ func (m *Manager) Start(ctx context.Context, videoID string) {
 		if !errors.Is(err, context.Canceled) {
 			m.send(context.Background(), Event{Kind: EventStopped, VideoID: videoID, Err: err})
 		}
-	}()
+	})
 }
 
 func (m *Manager) Stop(videoID string) {

@@ -106,7 +106,7 @@ func ParseSeed(fsys fs.FS) (*Seed, error) {
 		}
 
 		groups[g.ID] = &seedGroup{
-			Group: store.Group{ID: g.ID, Name: g.Name, ParentID: g.Parent, SkipAutoTranslate: g.SkipAutoTranslate},
+			ID: g.ID, Name: g.Name, ParentID: g.Parent, SkipAutoTranslate: g.SkipAutoTranslate,
 			order: g.Order,
 			file:  p,
 		}

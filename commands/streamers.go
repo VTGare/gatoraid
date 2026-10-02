@@ -248,7 +248,7 @@ func streamerEmbed(reg *streamers.Registry, st *store.Streamer) *discordgo.Messa
 
 func splitAliases(s string) []string {
 	var out []string
-	for _, a := range strings.Split(s, ",") {
+	for a := range strings.SplitSeq(s, ",") {
 		if a = strings.TrimSpace(a); a != "" && !slices.ContainsFunc(out, func(o string) bool { return strings.EqualFold(o, a) }) {
 			out = append(out, a)
 		}
