@@ -12,6 +12,7 @@ type Store interface {
 	SubscriptionStore
 	NoticeStore
 	LineStore
+	ModerationStore
 	Close() error
 }
 

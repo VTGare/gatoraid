@@ -118,6 +118,7 @@ var _ = Describe("Engine", func() {
 		stop    context.CancelFunc
 		done    chan struct{}
 		engine  *relay.Engine
+		rules   map[string]*relay.Moderation
 	)
 
 	BeforeEach(func() {
@@ -147,17 +148,19 @@ var _ = Describe("Engine", func() {
 		chats = &fakeChats{running: map[string]bool{}, events: make(chan chat.Event, 16)}
 		snd = &fakeSender{}
 		streams = make(chan stream.Event, 16)
+		rules = map[string]*relay.Moderation{}
 	})
 
 	start := func() {
 		engine = relay.NewEngine(relay.Config{
-			Streams:   streams,
-			Chats:     chats,
-			Registry:  reg,
-			Subs:      svc,
-			Store:     db,
-			Sender:    snd,
-			Formatter: &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
+			Streams:    streams,
+			Chats:      chats,
+			Registry:   reg,
+			Subs:       svc,
+			Store:      db,
+			Sender:     snd,
+			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
+			Moderation: func(guildID string) *relay.Moderation { return rules[guildID] },
 		})
 
 		var runCtx context.Context
@@ -341,6 +344,28 @@ var _ = Describe("Engine", func() {
 
 		streams <- stream.Event{Kind: stream.EventEnded, Stream: live("calli-live", calliID).Stream}
 		Eventually(chats.Running).Should(BeEmpty())
+	})
+
+	It("applies each guild's blacklist and filters", func() {
+		rules["g1"] = &relay.Moderation{Blacklist: map[string]bool{"UCspam": true}, Banned: []string{"spoiler"}, Wanted: []string{"es:"}}
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
+		start()
+
+		streams <- live("calli-live", calliID)
+		Eventually(snd.lines).Should(HaveLen(2))
+
+		say("calli-live", "UCspam", "@spam", "[EN] buy now")
+		say("calli-live", "UCviewer", "@viewer", "[EN] big SPOILER")
+		say("calli-live", "UCviewer", "@viewer", "ES: hola")
+		Eventually(snd.lines).Should(HaveLen(5))
+		Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(5))
+		Expect(snd.lines()).To(ContainElements(
+			"c1: 💬 ||@viewer:|| `ES: hola`",
+			"c2: 💬 ||@spam:|| `[EN] buy now`",
+			"c2: 💬 ||@viewer:|| `[EN] big SPOILER`",
+		))
+		Expect(snd.lines()).NotTo(ContainElement(HavePrefix("c2: 💬 ||@viewer:|| `ES:")))
 	})
 
 	It("adds the chat link when a channel relays several streamers", func() {

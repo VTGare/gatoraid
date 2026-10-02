@@ -149,6 +149,20 @@ func interaction(t discordgo.InteractionType, userID, name string, opts []*disco
 	}}
 }
 
+// MessageCommand runs a message context menu command on a message in the
+// interaction's channel.
+func MessageCommand(userID, name, messageID string) *discordgo.InteractionCreate {
+	i := interaction(discordgo.InteractionApplicationCommand, userID, name, nil)
+	data := i.Data.(discordgo.ApplicationCommandInteractionData)
+	data.CommandType = discordgo.MessageApplicationCommand
+	data.TargetID = messageID
+	data.Resolved = &discordgo.ApplicationCommandInteractionDataResolved{
+		Messages: map[string]*discordgo.Message{messageID: {ID: messageID, ChannelID: "channel"}},
+	}
+	i.Data = data
+	return i
+}
+
 func Sub(name string, opts ...*discordgo.ApplicationCommandInteractionDataOption) *discordgo.ApplicationCommandInteractionDataOption {
 	return &discordgo.ApplicationCommandInteractionDataOption{
 		Name: name, Type: discordgo.ApplicationCommandOptionSubCommand, Options: opts,

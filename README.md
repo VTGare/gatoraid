@@ -3,8 +3,8 @@
 A Discord bot that relays VTuber YouTube live chat — translations, streamer messages and mod
 messages — into Discord channels, and sends stream and community post notifications.
 
-> Work in progress. Relays (`/relay`, `/cameos`, `/gossip`) work. Moderation, TL logs, notifications
-> and `/settings` are next.
+> Work in progress. Relays (`/relay`, `/cameos`, `/gossip`) and moderation (`/blacklist`, `/filter`,
+> the "Blacklist author" message command) work. TL logs, notifications and `/settings` are next.
 
 ## Running
 
@@ -74,6 +74,7 @@ sender/               Discord send queue per channel
 subs/                 in-memory subscription index
 holodex/              Holodex API client
 holodex/tldex/        Holodex's TLdex translation feed
+moderation/           in-memory blacklists and filters
 stream/               stream tracker: Holodex polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup
@@ -81,6 +82,7 @@ internal/discordtest/ fake Discord API for tests
 store/                persistence interfaces and models
 store/sqlite/         SQLite implementation and migrations
 streamers/            streamer registry; seed/ holds the curated list
+youtube/channel/      finds YouTube channels from links, @handles and IDs
 youtube/livechat/     YouTube live chat reader
 ```
 

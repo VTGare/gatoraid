@@ -78,6 +78,9 @@ func run() error {
 	if err := b.Subs.Reload(ctx); err != nil {
 		return fmt.Errorf("load subscriptions: %w", err)
 	}
+	if err := b.Moderation.Reload(ctx); err != nil {
+		return fmt.Errorf("load blacklists and filters: %w", err)
+	}
 
 	if err := commands.Register(b); err != nil {
 		return err

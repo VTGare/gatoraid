@@ -26,6 +26,9 @@ func Register(b *bot.Bot) error {
 		subscriptionCommand(b, relayFeature),
 		subscriptionCommand(b, cameosFeature),
 		subscriptionCommand(b, gossipFeature),
+		blacklistCommand(b),
+		blacklistAuthorCommand(b),
+		filterCommand(b),
 		streamersCommand(b),
 		ownerCommand(b),
 	)

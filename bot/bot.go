@@ -14,12 +14,14 @@ import (
 	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
+	"github.com/VTGare/gatoraid/moderation"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/subs"
+	"github.com/VTGare/gatoraid/youtube/channel"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 )
 
@@ -39,8 +41,12 @@ type Bot struct {
 	Store     store.Store
 	Streamers *streamers.Registry
 	Subs      *subs.Service
-	Session   *discordgo.Session
-	Router    *gumi.Router
+	// Blacklists and filters.
+	Moderation *moderation.Service
+	// Looks up YouTube channels from links and handles.
+	Channels *channel.Client
+	Session  *discordgo.Session
+	Router   *gumi.Router
 	// Nil without a Holodex API key.
 	Holodex *holodex.Client
 	Streams *stream.Tracker
@@ -76,6 +82,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		ctx:       context.Background(),
 	}
 	b.Subs = subs.New(st, b.Streamers)
+	b.Moderation = moderation.New(st)
+	b.Channels = channel.New()
 
 	b.Router = gumi.New(gumi.Config{
 		DisablePrefixCommands: true,
@@ -134,7 +142,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 				Lineage: b.Streamers.Lineage,
 				Color:   Color,
 			},
-			Log: log.With("component", "relay"),
+			Moderation: b.Moderation.For,
+			Log:        log.With("component", "relay"),
 		})
 	}
 

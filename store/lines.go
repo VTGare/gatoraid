@@ -2,8 +2,11 @@ package store
 
 import (
 	"context"
+	"errors"
 	"time"
 )
+
+var ErrLineNotFound = errors.New("line not found")
 
 const (
 	GuildLineRetention   = 7 * 24 * time.Hour
@@ -37,6 +40,11 @@ type Line struct {
 type LineStore interface {
 	SaveLines(ctx context.Context, lines []Line) error
 	VideoLines(ctx context.Context, videoID, guildID string) ([]Line, error)
+	// The guild line posted as this Discord message.
+	LineByMessage(ctx context.Context, guildID, messageID string) (*Line, error)
+	// Authors of the guild's lines whose name contains query, most recent
+	// first, one line each.
+	RecentAuthors(ctx context.Context, guildID, query string, limit int) ([]Line, error)
 	// Guild lines and archive lines have separate cutoffs.
 	PruneLines(ctx context.Context, guildBefore, archiveBefore time.Time) (int, error)
 }

@@ -44,7 +44,7 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool) string {
 		sb.WriteString(f.Emoji(EmojiPrechat, fallbackPrechat) + " ")
 	}
 
-	name := escapeMarkdown(c.AuthorName)
+	name := EscapeMarkdown(c.AuthorName)
 	switch {
 	case kind == KindTL:
 		sb.WriteString(iconTL + " ||" + name + ":||")
@@ -57,7 +57,7 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool) string {
 	sb.WriteString(" " + code(c.Text))
 
 	if showChat {
-		sb.WriteString("\n**Chat:** [" + escapeMarkdown(hostName(c)) + "](<" + c.Stream.URL() + ">)")
+		sb.WriteString("\n**Chat:** [" + EscapeMarkdown(hostName(c)) + "](<" + c.Stream.URL() + ">)")
 	}
 
 	return sb.String()
@@ -78,8 +78,8 @@ func (f *Formatter) Gossip(c *Comment) string {
 }
 
 func (f *Formatter) elsewhere(c *Comment, author string) string {
-	return f.agencyEmoji(c.Author, EmojiPeek, fallbackPeek) + " **" + escapeMarkdown(author) + "** in [**" +
-		escapeMarkdown(hostName(c)) + "**'s chat](<" + c.Stream.URL() + ">): " + code(c.Text)
+	return f.agencyEmoji(c.Author, EmojiPeek, fallbackPeek) + " **" + EscapeMarkdown(author) + "** in [**" +
+		EscapeMarkdown(hostName(c)) + "**'s chat](<" + c.Stream.URL() + ">): " + code(c.Text)
 }
 
 // The nearest group with an emoji wins, so Hololive EN falls back to
@@ -119,4 +119,4 @@ var markdown = strings.NewReplacer(
 	`\`, `\\`, `*`, `\*`, `_`, `\_`, `~`, `\~`, `|`, `\|`, "`", "\\`", `>`, `\>`, `[`, `\[`, `]`, `\]`,
 )
 
-func escapeMarkdown(s string) string { return markdown.Replace(s) }
+func EscapeMarkdown(s string) string { return markdown.Replace(s) }
