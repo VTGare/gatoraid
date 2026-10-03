@@ -173,6 +173,549 @@ channel_name = "Amora Lumina Ch. 【EIEN Project】"
 twitter = "AmoraLumina"
 aliases = ["Amora", "Lumina"]
 
+[[streamer]]
+name = "Pmaru-sama"
+channel_id = "UCLqCmbd6bgcLaBVz3aA-68A"
+channel_name = "P丸様。"
+twitter = "p_ma_ru"
+
+[[streamer]]
+name = "Shigure Ui"
+channel_id = "UCt30jJgChL8qeT9VPadidSw"
+channel_name = "しぐれうい"
+twitter = "ui_shig"
+
+[[streamer]]
+name = "Gibpuri"
+channel_id = "UCompe4fS2oUss8CGTuhOSxA"
+channel_name = "Gibpuri Ch"
+twitter = "Gibpurin"
+
+[[streamer]]
+name = "Kanaria"
+channel_id = "UC10BM9XdLdrvB8japwmRUvA"
+channel_name = "Kanaria"
+twitter = "Kanaria390"
+
+[[streamer]]
+name = "Sameko Saba"
+channel_id = "UCxsZ6NCzjU_t4YSxQLBcM5A"
+channel_name = "saba"
+twitter = "samekosaba"
+
+[[streamer]]
+name = "Harris Caine"
+channel_id = "UCtC7olOldksX4fcl_8XKUFA"
+channel_name = "Harris Caine"
+twitter = "HarrisCainee"
+
+[[streamer]]
+name = "Daruma is god"
+channel_id = "UCRRKdB87Oj-FkqS4L9QQRiQ"
+channel_name = "だるまいずごっど"
+twitter = "darumaisgod"
+
+[[streamer]]
+name = "Mythia Batford"
+channel_id = "UCCK072ns5Bt1nYqX1CoaZ-g"
+channel_name = "Mythia Batford"
+twitter = "MythiaVTuber"
+
+[[streamer]]
+name = "PrettyHerb"
+channel_id = "UCtCnnCUn9IDDQRU9_04JD3g"
+channel_name = "쁘허"
+
+[[streamer]]
+name = "Yuuki Sakuna"
+channel_id = "UCrV1Hf5r8P148idjoSfrGEQ"
+channel_name = "Sakuna Ch. 結城さくな"
+twitter = "yuki_sakuna"
+
+[[streamer]]
+name = "Kawasaki Sui"
+channel_id = "UCs86f6tbWatcKVt7emv9hfQ"
+channel_name = "河崎 翆 ch / Kawasaki Sui ch."
+twitter = "Sui_Kawasaki"
+
+[[streamer]]
+name = "GreatMoonAroma"
+channel_id = "UCWL_9MaaMy8ObTDPmVHemjA"
+channel_name = "GreatMoonAroma 대월향"
+twitter = "aroma_great"
+
+[[streamer]]
+name = "Suou Patra"
+channel_id = "UCeLzT-7b2PBcunJplmWtoDg"
+channel_name = "Patra Channel / 周防パトラ"
+twitter = "Patra_HNST"
+
+[[streamer]]
+name = "Nito Wai"
+channel_id = "UCGV96w_TwvyCDusr_tmcu8A"
+channel_name = "わいちゃんねる@新兎わい"
+twitter = "nitowai_"
+
+[[streamer]]
+name = "Gingitsune Gehenna"
+channel_id = "UC8D3XmwYEr97q-tuNZjUuww"
+channel_name = "Gingitsune Gehenna"
+twitter = "gingehenna"
+
+[[streamer]]
+name = "Ponpoko-chan"
+channel_id = "UC1EB8moGYdkoZQfWHjh7Ivw"
+channel_name = "ぽんぽこちゃんねる"
+twitter = "ponpokoka"
+
+[[streamer]]
+name = "Nimi Nightmare"
+channel_id = "UCIfAvpeIWGHb0duCkMkmm2Q"
+channel_name = "Nimi Nightmare"
+twitter = "niminightmare"
+
+[[streamer]]
+name = "Mikazuki Arion"
+channel_id = "UCz_9zqgFPUYQBhDiZBFc00w"
+channel_name = "Mikazuki Arion"
+twitter = "MikazukiArion"
+
+[[streamer]]
+name = "Hanamiya Rica"
+channel_id = "UCz4jhqrCfthF8NnldZeK_rw"
+channel_name = "Rica Ch. / 花宮莉歌"
+twitter = "hanamiya_rica"
+
+[[streamer]]
+name = "Marikyuun"
+channel_id = "UCNz4hh9wLzfB-vf8JZmVwSQ"
+channel_name = "Marikyuun"
+twitter = "marikyuunn"
+
+[[streamer]]
+name = "Sakura Coromin"
+channel_id = "UCmZA7XRRzmxhM4jPltZX1Zg"
+channel_name = "桜ころみん coromin Ch"
+twitter = "corona567ice"
+
+[[streamer]]
+name = "Kairyu Crocodile"
+channel_id = "UCSEkHiOVY56frY1RcEsUAvA"
+channel_name = "Kairyu Crocodile"
+twitter = "KairyuCrocodile"
+
+[[streamer]]
+name = "Punkalopi"
+channel_id = "UCZhgX5W2iLfUm2NfyD7BSvw"
+channel_name = "Punkalopi"
+twitter = "punkalopi"
+
+[[streamer]]
+name = "Ito Life"
+channel_id = "UCj_KuUzpOXAliYEesJwdrbw"
+channel_name = "伊東ライフ"
+twitter = "itolife"
+
+[[streamer]]
+name = "Amagai Ruka"
+channel_id = "UClS3cnIUM9yzsBPQzeyX_8Q"
+channel_name = "Ruka Ch. 雨海ルカ"
+twitter = "amagai_ruka"
+
+[[streamer]]
+name = "Kotoha"
+channel_id = "UC3ql_EU4JnaE3Rh3cqbHu6g"
+channel_name = "Kotoha"
+twitter = "Kotoha_ktnh"
+
+[[streamer]]
+name = "Souta Izumi"
+channel_id = "UCv7rxNkDhRu-uyyLIQg2tew"
+channel_name = "Souta"
+twitter = "xSouta_"
+
+[[streamer]]
+name = "Nerumero"
+channel_id = "UCiR6oBbZBlAuOLInDTMzYuw"
+channel_name = "ねるめろ / Nerumero"
+twitter = "nerumero_OwO"
+
+[[streamer]]
+name = "Utai Meika"
+channel_id = "UC7-N7MvN5muVIHqyQx9LFbA"
+channel_name = "メイカちゃんねる"
+twitter = "meikahaotoko"
+
+[[streamer]]
+name = "Peanuts-kun"
+channel_id = "UCmgWMQkenFc72QnYkdxdoKA"
+channel_name = "ピーナッツくん!オシャレになりたい!"
+twitter = "osyarenuts"
+
+[[streamer]]
+name = "Kamito"
+channel_id = "UCgYCMluaLpERsyNXlPOvBtA"
+channel_name = "かみと-KamitoChannel-"
+twitter = "kamito_otaku"
+
+[[streamer]]
+name = "dooby"
+channel_id = "UC6T7TJZbW6nO-qsc5coo8Pg"
+channel_name = "dooby"
+twitter = "dooby3D"
+
+[[streamer]]
+name = "KyOresu"
+channel_id = "UCsFgdazMeQtf8lHvISB1DLQ"
+channel_name = "kyOresu"
+twitter = "KyOresu"
+
+[[streamer]]
+name = "Tomari Mari"
+channel_id = "UCkPIfBOLoO0hVPG-tI2YeGg"
+channel_name = "Tomari Mari channel / 兎鞠まりちゃんねる"
+twitter = "tomari_mari"
+
+[[streamer]]
+name = "Nanami Urara"
+channel_id = "UCpmSwekVKXnObCY7hpdHXdQ"
+channel_name = "七海うらら*歌channel"
+twitter = "773urara"
+
+[[streamer]]
+name = "Miori Celesta"
+channel_id = "UCyKsg-57XC9pyHbP7v3kCPQ"
+channel_name = "Miori Celesta"
+twitter = "mioricelesta"
+
+[[streamer]]
+name = "Kagura Nana"
+channel_id = "UCbfv8uuUXt3RSJGEwxny5Rw"
+channel_name = "カグラナナchannel／ななかぐら"
+twitter = "nana_kaguraaa"
+
+[[streamer]]
+name = "Nekomiya Hinata"
+channel_id = "UCevD0wKzJFpfIkvHOiQsfLQ"
+channel_name = "ひなたチャンネル (Hinata Channel)"
+twitter = "Nekomiya_Hinata"
+
+[[streamer]]
+name = "Engaku Asobi"
+channel_id = "UCcgspKfdWRiCKtJ1E1pAWwA"
+channel_name = "苑楽アソビ【びじぱと】"
+twitter = "EngakuAsobi"
+
+[[streamer]]
+name = "Choueki Tarou"
+channel_id = "UC0e6zo8oX6ISSBjPaSZsjeA"
+channel_name = "懲役太郎チャンネル"
+twitter = "choueki_tarou"
+
+[[streamer]]
+name = "Unnamed"
+channel_id = "UCrIs26bEKOvA_lRnO2Hgscw"
+channel_name = "Unnämed"
+twitter = "unnamednow00"
+
+[[streamer]]
+name = "Amau Syrup"
+channel_id = "UCDxHeaaTTRVgb2Pa2rQXSPw"
+channel_name = "天羽しろっぷ 【Amau Syrup】"
+twitter = "syrupchan0"
+
+[[streamer]]
+name = "Fuji Aoi"
+channel_id = "UC3Ruo_5doyu514PesWGvCAg"
+channel_name = "Aoi ch."
+twitter = "fuji_aoi_0618"
+
+[[streamer]]
+name = "Otsuka Ray"
+channel_id = "UCrAsByHNIFObjr2sEaZHkCg"
+channel_name = "Otsuka Ray ch.乙夏れい"
+twitter = "rayotsuka"
+
+[[streamer]]
+name = "Sata Nakia"
+channel_id = "UC8mnrvXyUWJZ4bB5XBLZpjw"
+channel_name = "沙汰ナキアASMR - Nakia Ch."
+twitter = "nakia_sata"
+
+[[streamer]]
+name = "Annin Miru"
+channel_id = "UCFahBR2wixu0xOex84bXFvg"
+channel_name = "Annin Miru Channel"
+twitter = "AnninMirudayo"
+
+[[streamer]]
+name = "Nene Amano"
+channel_id = "UCu1INzefw3R7M9-3QEHYmMQ"
+channel_name = "Nene Amano Ch. 天野寧々"
+twitter = "NeneAmanoVTuber"
+
+[[streamer]]
+name = "Kirschtorte"
+channel_id = "UCCebCRguPlkvWemz2dKxWIA"
+channel_name = "キルシュトルテ"
+twitter = "Kirschtort3"
+
+[[streamer]]
+name = "Kitsui Akira"
+channel_id = "UCcpgDsHDYHO1UyfpwjyNx1g"
+channel_name = "Kiichan Ch. 狐井アキラ"
+twitter = "KitsuiAkira"
+
+[[streamer]]
+name = "Zakuro Shiro"
+channel_id = "UCPmcUzR-kh8hGVbNdYU84EA"
+channel_name = "柘榴シロ@Zakuro shiro"
+twitter = "Zakuro_Shiro"
+
+[[streamer]]
+name = "Kagura Mea"
+channel_id = "UCWCc8tO-uUl_7SJXIKJACMw"
+channel_name = "神楽めあ / KaguraMea"
+twitter = "KaguraMea_VoV"
+
+[[streamer]]
+name = "Natori Sana"
+channel_id = "UCIdEIHpS0TdkqRkHL5OkLtA"
+channel_name = "さなちゃんねる"
+twitter = "sana_natori"
+
+[[streamer]]
+name = "Omega Sisters"
+channel_id = "UCNjTjd2-PMC8Oo_-dCEss7A"
+channel_name = "おめがシスターズ [Ω Sisters]"
+twitter = "omesis_rio"
+
+[[streamer]]
+name = "Nekomoto Pato"
+channel_id = "UCxm3RjoZHKNbvpiP5RW6Wlg"
+channel_name = "猫元パト / Patoneko Ch."
+twitter = "KusogePatrol"
+
+[[streamer]]
+name = "HoneyChurros"
+channel_id = "UCkQFRBUPh5mcF1kca4f_DvQ"
+channel_name = "허니츄러스 HoneyChurros"
+twitter = "honeychurros1"
+
+[[streamer]]
+name = "Soma Nahiro"
+channel_id = "UCftJR3Qm0LyEuEQue1QYytA"
+channel_name = "Nahiro Ch. 蒼真なひろ"
+twitter = "soma_nahiro"
+
+[[streamer]]
+name = "Ruroro"
+channel_id = "UCRf7OJA3azS4RsGd_G96FUw"
+channel_name = "璐洛洛 Ruroro【人造人Vtuber】"
+twitter = "ruroroisme"
+
+[[streamer]]
+name = "Towano Kanae"
+channel_id = "UCsABPC_SPKUaf7BkZGs4wbQ"
+channel_name = "犯罪学教室のかなえ先生 V Criminologist"
+twitter = "towanokanae1984"
+
+[[streamer]]
+name = "Mii Reis"
+channel_id = "UC4gwEpsyFnrjkMNOoevY8Rg"
+channel_name = "Mii Reis"
+twitter = "YasmimReisOFC"
+
+[[streamer]]
+name = "Deep Blizzard"
+channel_id = "UCHXgFLFyqR-XqtxfTH3qiYA"
+channel_name = "ディープブリザード"
+twitter = "mao_DBmiyuki"
+
+[[streamer]]
+name = "Miyadi ASMR"
+channel_id = "UCAWsbzucg3KVJ6_HNjtqg7g"
+channel_name = "みやぢASMR"
+twitter = "myd_tube"
+
+[[streamer]]
+name = "uruca"
+channel_id = "UChrTMfNcD1eN2ENGWBD7lUQ"
+channel_name = "Uruca ch /うるか"
+twitter = "ow_uruca"
+
+[[streamer]]
+name = "Hebi."
+channel_id = "UCPUcv2Zv9WhH6y8H1A9uWfg"
+channel_name = "Hebi."
+twitter = "hebi0211"
+
+[[streamer]]
+name = "YuNi"
+channel_id = "UCHTnX0CSX_KObo5I9WuZ64g"
+channel_name = "YuNi - official channel -"
+twitter = "_YuNiofficial_"
+
+[[streamer]]
+name = "Yubari Rei"
+channel_id = "UCnn1Pb_JtyHbiDTELf7mgSA"
+channel_name = "Rei Ch. 悠針れい"
+twitter = "yubarirei"
+
+[[streamer]]
+name = "Marika"
+channel_id = "UCRzoTlvAr66LWn41B7QSu1Q"
+channel_name = "Marika Ch. 真理果"
+twitter = "marika_vtuber"
+
+[[streamer]]
+name = "HØRI 07"
+channel_id = "UCMvc8BlQ7r5gRbz-D2EY0LA"
+channel_name = "HØRI 07 ⌜VZ⌟"
+twitter = "HO07RI"
+
+[[streamer]]
+name = "Tenkai Tsukasa"
+channel_id = "UCZYyhgoV314CM14zBD6vd4A"
+channel_name = "バーチャル債務者youtuber天開司"
+twitter = "tenkaitukasa"
+
+[[streamer]]
+name = "Tenjin Kotone"
+channel_id = "UCAr7rLi_Wn09G-XfTA07d4g"
+channel_name = "天神 子兎音 Tenjin Kotone"
+twitter = "kotonegami"
+
+[[streamer]]
+name = "Kitune-san"
+channel_id = "UCrKD8cwv_Wrpx22SO-VeWAQ"
+channel_name = "きつねさん / Kitune-san"
+twitter = "tebukuro_55"
+
+[[streamer]]
+name = "Kurageu Roa"
+channel_id = "UCLIpj4TmXviSTNE_U5WG_Ug"
+channel_name = "Roa Ch. 海月雲ろあ"
+twitter = "kurageuroa"
+
+[[streamer]]
+name = "Sakura Mau"
+channel_id = "UCIDEDCk2cFJqww1O7GgPPGA"
+channel_name = "桜 舞兎 / Sakura Mau"
+twitter = "Sakura_Mau_V"
+
+[[streamer]]
+name = "Maii"
+channel_id = "UC5pN7zP6awYB8igfmrOCo0g"
+channel_name = "鷗麥麥麥Maii Ch."
+twitter = "omaimaimai_0401"
+
+[[streamer]]
+name = "Kakage"
+channel_id = "UCOp2E63vw8m2ChLdvZ_fYYw"
+channel_name = "かかげ"
+twitter = "kakage0904"
+
+[[streamer]]
+name = "Zonchu"
+channel_id = "UCSgwEeOm7mrwPapt6PUt_5Q"
+channel_name = "ゾンちゅう〜ゾンビJKはゲーム配信中〜"
+twitter = "zonchu_official"
+
+[[streamer]]
+name = "kinako"
+channel_id = "UCrWkFUu3DK5XpYBUPDC5uLA"
+channel_name = "kinako"
+twitter = "kinako_pop"
+
+[[streamer]]
+name = "Kurokumo"
+channel_id = "UCtOy6aKyz2ltSKSkQccXVGA"
+channel_name = "Kurokumo Official "
+twitter = "kurokumo_01"
+
+[[streamer]]
+name = "Hanon"
+channel_id = "UCJB1hgmiAD4ysg0Ao7uS8Rw"
+channel_name = "Hanon"
+twitter = "hanon_moco"
+
+[[streamer]]
+name = "Kronus Genovius"
+channel_id = "UCDsY-h6IPSXUtEE0XnwW9Iw"
+channel_name = "Kronus"
+
+[[streamer]]
+name = "Shiratama Utano"
+channel_id = "UCNskpCCH661BeRJkN8n8d-A"
+channel_name = "UTANO ch. 白玖ウタノ"
+twitter = "shiratamautano"
+
+[[streamer]]
+name = "Mochizuki Naco"
+channel_id = "UCzqQYhCoGsQhzUjtFjppW1Q"
+channel_name = "Naco Ch. 餅月なこ"
+twitter = "naco_mochizuki"
+
+[[streamer]]
+name = "MerryMa"
+channel_id = "UCxJVZE-A65Vdjg9J0XsGf6A"
+channel_name = "MerryMa 메리마"
+
+[[streamer]]
+name = "DELUTAYA"
+channel_id = "UC7YXqPO3eUnxbJ6rN0z2z1Q"
+channel_name = "DELUTAYA Δ."
+twitter = "mgmgoi4"
+
+[[streamer]]
+name = "Mizuchima Komori"
+channel_id = "UCMBzCzLVj4J40PUtQUSY0eQ"
+channel_name = "鮫升コモリ"
+twitter = "mizuchimakomori"
+
+[[streamer]]
+name = "Virtual Obachan"
+channel_id = "UCTMgd9qnUD9qKBX5oTtD6ug"
+channel_name = "バーチャルおばあちゃんねる"
+twitter = "virtual_obachan"
+
+[[streamer]]
+name = "Yaki Mayuru"
+channel_id = "UCg7aL_drCGzlPCrV6Hys_-w"
+channel_name = "焼まゆるのお絵かきちゃんねる"
+twitter = "yaki_mayu"
+
+[[streamer]]
+name = "Hira"
+channel_id = "UCmxAWbOvT8osBX_tGMVFVPA"
+channel_name = "ヒラ"
+twitter = "hira_saiore"
+
+[[streamer]]
+name = "meimei"
+channel_id = "UCHT_vElA_6ERjOvRbww01dw"
+channel_name = "羊羊🐏meimei"
+twitter = "_lamb_lamb"
+
+[[streamer]]
+name = "Usabara Ena"
+channel_id = "UC5EKOQyVgU4VAu7IaAjj_GQ"
+channel_name = "兎晴エナ / Ena Usabara"
+twitter = "ena_usabara"
+
+[[streamer]]
+name = "Laibaht"
+channel_id = "UCR1Htb-H1-tus7UPotPh69A"
+channel_name = "Laibaht Ch. / หลายบาท"
+twitter = "manybaht"
+
+[[streamer]]
+name = "Yukinoshita Peo"
+channel_id = "UChTI-WraqcTbKuSiG6zVQcw"
+channel_name = "Peo Ch. 雪乃下ぴお"
+twitter = "yukinoshitapeo"
+
 
 # Cosmia
 
