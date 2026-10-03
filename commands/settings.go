@@ -29,7 +29,7 @@ var toggles = []toggle{
 		func(s *store.Settings) *bool { return &s.ModMessages }},
 	{"prechat", "relay", "Waiting rooms", "Relay the waiting room before the stream starts",
 		func(s *store.Settings) *bool { return &s.Prechat }},
-	{"chatlink", "relay", "Chat link", "Add a link to the chat when a channel relays several streamers",
+	{"chatlink", "relay", "Chat link", "Link the chat when a line could come from more than one",
 		func(s *store.Settings) *bool { return &s.ShowChat }},
 	{"translate", "relay", "Auto-translate", "Translate what VTubers say when it isn't in the server's language",
 		func(s *store.Settings) *bool { return &s.AutoTranslate }},

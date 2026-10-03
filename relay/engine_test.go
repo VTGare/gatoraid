@@ -546,6 +546,28 @@ var _ = Describe("Engine", func() {
 		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `おはよう`"))
 	})
 
+	It("adds the chat link when the streamer has several chats open", func() {
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+
+		streams <- live("calli-live", calliID)
+		Eventually(chats.Running).Should(HaveLen(1))
+		say("calli-live", calliID, "@calli", "alone")
+		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `alone`"))
+
+		streams <- stream.Event{Kind: stream.EventPrechat, Stream: stream.Stream{
+			VideoID: "calli-room", ChannelID: calliID, Status: stream.Upcoming, Title: "Free chat",
+			Distant: true, ScheduledAt: time.Now().Add(30 * 24 * time.Hour),
+		}}
+		Eventually(chats.Running).Should(HaveLen(2))
+		say("calli-live", calliID, "@calli", "hi")
+		say("calli-room", calliID, "@calli", "schedule's up")
+		Eventually(snd.lines).Should(ContainElements(
+			"c1: 🎙️ **@calli:** `hi`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-live>)",
+			"c1: ⏳ 🎙️ **@calli:** `schedule's up`\n**Chat:** [Mori Calliope · Free chat](<https://youtu.be/calli-room>)",
+		))
+	})
+
 	It("adds the chat link when a channel relays several streamers", func() {
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, kiaraID, "c1", "")

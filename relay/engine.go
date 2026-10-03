@@ -343,6 +343,10 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	}
 	toTranslate := map[string][]waiting{}
 
+	// A streamer can have a live stream and waiting rooms open at once, and
+	// only the link says which one a line came from.
+	severalChats := e.openChats(s.ChannelID) > 1
+
 	for _, sub := range e.cfg.Subs.Match(store.FeatureRelay, s.ChannelID) {
 		st := e.guildSettings(sub.GuildID)
 		if st == nil || !relayable(s, st) {
@@ -354,8 +358,8 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 			continue
 		}
 
-		showChat := st.ShowChat &&
-			(sub.Target.Kind != store.TargetChannel || e.cfg.Subs.Count(store.FeatureRelay, sub.ChannelID) > 1)
+		showChat := st.ShowChat && (severalChats ||
+			sub.Target.Kind != store.TargetChannel || e.cfg.Subs.Count(store.FeatureRelay, sub.ChannelID) > 1)
 		if e.translates(c, kind, st) {
 			sent[sub.ChannelID] = true
 			toTranslate[st.TargetLanguage] = append(toTranslate[st.TargetLanguage], waiting{sub, kind, showChat})
@@ -385,6 +389,16 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	for target, lines := range toTranslate {
 		e.translateAndPost(c, target, lines)
 	}
+}
+
+func (e *Engine) openChats(channelID string) int {
+	n := 0
+	for id := range e.running {
+		if s, ok := e.streams[id]; ok && s.ChannelID == channelID {
+			n++
+		}
+	}
+	return n
 }
 
 func (e *Engine) post(c *Comment, sub *store.Subscription, kind Kind, content string) {

@@ -51,6 +51,18 @@ var _ = Describe("Formatter", func() {
 			c.Stream.Status = stream.Upcoming
 			return c
 		}(), relay.KindTL, false, "<:pre:2> 💬 ||@viewer:|| `[EN] soon`"),
+		Entry("a waiting room's chat link, with the title", func() *relay.Comment {
+			c := comment("[EN] soon")
+			c.Stream.Status, c.Stream.Title = stream.Upcoming, "【Schedule】Click here to see schedule!"
+			return c
+		}(), relay.KindTL, true,
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope · 【Schedule】Click here to see schedule!](<https://youtu.be/vid>)"),
+		Entry("a waiting room's long title, cut short", func() *relay.Comment {
+			c := comment("[EN] soon")
+			c.Stream.Status, c.Stream.Title = stream.Upcoming, strings.Repeat("あ", 60)
+			return c
+		}(), relay.KindTL, true,
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope · "+strings.Repeat("あ", 49)+"…](<https://youtu.be/vid>)"),
 		Entry("a channel the registry doesn't know", func() *relay.Comment {
 			c := comment("[EN] hi")
 			c.Host = nil

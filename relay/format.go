@@ -28,6 +28,8 @@ const (
 // message has to fit Discord's 2000 with names and links around it.
 const maxText = 1500
 
+const maxLinkTitle = 50
+
 type Formatter struct {
 	// Returns fallback when the key isn't configured.
 	Emoji func(key, fallback string) string
@@ -38,8 +40,7 @@ type Formatter struct {
 }
 
 // Relay formats a relayed line. translation adds a DeepL line, and showChat
-// a link to the chat for Discord channels that relay more than one
-// streamer.
+// a link to the chat for lines that could have come from more than one.
 func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation string) string {
 	var sb strings.Builder
 
@@ -64,7 +65,18 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation stri
 	}
 
 	if showChat {
-		sb.WriteString("\n**Chat:** [" + EscapeMarkdown(hostName(c)) + "](<" + c.Stream.URL() + ">)")
+		label := hostName(c)
+
+		// A streamer's waiting rooms only differ by title.
+		if c.Stream.Status == stream.Upcoming && c.Stream.Title != "" {
+			label += " · " + truncate(c.Stream.Title, maxLinkTitle)
+		}
+
+		sb.WriteString("\n**Chat:** [")
+		sb.WriteString(EscapeMarkdown(label))
+		sb.WriteString("](<")
+		sb.WriteString(c.Stream.URL())
+		sb.WriteString(">)")
 	}
 
 	return sb.String()
@@ -107,6 +119,13 @@ func hostName(c *Comment) string {
 		return c.Host.Name
 	}
 	return c.Stream.ChannelName
+}
+
+func truncate(s string, limit int) string {
+	if utf8.RuneCountInString(s) <= limit {
+		return s
+	}
+	return string([]rune(s)[:limit-1]) + "…"
 }
 
 // Inline code can't hold backticks.
