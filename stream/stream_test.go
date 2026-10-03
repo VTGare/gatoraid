@@ -183,6 +183,23 @@ var _ = Describe("Tracker", func() {
 		Expect(tracker.Distant("unknown")).To(BeFalse())
 	})
 
+	It("sends events live first, then near rooms, then distant ones", func() {
+		src.live = []holodex.Video{
+			video("unscheduled", "UCb", holodex.StatusUpcoming, time.Time{}),
+			video("next-month", "UCb", holodex.StatusUpcoming, now.Add(30*24*time.Hour)),
+			video("tonight", "UCa", holodex.StatusUpcoming, now.Add(5*time.Hour)),
+			video("next-week", "UCb", holodex.StatusUpcoming, now.Add(7*24*time.Hour)),
+			video("soon", "UCa", holodex.StatusUpcoming, now.Add(time.Hour)),
+			video("live", "UCa", holodex.StatusLive, now.Add(-time.Hour)),
+		}
+
+		var order []string
+		for _, e := range poll() {
+			order = append(order, e.Stream.VideoID)
+		}
+		Expect(order).To(Equal([]string{"live", "soon", "tonight", "next-week", "next-month", "unscheduled"}))
+	})
+
 	It("only reports changes on later polls", func() {
 		src.live = []holodex.Video{
 			video("live", "UCa", holodex.StatusLive, now),

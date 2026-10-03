@@ -229,6 +229,17 @@ func (t *Tracker) Poll(ctx context.Context) error {
 		t.cfg.OnAvatars(ctx, avatars)
 	}
 
+	// Ended streams go first, since they free chats up.
+	slices.SortStableFunc(events, func(a, b Event) int {
+		if (a.Kind == EventEnded) != (b.Kind == EventEnded) {
+			if a.Kind == EventEnded {
+				return -1
+			}
+			return 1
+		}
+		return Urgency(&a.Stream, &b.Stream)
+	})
+
 	for _, e := range events {
 		select {
 		case t.events <- e:

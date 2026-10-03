@@ -90,8 +90,8 @@ type Config struct {
 	// every chat together, and a burst of page loads looks like a scraper
 	// to YouTube.
 	MaxOpening int
-	// The shortest wait between polls of a chat, on top of what YouTube
-	// asks for. Optional.
+	// Polls of a chat are at least this far apart, even when YouTube asks
+	// for less. Optional.
 	MinWait func(videoID string) time.Duration
 }
 
@@ -119,7 +119,7 @@ func NewManager(cfg Config) *Manager {
 		cfg.GiveUpAfter = 10 * time.Minute
 	}
 	if cfg.MaxOpening == 0 {
-		cfg.MaxOpening = 2
+		cfg.MaxOpening = 4
 	}
 	if cfg.MinWait == nil {
 		cfg.MinWait = func(string) time.Duration { return 0 }

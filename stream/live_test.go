@@ -5,6 +5,7 @@ package stream_test
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/stream"
@@ -40,9 +41,22 @@ var _ = Describe("Live tracker", func() {
 			OnAvatars:   func(_ context.Context, a map[string]string) { avatars = a },
 		})
 
-		Expect(tracker.Poll(context.Background())).To(Succeed())
+		// Every upcoming room is an event, more than the channel holds, so
+		// read while polling.
+		polled := make(chan error)
+		go func() { polled <- tracker.Poll(context.Background()) }()
 
 		counts := map[stream.EventKind]int{}
+	read:
+		for {
+			select {
+			case e := <-tracker.Events():
+				counts[e.Kind]++
+			case err := <-polled:
+				Expect(err).NotTo(HaveOccurred())
+				break read
+			}
+		}
 		for len(tracker.Events()) > 0 {
 			counts[(<-tracker.Events()).Kind]++
 		}

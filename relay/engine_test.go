@@ -351,6 +351,24 @@ var _ = Describe("Engine", func() {
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
 
+	It("starts the most urgent chats first when subscriptions change", func() {
+		start()
+
+		upcoming := func(id string, in time.Duration, distant bool) stream.Event {
+			return stream.Event{Kind: stream.EventPrechat, Stream: stream.Stream{
+				VideoID: id, ChannelID: calliID, Status: stream.Upcoming, ScheduledAt: time.Now().Add(in), Distant: distant,
+			}}
+		}
+		streams <- upcoming("next-month", 30*24*time.Hour, true)
+		streams <- upcoming("tonight", 5*time.Hour, false)
+		streams <- upcoming("next-week", 7*24*time.Hour, true)
+		streams <- live("calli-live", calliID)
+		Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		Eventually(chats.Starts).Should(Equal([]string{"calli-live", "tonight", "next-week", "next-month"}))
+	})
+
 	It("relays free chat rooms without a notice, even when they get near", func() {
 		g, err := db.Guild(ctx, "g1")
 		Expect(err).NotTo(HaveOccurred())

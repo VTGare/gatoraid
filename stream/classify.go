@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"cmp"
 	"strings"
 	"time"
 
@@ -33,14 +34,44 @@ type Stream struct {
 	StartedAt   time.Time
 	MembersOnly bool
 	FreeChat    bool
-	// Upcoming and further off than the tracker's PrechatLead, or with no
-	// scheduled time. Distant rooms are relayed quietly and read slowly.
+	// The tracker sets it for upcoming streams further off than its
+	// PrechatLead or with no scheduled time. Their chat is read slowly and
+	// gets no relay notice.
 	Distant bool
 	// Channels Holodex detected in the stream, for collabs.
 	Mentions []string
 }
 
 func (s *Stream) URL() string { return "https://youtu.be/" + s.VideoID }
+
+// Urgency puts live streams first, then near waiting rooms, then distant
+// ones, each by scheduled time. Chats open a few at a time, and after a
+// restart this order decides which ones wait.
+func Urgency(a, b *Stream) int {
+	rank := func(s *Stream) int {
+		switch {
+		case s.Status == Live:
+			return 0
+		case !s.Distant:
+			return 1
+		default:
+			return 2
+		}
+	}
+	if c := cmp.Compare(rank(a), rank(b)); c != 0 {
+		return c
+	}
+
+	switch {
+	case a.ScheduledAt.IsZero() != b.ScheduledAt.IsZero():
+		if a.ScheduledAt.IsZero() {
+			return 1
+		}
+		return -1
+	default:
+		return a.ScheduledAt.Compare(b.ScheduledAt)
+	}
+}
 
 // Phrases rather than "member", which would also match "remember".
 var membersOnlyPhrases = []string{

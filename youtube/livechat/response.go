@@ -61,8 +61,8 @@ type liveChatContinuation struct {
 	} `json:"actions"`
 }
 
-// Quiet chats ask for about 15 seconds. The cap only guards against a
-// broken timeoutMs.
+// YouTube asks quiet chats to wait about 15 seconds. maxWait only guards
+// against a broken timeoutMs.
 const (
 	minWait     = time.Second
 	maxWait     = 30 * time.Second

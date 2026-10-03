@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"maps"
+	"slices"
 	"sync"
 	"time"
 
@@ -144,14 +146,18 @@ func (e *Engine) Run(ctx context.Context) error {
 		case ev := <-e.cfg.Chats.Events():
 			e.onChat(ev)
 		case <-e.cfg.Subs.Changed():
-			for _, s := range e.streams {
-				e.update(ctx, s)
-			}
+			e.updateAll(ctx)
 		case <-e.resync:
-			for _, s := range e.streams {
-				e.update(ctx, s)
-			}
+			e.updateAll(ctx)
 		}
+	}
+}
+
+func (e *Engine) updateAll(ctx context.Context) {
+	streams := slices.Collect(maps.Values(e.streams))
+	slices.SortFunc(streams, stream.Urgency)
+	for _, s := range streams {
+		e.update(ctx, s)
 	}
 }
 
@@ -258,8 +264,8 @@ func (e *Engine) readForOthers(s *stream.Stream) bool {
 
 func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Subscription) {
 	// The tracker sends the stream again once it's near, and that's when
-	// the notice goes out. Free chat rooms never get one: they aren't
-	// streams, and their scheduled time is a placeholder.
+	// the notice goes out. Free chat rooms never get one, because they
+	// aren't streams and their scheduled time is only a placeholder.
 	if s.Distant || s.FreeChat {
 		return
 	}
