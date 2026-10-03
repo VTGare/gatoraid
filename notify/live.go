@@ -94,7 +94,7 @@ func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer
 	if err != nil {
 		return err
 	}
-	if s.MembersOnly && !g.Settings.NotifyMembersOnly || s.FreeChat && !g.Settings.NotifyFreeChat {
+	if s.MembersOnly && !g.Settings.NotifyMembersOnly {
 		return nil
 	}
 

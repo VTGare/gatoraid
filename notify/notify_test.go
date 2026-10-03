@@ -159,7 +159,7 @@ var _ = Describe("Live", func() {
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(BeEmpty())
 	})
 
-	It("announces members-only streams and free chats only when the guild wants them", func() {
+	It("announces members-only streams only when the guild wants them", func() {
 		g, err := w.db.Guild(w.ctx, "g2")
 		Expect(err).NotTo(HaveOccurred())
 		g.Settings.NotifyMembersOnly = true
@@ -171,10 +171,7 @@ var _ = Describe("Live", func() {
 
 		members := live("members", calliID, time.Minute)
 		members.Stream.MembersOnly = true
-		freeChat := live("free", calliID, time.Minute)
-		freeChat.Stream.FreeChat = true
 		streams <- members
-		streams <- freeChat
 
 		Eventually(w.snd.contents).Should(ConsistOf("c2:  | Mori Calliope: Karaoke_time (Members-only stream)"))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(1))

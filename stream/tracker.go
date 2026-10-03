@@ -14,17 +14,16 @@ import (
 const (
 	DefaultInterval = 30 * time.Second
 
-	// Prechat relays start a day before a stream is scheduled and wait up to
-	// 6 hours past it for late starts. Upcoming rooms overdue by more than
-	// that are usually abandoned.
-	PrechatLead  = 24 * time.Hour
+	// Upcoming rooms more than 6 hours past their scheduled start are
+	// usually abandoned, so they aren't relayed.
 	PrechatGrace = 6 * time.Hour
 )
 
 type EventKind int
 
 const (
-	// An upcoming stream entered the prechat window. Sent once per stream.
+	// An upcoming stream turned up. Sent again when a distant stream stops
+	// being distant.
 	EventPrechat EventKind = iota
 	EventLive
 	EventEnded
@@ -60,18 +59,21 @@ type Config struct {
 	Channels   func() []string
 	Classifier Classifier
 	Interval   time.Duration
-	Log        *slog.Logger
-	OnAvatars  func(ctx context.Context, avatars map[string]string)
-	Now        func() time.Time
+	// Upcoming streams further off than this are distant.
+	PrechatLead time.Duration
+	Log         *slog.Logger
+	OnAvatars   func(ctx context.Context, avatars map[string]string)
+	Now         func() time.Time
 }
 
 type tracked struct {
 	Stream
 	prechatSent bool
+	nearSent    bool
 }
 
-// On startup the tracker reports everything that's already live or in the
-// prechat window, so consumers have to dedupe notifications across restarts.
+// On startup the tracker reports everything that's already live or
+// upcoming, so consumers have to dedupe notifications across restarts.
 type Tracker struct {
 	cfg    Config
 	events chan Event
@@ -116,6 +118,15 @@ func (t *Tracker) Streams() []Stream {
 		return a.ScheduledAt.Compare(b.ScheduledAt)
 	})
 	return out
+}
+
+// Distant is as of the last poll. Unknown streams aren't distant.
+func (t *Tracker) Distant(videoID string) bool {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	tr, ok := t.state[videoID]
+	return ok && tr.Distant
 }
 
 func (t *Tracker) Run(ctx context.Context) error {
@@ -166,18 +177,24 @@ func (t *Tracker) Poll(ctx context.Context) error {
 		}
 
 		s := t.cfg.Classifier.Classify(v)
+		s.Distant = t.distant(&s, now)
 		prev := t.state[v.ID]
 		tr := &tracked{Stream: s}
 		if prev != nil {
 			tr.prechatSent = prev.prechatSent
+			tr.nearSent = prev.nearSent
 		}
 		t.state[v.ID] = tr
 
 		switch {
 		case s.Status == Live && (prev == nil || prev.Status != Live):
 			events = append(events, Event{Kind: EventLive, Stream: s})
-		case s.Status == Upcoming && !tr.prechatSent && inPrechatWindow(s.ScheduledAt, now):
+		case s.Status == Upcoming && !tr.prechatSent && !overdue(&s, now):
 			tr.prechatSent = true
+			tr.nearSent = !s.Distant
+			events = append(events, Event{Kind: EventPrechat, Stream: s})
+		case s.Status == Upcoming && tr.prechatSent && !tr.nearSent && !s.Distant:
+			tr.nearSent = true
 			events = append(events, Event{Kind: EventPrechat, Stream: s})
 		}
 	}
@@ -242,11 +259,15 @@ func (t *Tracker) confirmEnded(ctx context.Context, tr *tracked, requested map[s
 	}
 }
 
-func inPrechatWindow(scheduled, now time.Time) bool {
-	if scheduled.IsZero() {
+func (t *Tracker) distant(s *Stream, now time.Time) bool {
+	if s.Status != Upcoming {
 		return false
 	}
-	return !scheduled.Before(now.Add(-PrechatGrace)) && !scheduled.After(now.Add(PrechatLead))
+	return s.ScheduledAt.IsZero() || s.ScheduledAt.Sub(now) > t.cfg.PrechatLead
+}
+
+func overdue(s *Stream, now time.Time) bool {
+	return !s.ScheduledAt.IsZero() && s.ScheduledAt.Before(now.Add(-PrechatGrace))
 }
 
 func mentionsAny(mentions []string, requested map[string]bool) bool {

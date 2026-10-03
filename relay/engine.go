@@ -257,6 +257,13 @@ func (e *Engine) readForOthers(s *stream.Stream) bool {
 }
 
 func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Subscription) {
+	// The tracker sends the stream again once it's near, and that's when
+	// the notice goes out. Free chat rooms never get one: they aren't
+	// streams, and their scheduled time is a placeholder.
+	if s.Distant || s.FreeChat {
+		return
+	}
+
 	kind := store.NoticeRelay
 	if s.Status == stream.Upcoming {
 		kind = store.NoticePrechat

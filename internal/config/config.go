@@ -21,6 +21,7 @@ const (
 	// The DeepL API Free monthly limit.
 	DefaultDeepLBudget  = 500_000
 	DefaultUserChannels = 25
+	DefaultPrechatHours = 24
 	DefaultLogLevel     = "info"
 	DefaultLogFormat    = "json"
 )
@@ -33,6 +34,7 @@ type Config struct {
 	Holodex  Holodex  `json:"holodex" envPrefix:"HOLODEX_"`
 	DeepL    DeepL    `json:"deepl" envPrefix:"DEEPL_"`
 	Limits   Limits   `json:"limits" envPrefix:"LIMITS_"`
+	Relay    Relay    `json:"relay" envPrefix:"RELAY_"`
 	Log      Log      `json:"log" envPrefix:"LOG_"`
 	// Emojis maps keys like "deepl" or "hololive" to custom emoji markup
 	// ("<:deepL:123>"). Missing keys use plain Unicode emojis. From the
@@ -73,6 +75,13 @@ type DeepL struct {
 type Limits struct {
 	// YouTube channels outside the streamer registry one guild can add.
 	UserChannels int `json:"user_channels" env:"USER_CHANNELS"`
+}
+
+type Relay struct {
+	// Waiting rooms further off than this many hours are relayed quietly.
+	// Their chat is read every 15 seconds and the relay notice waits until
+	// they're this close.
+	PrechatHours *int `json:"prechat_hours" env:"PRECHAT_HOURS"`
 }
 
 type Log struct {
@@ -159,6 +168,10 @@ func (c *Config) Validate() error {
 		errs = append(errs, errors.New("config: the user channel limit cannot be negative"))
 	}
 
+	if c.Relay.PrechatHours != nil && *c.Relay.PrechatHours < 1 {
+		errs = append(errs, errors.New("config: the prechat hours must be at least 1"))
+	}
+
 	return errors.Join(errs...)
 }
 
@@ -190,6 +203,11 @@ func (c *Config) applyDefaults() {
 
 	if c.Limits.UserChannels == 0 {
 		c.Limits.UserChannels = DefaultUserChannels
+	}
+
+	if c.Relay.PrechatHours == nil {
+		h := DefaultPrechatHours
+		c.Relay.PrechatHours = &h
 	}
 
 	if c.Log.Level == "" {

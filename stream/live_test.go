@@ -33,10 +33,11 @@ var _ = Describe("Live tracker", func() {
 
 		var avatars map[string]string
 		tracker := stream.NewTracker(stream.Config{
-			Source:     holodex.New(key),
-			Channels:   func() []string { return ids },
-			Classifier: stream.Classifier{FreeChatStreams: func(id string) bool { return freeChat[id] }},
-			OnAvatars:  func(_ context.Context, a map[string]string) { avatars = a },
+			Source:      holodex.New(key),
+			Channels:    func() []string { return ids },
+			Classifier:  stream.Classifier{FreeChatStreams: func(id string) bool { return freeChat[id] }},
+			PrechatLead: 24 * time.Hour,
+			OnAvatars:   func(_ context.Context, a map[string]string) { avatars = a },
 		})
 
 		Expect(tracker.Poll(context.Background())).To(Succeed())

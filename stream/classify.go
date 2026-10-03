@@ -33,6 +33,9 @@ type Stream struct {
 	StartedAt   time.Time
 	MembersOnly bool
 	FreeChat    bool
+	// Upcoming and further off than the tracker's PrechatLead, or with no
+	// scheduled time. Distant rooms are relayed quietly and read slowly.
+	Distant bool
 	// Channels Holodex detected in the stream, for collabs.
 	Mentions []string
 }

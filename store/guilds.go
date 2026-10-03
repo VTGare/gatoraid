@@ -36,7 +36,6 @@ type Settings struct {
 
 	NotifyMembersOnly bool `json:"notify_members_only"`
 	RelayFreeChat     bool `json:"relay_free_chat"`
-	NotifyFreeChat    bool `json:"notify_free_chat"`
 }
 
 func DefaultSettings() Settings {

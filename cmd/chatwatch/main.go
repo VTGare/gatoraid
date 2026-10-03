@@ -44,7 +44,7 @@ func main() {
 		go func() { _ = tl.Run(ctx) }()
 	}
 
-	chats := bot.NewChatManager(tl, log)
+	chats := bot.NewChatManager(tl, nil, log)
 	for _, id := range flag.Args() {
 		chats.Start(ctx, id)
 	}

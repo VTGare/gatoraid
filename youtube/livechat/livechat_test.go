@@ -154,7 +154,7 @@ var _ = Describe("Chat", func() {
 		msgs, err := chat.Poll(ctx)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(msgs[0].Text).To(Equal("pat :_MachiPat:"))
-		Expect(chat.Wait()).To(Equal(10 * time.Second))
+		Expect(chat.Wait()).To(Equal(30 * time.Second))
 	})
 
 	It("reports the end of the chat", func() {

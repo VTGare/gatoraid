@@ -86,11 +86,19 @@ type Config struct {
 	MaxBackoff time.Duration
 	// A chat that keeps failing for this long is given up on.
 	GiveUpAfter time.Duration
+	// How many chats can be opening or reopening at once. A restart starts
+	// every chat together, and a burst of page loads looks like a scraper
+	// to YouTube.
+	MaxOpening int
+	// The shortest wait between polls of a chat, on top of what YouTube
+	// asks for. Optional.
+	MinWait func(videoID string) time.Duration
 }
 
 type Manager struct {
-	cfg    Config
-	events chan Event
+	cfg     Config
+	events  chan Event
+	opening chan struct{}
 
 	mu       sync.Mutex
 	sessions map[string]context.CancelFunc
@@ -110,8 +118,19 @@ func NewManager(cfg Config) *Manager {
 	if cfg.GiveUpAfter == 0 {
 		cfg.GiveUpAfter = 10 * time.Minute
 	}
+	if cfg.MaxOpening == 0 {
+		cfg.MaxOpening = 2
+	}
+	if cfg.MinWait == nil {
+		cfg.MinWait = func(string) time.Duration { return 0 }
+	}
 
-	return &Manager{cfg: cfg, events: make(chan Event, 1024), sessions: map[string]context.CancelFunc{}}
+	return &Manager{
+		cfg:      cfg,
+		events:   make(chan Event, 1024),
+		opening:  make(chan struct{}, cfg.MaxOpening),
+		sessions: map[string]context.CancelFunc{},
+	}
 }
 
 func (m *Manager) Events() <-chan Event { return m.events }
@@ -184,7 +203,7 @@ func (m *Manager) run(ctx context.Context, videoID string) error {
 
 	var failingSince time.Time
 	backoff := m.cfg.Backoff
-	wait := chat.Wait()
+	wait := max(chat.Wait(), m.cfg.MinWait(videoID))
 
 	for {
 		select {
@@ -196,13 +215,16 @@ func (m *Manager) run(ctx context.Context, videoID string) error {
 		msgs, err := chat.Poll(ctx)
 		if err != nil && !permanent(err) {
 			// Reopening picks up anything posted while the poll failed.
-			msgs, err = chat.Reopen(ctx)
+			err = m.limitOpening(ctx, func() (err error) {
+				msgs, err = chat.Reopen(ctx)
+				return err
+			})
 		}
 
 		switch {
 		case err == nil:
 			failingSince, backoff = time.Time{}, m.cfg.Backoff
-			wait = chat.Wait()
+			wait = max(chat.Wait(), m.cfg.MinWait(videoID))
 			for _, msg := range msgs {
 				if c := fromYouTube(videoID, msg); dedup.first(c) {
 					m.send(ctx, Event{Kind: EventComment, VideoID: videoID, Comment: c})
@@ -231,7 +253,11 @@ func (m *Manager) open(ctx context.Context, videoID string) (Reader, error) {
 	backoff := m.cfg.Backoff
 
 	for {
-		chat, err := m.cfg.Open(ctx, videoID)
+		var chat Reader
+		err := m.limitOpening(ctx, func() (err error) {
+			chat, err = m.cfg.Open(ctx, videoID)
+			return err
+		})
 		if err == nil || permanent(err) || ctx.Err() != nil || time.Since(start) > m.cfg.GiveUpAfter {
 			return chat, err
 		}
@@ -244,6 +270,17 @@ func (m *Manager) open(ctx context.Context, videoID string) (Reader, error) {
 		}
 		backoff = min(backoff*2, m.cfg.MaxBackoff)
 	}
+}
+
+func (m *Manager) limitOpening(ctx context.Context, open func() error) error {
+	select {
+	case m.opening <- struct{}{}:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	defer func() { <-m.opening }()
+
+	return open()
 }
 
 func (m *Manager) relayTLdex(ctx context.Context, videoID string, updates <-chan tldex.Update, dedup *deduper) {

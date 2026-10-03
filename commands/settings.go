@@ -27,7 +27,7 @@ type toggle struct {
 var toggles = []toggle{
 	{"mods", "relay", "Mod messages", "Relay what chat moderators say",
 		func(s *store.Settings) *bool { return &s.ModMessages }},
-	{"prechat", "relay", "Waiting rooms", "Start relaying when the waiting room opens, up to a day early",
+	{"prechat", "relay", "Waiting rooms", "Relay the waiting room before the stream starts",
 		func(s *store.Settings) *bool { return &s.Prechat }},
 	{"chatlink", "relay", "Chat link", "Add a link to the chat when a channel relays several streamers",
 		func(s *store.Settings) *bool { return &s.ShowChat }},
@@ -37,8 +37,6 @@ var toggles = []toggle{
 		func(s *store.Settings) *bool { return &s.NotifyMembersOnly }},
 	{"relayfreechat", "streams", "Relay free chat rooms", "Relay the chat of rooms titled free chat",
 		func(s *store.Settings) *bool { return &s.RelayFreeChat }},
-	{"notifyfreechat", "streams", "Notify free chat rooms", "Live notifications for free chat rooms",
-		func(s *store.Settings) *bool { return &s.NotifyFreeChat }},
 }
 
 type section struct {
@@ -339,8 +337,8 @@ func (v *panelView) renderHome(e *discordgo.MessageEmbed) {
 			onOff(s.ModMessages), onOff(s.Prechat), onOff(s.ShowChat), onOff(s.AutoTranslate))},
 		{Name: "Translation", Value: "Into **" + translate.Name(s.TargetLanguage) + "**"},
 		{Name: "Logs", Value: v.logChannel()},
-		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s** · Notify free chat **%s**",
-			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat), onOff(s.NotifyFreeChat))},
+		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s**",
+			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat))},
 		{Name: "Permissions", Value: "Managers " + roleList(v.managers) + " · Blacklisters " + roleList(v.blacklisters)},
 	}
 	e.Footer = &discordgo.MessageEmbedFooter{Text: "Changing settings needs Manage Server or a Manager role"}

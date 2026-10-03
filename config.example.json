@@ -20,6 +20,9 @@
   "limits": {
     "user_channels": 25
   },
+  "relay": {
+    "prechat_hours": 24
+  },
   "log": {
     "level": "info",
     "format": "json"

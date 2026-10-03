@@ -331,6 +331,47 @@ var _ = Describe("Engine", func() {
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
 
+	It("relays distant waiting rooms without a notice until they get near", func() {
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+
+		room := stream.Stream{
+			VideoID: "calli-room", ChannelID: calliID, Status: stream.Upcoming, ScheduledAt: time.Now().Add(30 * 24 * time.Hour),
+			Distant: true,
+		}
+		streams <- stream.Event{Kind: stream.EventPrechat, Stream: room}
+		Eventually(chats.Running).Should(Equal([]string{"calli-room"}))
+
+		say("calli-room", calliID, "@calli", "schedule's up")
+		Eventually(snd.lines).Should(ConsistOf("c1: ⏳ 🎙️ **@calli:** `schedule's up`"))
+
+		room.ScheduledAt, room.Distant = time.Now().Add(time.Hour), false
+		streams <- stream.Event{Kind: stream.EventPrechat, Stream: room}
+		Eventually(snd.lines).Should(ContainElement(ContainSubstring("c1: notice  Relaying the waiting room chat here.")))
+		Expect(chats.Starts()).To(HaveLen(1))
+	})
+
+	It("relays free chat rooms without a notice, even when they get near", func() {
+		g, err := db.Guild(ctx, "g1")
+		Expect(err).NotTo(HaveOccurred())
+		g.Settings.RelayFreeChat = true
+		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
+
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+		start()
+
+		room := stream.Stream{
+			VideoID: "calli-free", ChannelID: calliID, Status: stream.Upcoming, ScheduledAt: time.Now().Add(time.Hour),
+			FreeChat: true,
+		}
+		streams <- stream.Event{Kind: stream.EventPrechat, Stream: room}
+		Eventually(chats.Running).Should(Equal([]string{"calli-free"}))
+
+		say("calli-free", calliID, "@calli", "schedule's up")
+		Eventually(snd.lines).Should(ConsistOf("c1: ⏳ 🎙️ **@calli:** `schedule's up`"))
+		Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(1))
+	})
+
 	It("skips members-only streams and free chats unless the guild relays free chats", func() {
 		subscribe("g1", store.FeatureRelay, store.TargetGroup, "holo-en", "c1", "")
 		start()

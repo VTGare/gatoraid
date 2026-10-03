@@ -61,9 +61,11 @@ type liveChatContinuation struct {
 	} `json:"actions"`
 }
 
+// Quiet chats ask for about 15 seconds. The cap only guards against a
+// broken timeoutMs.
 const (
 	minWait     = time.Second
-	maxWait     = 10 * time.Second
+	maxWait     = 30 * time.Second
 	defaultWait = 5 * time.Second
 )
 

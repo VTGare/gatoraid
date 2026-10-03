@@ -168,6 +168,57 @@ var _ = Describe("Manager", func() {
 		Expect(manager.Running()).To(Equal([]string{"v"}))
 	})
 
+	It("waits at least MinWait between polls", func() {
+		reader.polls = []step{{msgs: []livechat.Message{msg("a", "UC1", "hi")}}}
+		cfg := manager.cfg
+		cfg.MinWait = func(videoID string) time.Duration {
+			if videoID == "distant" {
+				return time.Hour
+			}
+			return 0
+		}
+		manager = NewManager(cfg)
+
+		manager.Start(ctx, "distant")
+		Consistently(manager.Events(), 100*time.Millisecond).ShouldNot(Receive())
+
+		manager.Stop("distant")
+		manager.Start(ctx, "near")
+		Expect(comments(1)).To(Equal([]string{"a"}))
+	})
+
+	It("opens a limited number of chats at once", func() {
+		release := make(chan struct{})
+		var opening, most int
+		cfg := manager.cfg
+		cfg.MaxOpening = 2
+		cfg.Open = func(ctx context.Context, _ string) (Reader, error) {
+			mu.Lock()
+			opening++
+			most = max(most, opening)
+			mu.Unlock()
+			defer func() { mu.Lock(); opening--; mu.Unlock() }()
+
+			select {
+			case <-release:
+			case <-ctx.Done():
+			}
+			return &fakeReader{}, nil
+		}
+		manager = NewManager(cfg)
+
+		for _, id := range []string{"a", "b", "c", "d"} {
+			manager.Start(ctx, id)
+		}
+		count := func() int { mu.Lock(); defer mu.Unlock(); return opening }
+		Eventually(count).Should(Equal(2))
+		Consistently(count, 50*time.Millisecond).Should(Equal(2))
+
+		close(release)
+		Eventually(count).Should(BeZero())
+		Expect(most).To(Equal(2))
+	})
+
 	It("runs one session per stream", func() {
 		manager.Start(ctx, "v")
 		manager.Start(ctx, "v")

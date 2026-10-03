@@ -30,11 +30,12 @@ import (
 )
 
 const (
-	eventTimeout   = 10 * time.Second
-	commandTimeout = 2 * time.Minute
-	pruneInterval  = time.Hour
-	purgeInterval  = 24 * time.Hour
-	streamBuffer   = 256
+	eventTimeout    = 10 * time.Second
+	commandTimeout  = 2 * time.Minute
+	pruneInterval   = time.Hour
+	purgeInterval   = 24 * time.Hour
+	streamBuffer    = 256
+	distantChatPoll = 15 * time.Second
 )
 
 // Embed color for everything the bot posts.
@@ -131,7 +132,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 				st, ok := b.Streamers.Streamer(id)
 				return ok && st.FreeChatStreams
 			}},
-			Log: log.With("component", "streams"),
+			PrechatLead: time.Duration(*cfg.Relay.PrechatHours) * time.Hour,
+			Log:         log.With("component", "streams"),
 			OnAvatars: func(ctx context.Context, avatars map[string]string) {
 				if err := b.Streamers.UpdateAvatars(ctx, avatars); err != nil {
 					log.Warn("failed to update avatars", slog.Any("error", err))
@@ -143,7 +145,18 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	if cfg.Holodex.TLdex {
 		b.TLdex = tldex.New(tldex.WithLogger(log.With("component", "tldex")))
 	}
-	b.Chats = NewChatManager(b.TLdex, log.With("component", "chat"))
+
+	var minWait func(string) time.Duration
+	if b.Streams != nil {
+		minWait = func(videoID string) time.Duration {
+			if b.Streams.Distant(videoID) {
+				return distantChatPoll
+			}
+			return 0
+		}
+	}
+
+	b.Chats = NewChatManager(b.TLdex, minWait, log.With("component", "chat"))
 
 	b.Sender = sender.New(sender.Config{Poster: s, Log: log.With("component", "sender")})
 
@@ -207,7 +220,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 }
 
 // NewChatManager reads YouTube chat, merged with TLdex when tl isn't nil.
-func NewChatManager(tl *tldex.Client, log *slog.Logger) *chat.Manager {
+// minWait is optional.
+func NewChatManager(tl *tldex.Client, minWait func(videoID string) time.Duration, log *slog.Logger) *chat.Manager {
 	youtube := livechat.New()
 	cfg := chat.Config{
 		Open: func(ctx context.Context, videoID string) (chat.Reader, error) {
@@ -217,7 +231,8 @@ func NewChatManager(tl *tldex.Client, log *slog.Logger) *chat.Manager {
 			}
 			return c, nil
 		},
-		Log: log,
+		MinWait: minWait,
+		Log:     log,
 	}
 	// A nil *tldex.Client in the interface would look like TLdex is on.
 	if tl != nil {

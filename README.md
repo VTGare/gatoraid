@@ -114,13 +114,15 @@ option.
 | `GATORAID_DEEPL_API_KEY` | `deepl.api_key` | |
 | `GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET` | `deepl.monthly_character_budget` | `500000` |
 | `GATORAID_LIMITS_USER_CHANNELS` | `limits.user_channels` | `25` |
+| `GATORAID_RELAY_PRECHAT_HOURS` | `relay.prechat_hours` | `24` |
 | `GATORAID_LOG_LEVEL` | `log.level` | `info` |
 | `GATORAID_LOG_FORMAT` | `log.format` | `json` |
 | `GATORAID_EMOJIS` | `emojis` | |
 
 `holodex.tldex` also reads Holodex's TLdex feed, which adds translations posted with MChad and
 the exact stream start times. `limits.user_channels` is how many channels from outside the
-streamer list each server can follow.
+streamer list each server can follow. Rooms further off than `relay.prechat_hours` are relayed quietly: their chat is read every 15 seconds, and the
+"relaying the waiting room" notice waits until the stream is that close. It must be at least `1`.
 
 `emojis` maps keys to custom emoji markup such as `<:holo:123>`. Keys: `deepl` (translations),
 `prechat` (waiting room lines), `vtuber` and `peek` (VTubers without a group emoji, in relays and

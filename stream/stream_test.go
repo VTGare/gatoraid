@@ -75,9 +75,10 @@ var _ = Describe("Tracker", func() {
 		avatars = nil
 
 		tracker = stream.NewTracker(stream.Config{
-			Source:   src,
-			Channels: func() []string { return channels },
-			Now:      func() time.Time { return clock },
+			Source:      src,
+			Channels:    func() []string { return channels },
+			PrechatLead: 24 * time.Hour,
+			Now:         func() time.Time { return clock },
 			OnAvatars: func(_ context.Context, a map[string]string) {
 				avatars = a
 			},
@@ -105,22 +106,81 @@ var _ = Describe("Tracker", func() {
 		return out
 	}
 
-	It("reports what's live or in the prechat window on the first poll", func() {
+	It("reports what's live or upcoming on the first poll", func() {
 		src.live = []holodex.Video{
 			video("live", "UCa", holodex.StatusLive, now.Add(-time.Hour)),
 			video("soon", "UCa", holodex.StatusUpcoming, now.Add(23*time.Hour)),
 			video("late", "UCb", holodex.StatusUpcoming, now.Add(-5*time.Hour)),
 			video("later", "UCb", holodex.StatusUpcoming, now.Add(25*time.Hour)),
 			video("abandoned", "UCb", holodex.StatusUpcoming, now.Add(-7*time.Hour)),
+			video("unscheduled", "UCb", holodex.StatusUpcoming, time.Time{}),
 		}
 
 		Expect(kinds(poll())).To(Equal(map[string]stream.EventKind{
-			"live": stream.EventLive,
-			"soon": stream.EventPrechat,
-			"late": stream.EventPrechat,
+			"live":        stream.EventLive,
+			"soon":        stream.EventPrechat,
+			"late":        stream.EventPrechat,
+			"later":       stream.EventPrechat,
+			"unscheduled": stream.EventPrechat,
 		}))
-		Expect(tracker.Streams()).To(HaveLen(5))
+		Expect(tracker.Streams()).To(HaveLen(6))
 		Expect(tracker.Streams()[0].VideoID).To(Equal("live"))
+	})
+
+	DescribeTable("marks upcoming streams past the prechat lead as distant",
+		func(lead time.Duration, want map[string]bool) {
+			tracker = stream.NewTracker(stream.Config{
+				Source:      src,
+				Channels:    func() []string { return channels },
+				PrechatLead: lead,
+				Now:         func() time.Time { return clock },
+			})
+			src.live = []holodex.Video{
+				video("live", "UCa", holodex.StatusLive, now.Add(-time.Hour)),
+				video("soon", "UCa", holodex.StatusUpcoming, now.Add(time.Hour)),
+				video("tomorrow", "UCa", holodex.StatusUpcoming, now.Add(47*time.Hour)),
+				video("next-year", "UCb", holodex.StatusUpcoming, now.Add(365*24*time.Hour)),
+				video("unscheduled", "UCb", holodex.StatusUpcoming, time.Time{}),
+			}
+
+			distant := map[string]bool{}
+			for _, e := range poll() {
+				distant[e.Stream.VideoID] = e.Stream.Distant
+				Expect(tracker.Distant(e.Stream.VideoID)).To(Equal(e.Stream.Distant))
+			}
+			Expect(distant).To(Equal(want))
+		},
+		Entry("two hours", 2*time.Hour, map[string]bool{
+			"live": false, "soon": false, "tomorrow": true, "next-year": true, "unscheduled": true,
+		}),
+		Entry("two days", 48*time.Hour, map[string]bool{
+			"live": false, "soon": false, "tomorrow": false, "next-year": true, "unscheduled": true,
+		}),
+	)
+
+	It("sends prechat again when a distant stream gets near, then live", func() {
+		src.live = []holodex.Video{video("v", "UCa", holodex.StatusUpcoming, now.Add(30*time.Hour))}
+
+		events := poll()
+		Expect(events).To(HaveLen(1))
+		Expect(events[0].Kind).To(Equal(stream.EventPrechat))
+		Expect(events[0].Stream.Distant).To(BeTrue())
+		Expect(poll()).To(BeEmpty())
+
+		clock = now.Add(7 * time.Hour)
+		events = poll()
+		Expect(events).To(HaveLen(1))
+		Expect(events[0].Kind).To(Equal(stream.EventPrechat))
+		Expect(events[0].Stream.Distant).To(BeFalse())
+		Expect(tracker.Distant("v")).To(BeFalse())
+		Expect(poll()).To(BeEmpty())
+
+		src.live = []holodex.Video{video("v", "UCa", holodex.StatusLive, now.Add(30*time.Hour))}
+		events = poll()
+		Expect(events).To(HaveLen(1))
+		Expect(events[0].Kind).To(Equal(stream.EventLive))
+		Expect(events[0].Stream.StartedAt).To(Equal(now.Add(30 * time.Hour)))
+		Expect(tracker.Distant("unknown")).To(BeFalse())
 	})
 
 	It("only reports changes on later polls", func() {
@@ -131,23 +191,6 @@ var _ = Describe("Tracker", func() {
 		poll()
 
 		Expect(poll()).To(BeEmpty())
-	})
-
-	It("sends prechat once a stream enters the window, then live", func() {
-		src.live = []holodex.Video{video("v", "UCa", holodex.StatusUpcoming, now.Add(30*time.Hour))}
-		Expect(poll()).To(BeEmpty())
-
-		clock = now.Add(7 * time.Hour)
-		events := poll()
-		Expect(events).To(HaveLen(1))
-		Expect(events[0].Kind).To(Equal(stream.EventPrechat))
-		Expect(poll()).To(BeEmpty())
-
-		src.live = []holodex.Video{video("v", "UCa", holodex.StatusLive, now.Add(30*time.Hour))}
-		events = poll()
-		Expect(events).To(HaveLen(1))
-		Expect(events[0].Kind).To(Equal(stream.EventLive))
-		Expect(events[0].Stream.StartedAt).To(Equal(now.Add(30 * time.Hour)))
 	})
 
 	Describe("streams that disappear", func() {
