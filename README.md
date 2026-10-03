@@ -16,7 +16,7 @@ posts.
   prefixes.
 
 Any YouTube channel that [Holodex](https://holodex.net) tracks can be relayed, not just the
-curated streamer list.
+curated streamer list. See [Channels outside the streamer list](#channels-outside-the-streamer-list).
 
 ## Commands
 
@@ -34,6 +34,28 @@ curated streamer list.
 
 Managers have Manage Server or a Manager role. Blacklisters have Manage Messages, a Blacklister
 role or a Manager role. Both roles are set in `/settings`. Administrators can always do everything.
+
+### Channels outside the streamer list
+
+`/relay add`, `/notify youtube add` and `/notify posts add` also take a YouTube channel link, an
+`@handle` or a `UC…` channel ID as the target:
+
+```
+/relay add target:https://www.youtube.com/@SomeVTuber
+```
+
+The bot looks the channel up and adds it to the streamer list for everyone, marked as added by a
+server. It has to be a channel Holodex tracks, since that's how the bot learns about streams, and
+Holodex mustn't list it as inactive. The channel's owner can ask Holodex to add it at
+<https://holodex.net/addChannel>.
+
+These channels work a little differently from the curated list:
+
+- A server can follow 25 of them (`limits.user_channels`). Removing every subscription to one
+  frees its slot.
+- They aren't in any group, so following a group or everyone doesn't include them.
+- They don't count as VTubers in other chats, and `/cameos` and `/gossip` don't take links, so
+  they have no cameos or gossip.
 
 ## Running
 
