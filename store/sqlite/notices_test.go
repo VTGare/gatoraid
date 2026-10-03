@@ -45,8 +45,6 @@ var _ = Describe("Notices", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(created).To(Equal(tc.new))
 		}
-
-		Expect(db.SetNoticeMessage(ctx, n, "m")).To(Succeed())
 	})
 
 	It("prunes old notices", func() {

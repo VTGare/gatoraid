@@ -69,7 +69,7 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation stri
 
 		// A streamer's waiting rooms only differ by title.
 		if c.Stream.Status == stream.Upcoming && c.Stream.Title != "" {
-			label += " · " + truncate(c.Stream.Title, maxLinkTitle)
+			label += " · " + Truncate(c.Stream.Title, maxLinkTitle)
 		}
 
 		sb.WriteString("\n**Chat:** [")
@@ -121,7 +121,8 @@ func hostName(c *Comment) string {
 	return c.Stream.ChannelName
 }
 
-func truncate(s string, limit int) string {
+// Truncate cuts s to limit runes, the last one an ellipsis.
+func Truncate(s string, limit int) string {
 	if utf8.RuneCountInString(s) <= limit {
 		return s
 	}

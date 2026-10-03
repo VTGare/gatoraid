@@ -52,8 +52,6 @@ type Option func(*Client)
 
 func WithBaseURL(u string) Option { return func(c *Client) { c.base = strings.TrimSuffix(u, "/") } }
 
-func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.http = h } }
-
 func New(opts ...Option) *Client {
 	c := &Client{base: DefaultBaseURL, http: &http.Client{Timeout: 20 * time.Second}}
 	for _, o := range opts {

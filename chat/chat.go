@@ -301,8 +301,6 @@ func (m *Manager) relayTLdex(ctx context.Context, videoID string, updates <-chan
 					m.send(ctx, Event{Kind: EventComment, VideoID: videoID, Comment: c})
 				}
 			}
-			// TLdex's end notice isn't used. YouTube chat ending is the
-			// signal, and it covers streams without TLdex too.
 		}
 	}
 }

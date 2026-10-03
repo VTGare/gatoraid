@@ -42,8 +42,6 @@ type Option func(*Client)
 
 func WithBaseURL(u string) Option { return func(c *Client) { c.base = strings.TrimSuffix(u, "/") } }
 
-func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.http = h } }
-
 func New(apiKey string, opts ...Option) *Client {
 	c := &Client{
 		key:  apiKey,

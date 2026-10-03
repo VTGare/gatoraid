@@ -132,7 +132,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 				st, ok := b.Streamers.Streamer(id)
 				return ok && st.FreeChatStreams
 			}},
-			PrechatLead: time.Duration(*cfg.Relay.PrechatHours) * time.Hour,
+			PrechatLead: time.Duration(cfg.Relay.PrechatHours) * time.Hour,
 			Log:         log.With("component", "streams"),
 			OnAvatars: func(ctx context.Context, avatars map[string]string) {
 				if err := b.Streamers.UpdateAvatars(ctx, avatars); err != nil {

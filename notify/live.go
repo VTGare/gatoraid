@@ -24,7 +24,6 @@ const (
 type LiveStore interface {
 	Guild(ctx context.Context, guildID string) (*store.Guild, error)
 	ClaimNotice(ctx context.Context, n store.Notice) (bool, error)
-	SetNoticeMessage(ctx context.Context, n store.Notice, messageID string) error
 }
 
 type LiveConfig struct {
@@ -107,35 +106,13 @@ func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer
 	l.cfg.Sender.Send(sender.Message{
 		ChannelID: sub.ChannelID,
 		Send:      LiveMessage(s, host, sub.RoleID, l.cfg.Color),
-		OnSent: func(m *discordgo.Message) {
-			ctx, cancel := context.WithTimeout(context.Background(), storeTimeout)
-			defer cancel()
-			if err := l.cfg.Store.SetNoticeMessage(ctx, n, m.ID); err != nil {
-				l.cfg.Log.Warn("failed to save a notification's message", slog.Any("error", err))
-			}
-		},
 	})
 	return nil
 }
 
-// LiveMessage pings only the role, which has to be in the message text to
-// notify anyone.
 func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int) *discordgo.MessageSend {
-	e := &discordgo.MessageEmbed{
-		Title:       s.Title,
-		URL:         s.URL(),
-		Description: "Live now",
-		Color:       color,
-		Image:       &discordgo.MessageEmbedImage{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"},
-		Author: &discordgo.MessageEmbedAuthor{
-			Name: s.ChannelName,
-			URL:  "https://www.youtube.com/channel/" + s.ChannelID,
-		},
-	}
-	if host != nil {
-		e.Author.Name = host.Name
-		e.Author.IconURL = host.AvatarURL
-	}
+	e := relay.StreamEmbed(&s, host, color)
+	e.Description = "Live now"
 	if s.MembersOnly {
 		e.Description = "Members-only stream"
 	}
@@ -143,10 +120,5 @@ func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int
 		e.Timestamp = s.StartedAt.Format(time.RFC3339)
 	}
 
-	msg := &discordgo.MessageSend{Embeds: []*discordgo.MessageEmbed{e}, AllowedMentions: &discordgo.MessageAllowedMentions{}}
-	if roleID != "" {
-		msg.Content = "<@&" + roleID + ">"
-		msg.AllowedMentions.Roles = []string{roleID}
-	}
-	return msg
+	return relay.RoleMessage(e, roleID)
 }

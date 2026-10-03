@@ -218,10 +218,6 @@ func String(name, value string) *discordgo.ApplicationCommandInteractionDataOpti
 	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionString, Value: value}
 }
 
-func Bool(name string, value bool) *discordgo.ApplicationCommandInteractionDataOption {
-	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionBoolean, Value: value}
-}
-
 // The ID option types (channel, role, user) carry the ID as a string.
 func Channel(name, id string) *discordgo.ApplicationCommandInteractionDataOption {
 	return &discordgo.ApplicationCommandInteractionDataOption{Name: name, Type: discordgo.ApplicationCommandOptionChannel, Value: id}

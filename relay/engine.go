@@ -296,13 +296,6 @@ func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Sub
 		e.cfg.Sender.Send(sender.Message{
 			ChannelID: sub.ChannelID,
 			Send:      e.cfg.Formatter.Notice(kind, s, host, sub.RoleID),
-			OnSent: func(m *discordgo.Message) {
-				ctx, cancel := context.WithTimeout(context.Background(), storeTimeout)
-				defer cancel()
-				if err := e.cfg.Store.SetNoticeMessage(ctx, n, m.ID); err != nil {
-					e.cfg.Log.Warn("failed to save a notice's message", slog.Any("error", err))
-				}
-			},
 		})
 	}
 }

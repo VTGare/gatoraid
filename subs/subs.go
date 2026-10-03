@@ -21,10 +21,11 @@ type Service struct {
 type index map[store.Feature]*targets
 
 type targets struct {
-	all     []*store.Subscription
+	list    []*store.Subscription
 	channel map[string][]*store.Subscription
 	group   map[string][]*store.Subscription
-	every   []*store.Subscription
+	// Subscriptions whose target is all streamers.
+	targetAll []*store.Subscription
 	// Subscriptions per Discord channel.
 	perChannel map[string]int
 }
@@ -61,7 +62,7 @@ func (s *Service) Reload(ctx context.Context) error {
 			idx[sub.Feature] = t
 		}
 
-		t.every = append(t.every, sub)
+		t.list = append(t.list, sub)
 		t.perChannel[sub.ChannelID]++
 		switch sub.Target.Kind {
 		case store.TargetChannel:
@@ -69,7 +70,7 @@ func (s *Service) Reload(ctx context.Context) error {
 		case store.TargetGroup:
 			t.group[sub.Target.ID] = append(t.group[sub.Target.ID], sub)
 		case store.TargetAll:
-			t.all = append(t.all, sub)
+			t.targetAll = append(t.targetAll, sub)
 		}
 	}
 
@@ -115,7 +116,7 @@ func (s *Service) Match(feature store.Feature, channelID string) []*store.Subscr
 		for _, g := range s.reg.Lineage(st.GroupID) {
 			add(t.group[g.ID])
 		}
-		add(t.all)
+		add(t.targetAll)
 	}
 
 	return out
@@ -125,7 +126,7 @@ func (s *Service) Match(feature store.Feature, channelID string) []*store.Subscr
 // people say rather than by channel, so it needs the whole list.
 func (s *Service) All(feature store.Feature) []*store.Subscription {
 	if t := (*s.idx.Load())[feature]; t != nil {
-		return t.every
+		return t.list
 	}
 	return nil
 }

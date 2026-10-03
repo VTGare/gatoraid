@@ -54,8 +54,6 @@ type Option func(*Client)
 
 func WithBaseURL(u string) Option { return func(c *Client) { c.base = strings.TrimSuffix(u, "/") } }
 
-func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.http = h } }
-
 func New(opts ...Option) *Client {
 	c := &Client{base: DefaultBaseURL, http: &http.Client{Timeout: 20 * time.Second}}
 	for _, o := range opts {
@@ -84,8 +82,6 @@ func (c *Client) Open(ctx context.Context, videoID string) (*Chat, error) {
 	}
 	return ch, nil
 }
-
-func (ch *Chat) VideoID() string { return ch.videoID }
 
 // How long YouTube asks clients to wait before the next Poll.
 func (ch *Chat) Wait() time.Duration { return ch.wait }

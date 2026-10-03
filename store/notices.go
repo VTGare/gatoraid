@@ -25,7 +25,6 @@ type Notice struct {
 	VideoID   string
 	Kind      NoticeKind
 	ChannelID string
-	MessageID string
 }
 
 type LogStore interface {
@@ -39,6 +38,5 @@ type NoticeStore interface {
 	// Records the notice and reports whether it's new. Claim before
 	// sending: a crash in between loses a notice instead of pinging twice.
 	ClaimNotice(ctx context.Context, n Notice) (bool, error)
-	SetNoticeMessage(ctx context.Context, n Notice, messageID string) error
 	PruneNotices(ctx context.Context, before time.Time) (int, error)
 }

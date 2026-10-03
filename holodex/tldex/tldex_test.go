@@ -126,7 +126,7 @@ var _ = Describe("Client", func() {
 		Expect(updates).NotTo(BeClosed())
 	})
 
-	It("delivers start times, chat lines and ends", func() {
+	It("delivers start times and chat lines", func() {
 		updates := client.Subscribe("v")
 		run()
 		Eventually(srv.got).Should(ContainElement(subscribed("v")))
@@ -154,8 +154,6 @@ var _ = Describe("Client", func() {
 		Expect(u.Message.TL).To(BeTrue())
 		Expect(u.Message.Source).To(Equal("MChad"))
 
-		Eventually(updates).Should(Receive(&u))
-		Expect(u.Ended).To(BeTrue())
 		Consistently(updates).ShouldNot(Receive())
 	})
 

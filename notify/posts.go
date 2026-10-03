@@ -7,7 +7,6 @@ import (
 	"slices"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -178,7 +177,7 @@ func (p *Posts) announce(post posts.Post) {
 
 func PostMessage(post posts.Post, roleID string, color int) *discordgo.MessageSend {
 	var desc strings.Builder
-	desc.WriteString(truncate(post.Text, maxPostText))
+	desc.WriteString(relay.Truncate(post.Text, maxPostText))
 	if post.VideoID != "" {
 		desc.WriteString("\n\nhttps://youtu.be/" + post.VideoID)
 	}
@@ -210,19 +209,7 @@ func PostMessage(post posts.Post, roleID string, color int) *discordgo.MessageSe
 		e.Footer = &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("%d more images on YouTube", more)}
 	}
 
-	msg := &discordgo.MessageSend{Embeds: []*discordgo.MessageEmbed{e}, AllowedMentions: &discordgo.MessageAllowedMentions{}}
-	if roleID != "" {
-		msg.Content = "<@&" + roleID + ">"
-		msg.AllowedMentions.Roles = []string{roleID}
-	}
-	return msg
-}
-
-func truncate(s string, limit int) string {
-	if utf8.RuneCountInString(s) <= limit {
-		return s
-	}
-	return string([]rune(s)[:limit-1]) + "…"
+	return relay.RoleMessage(e, roleID)
 }
 
 func sleep(ctx context.Context, d time.Duration) bool {

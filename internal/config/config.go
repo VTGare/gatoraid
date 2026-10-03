@@ -81,7 +81,7 @@ type Relay struct {
 	// Waiting rooms further off than this many hours are relayed quietly.
 	// Their chat is read every 15 seconds and the relay notice waits until
 	// they're this close.
-	PrechatHours *int `json:"prechat_hours" env:"PRECHAT_HOURS"`
+	PrechatHours int `json:"prechat_hours" env:"PRECHAT_HOURS"`
 }
 
 type Log struct {
@@ -168,8 +168,8 @@ func (c *Config) Validate() error {
 		errs = append(errs, errors.New("config: the user channel limit cannot be negative"))
 	}
 
-	if c.Relay.PrechatHours != nil && *c.Relay.PrechatHours < 1 {
-		errs = append(errs, errors.New("config: the prechat hours must be at least 1"))
+	if c.Relay.PrechatHours < 0 {
+		errs = append(errs, errors.New("config: the prechat hours cannot be negative"))
 	}
 
 	return errors.Join(errs...)
@@ -205,9 +205,8 @@ func (c *Config) applyDefaults() {
 		c.Limits.UserChannels = DefaultUserChannels
 	}
 
-	if c.Relay.PrechatHours == nil {
-		h := DefaultPrechatHours
-		c.Relay.PrechatHours = &h
+	if c.Relay.PrechatHours == 0 {
+		c.Relay.PrechatHours = DefaultPrechatHours
 	}
 
 	if c.Log.Level == "" {

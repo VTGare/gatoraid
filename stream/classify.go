@@ -15,19 +15,11 @@ const (
 	Live
 )
 
-func (s Status) String() string {
-	if s == Live {
-		return "live"
-	}
-	return "upcoming"
-}
-
 type Stream struct {
 	VideoID     string
 	ChannelID   string
 	ChannelName string
 	Title       string
-	TopicID     string
 	Status      Status
 	ScheduledAt time.Time
 	// Set once the stream is live.
@@ -93,7 +85,6 @@ func (c Classifier) Classify(v holodex.Video) Stream {
 		ChannelID:   v.Channel.ID,
 		ChannelName: v.Channel.Name,
 		Title:       v.Title,
-		TopicID:     v.TopicID,
 		Status:      Upcoming,
 		ScheduledAt: v.StartScheduled,
 	}

@@ -46,7 +46,7 @@ var _ = Describe("Config", func() {
 		Expect(cfg.Holodex).To(Equal(config.Holodex{APIKey: "h", TLdex: true}))
 		Expect(cfg.DeepL).To(Equal(config.DeepL{APIKey: "d:fx", MonthlyCharacterBudget: 1000}))
 		Expect(cfg.Limits.UserChannels).To(Equal(5))
-		Expect(cfg.Relay.PrechatHours).To(HaveValue(Equal(48)))
+		Expect(cfg.Relay.PrechatHours).To(Equal(48))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "debug", Format: "text"}))
 		Expect(cfg.Emojis).To(Equal(map[string]string{"deepl": "<:deepL:1>", "hololive": "<:holo:2>"}))
 	})
@@ -87,11 +87,11 @@ var _ = Describe("Config", func() {
 
 		cfg, err := config.Load(path, nil)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(cfg.Relay.PrechatHours).To(HaveValue(Equal(48)))
+		Expect(cfg.Relay.PrechatHours).To(Equal(48))
 
 		cfg, err = config.Load(path, []string{"GATORAID_RELAY_PRECHAT_HOURS=12"})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(cfg.Relay.PrechatHours).To(HaveValue(Equal(12)))
+		Expect(cfg.Relay.PrechatHours).To(Equal(12))
 	})
 
 	It("fills in defaults", func() {
@@ -101,7 +101,7 @@ var _ = Describe("Config", func() {
 		Expect(cfg.Database.Path).To(Equal(config.DefaultDatabasePath))
 		Expect(cfg.DeepL.MonthlyCharacterBudget).To(Equal(config.DefaultDeepLBudget))
 		Expect(cfg.Limits.UserChannels).To(Equal(config.DefaultUserChannels))
-		Expect(cfg.Relay.PrechatHours).To(HaveValue(Equal(config.DefaultPrechatHours)))
+		Expect(cfg.Relay.PrechatHours).To(Equal(config.DefaultPrechatHours))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "info", Format: "json"}))
 	})
 
@@ -122,9 +122,7 @@ var _ = Describe("Config", func() {
 		Entry("bad log level", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LOG_LEVEL=loud"}, "log level"),
 		Entry("bad log format", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LOG_FORMAT=xml"}, "log format"),
 		Entry("negative budget", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET=-1"}, "cannot be negative"),
-		Entry("zero prechat hours in the file", `{"discord": {"token": "t"}, "relay": {"prechat_hours": 0}}`, nil, "prechat hours must be at least 1"),
-		Entry("zero prechat hours", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_RELAY_PRECHAT_HOURS=0"}, "prechat hours must be at least 1"),
-		Entry("negative prechat hours", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_RELAY_PRECHAT_HOURS=-1"}, "prechat hours must be at least 1"),
+		Entry("negative prechat hours", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_RELAY_PRECHAT_HOURS=-1"}, "prechat hours cannot be negative"),
 		Entry("negative user channel limit", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LIMITS_USER_CHANNELS=-1"}, "user channel limit cannot be negative"),
 	)
 

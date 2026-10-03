@@ -29,17 +29,6 @@ const (
 	EventEnded
 )
 
-func (k EventKind) String() string {
-	switch k {
-	case EventPrechat:
-		return "prechat"
-	case EventLive:
-		return "live"
-	default:
-		return "ended"
-	}
-}
-
 type Event struct {
 	Kind   EventKind
 	Stream Stream
@@ -102,7 +91,7 @@ func NewTracker(cfg Config) *Tracker {
 
 func (t *Tracker) Events() <-chan Event { return t.events }
 
-// Live streams come first, then the rest by schedule.
+// In Urgency order.
 func (t *Tracker) Streams() []Stream {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
@@ -111,12 +100,7 @@ func (t *Tracker) Streams() []Stream {
 	for _, tr := range t.state {
 		out = append(out, tr.Stream)
 	}
-	slices.SortFunc(out, func(a, b Stream) int {
-		if a.Status != b.Status {
-			return int(b.Status) - int(a.Status)
-		}
-		return a.ScheduledAt.Compare(b.ScheduledAt)
-	})
+	slices.SortFunc(out, func(a, b Stream) int { return Urgency(&a, &b) })
 	return out
 }
 

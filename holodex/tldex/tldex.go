@@ -38,7 +38,6 @@ type Update struct {
 	Message *Message
 	// Set once Holodex confirms the subscription, when it knows the start.
 	StartedAt time.Time
-	Ended     bool
 }
 
 type Client struct {
@@ -247,7 +246,6 @@ func (c *Client) handleEvent(data []byte) {
 
 func parseUpdate(videoID string, data json.RawMessage) (Update, bool) {
 	var raw struct {
-		Type        string `json:"type"`
 		Name        string `json:"name"`
 		ChannelID   string `json:"channel_id"`
 		Message     string `json:"message"`
@@ -261,9 +259,8 @@ func parseUpdate(videoID string, data json.RawMessage) (Update, bool) {
 		return Update{}, false
 	}
 
-	if raw.Type == "end" {
-		return Update{Ended: true}, true
-	}
+	// End notices and viewer counts have neither. The end isn't needed,
+	// since the YouTube chat ending covers streams without TLdex too.
 	if raw.Name == "" || raw.Message == "" {
 		return Update{}, false
 	}

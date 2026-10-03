@@ -14,15 +14,10 @@ type Guild struct {
 
 func (g *Guild) Active() bool { return g.LeftAt == nil }
 
-// Bump when a Settings change needs DecodeSettings to migrate old values.
-const SettingsVersion = 1
-
 // Settings holds a guild's /settings values. They're stored as a single
 // JSON document and decoded on top of DefaultSettings, so adding a field
 // doesn't need a migration.
 type Settings struct {
-	Version int `json:"v"`
-
 	ModMessages   bool `json:"mod_messages"`
 	Prechat       bool `json:"prechat"`
 	ShowChat      bool `json:"show_chat"`
@@ -40,7 +35,6 @@ type Settings struct {
 
 func DefaultSettings() Settings {
 	return Settings{
-		Version:        SettingsVersion,
 		ModMessages:    true,
 		Prechat:        true,
 		ShowChat:       true,
@@ -59,11 +53,9 @@ func DecodeSettings(data []byte) (Settings, error) {
 		return Settings{}, err
 	}
 
-	s.Version = SettingsVersion
 	return s, nil
 }
 
 func EncodeSettings(s Settings) ([]byte, error) {
-	s.Version = SettingsVersion
 	return json.Marshal(s)
 }
