@@ -44,8 +44,13 @@ type Result struct {
 	DetectedSource string
 }
 
-func (d *DeepL) Translate(ctx context.Context, text, target string) (Result, error) {
-	body, err := json.Marshal(map[string]any{"text": []string{text}, "target_lang": target})
+func (d *DeepL) Translate(ctx context.Context, text, target, background string) (Result, error) {
+	req := map[string]any{"text": []string{text}, "target_lang": target}
+	if background != "" {
+		req["context"] = background
+	}
+
+	body, err := json.Marshal(req)
 	if err != nil {
 		return Result{}, err
 	}

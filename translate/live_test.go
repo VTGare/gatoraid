@@ -24,7 +24,7 @@ var _ = Describe("Live DeepL", func() {
 		DeferCleanup(cancel)
 		d := translate.NewDeepL(key)
 
-		r, err := d.Translate(ctx, "おはよう", "EN-US")
+		r, err := d.Translate(ctx, "おはよう", "EN-US", "")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(r.DetectedSource).To(Equal("JA"))
 		Expect(r.Text).NotTo(BeEmpty())

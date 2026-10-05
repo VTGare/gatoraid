@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 	"time"
+
+	"github.com/VTGare/gatoraid/youtube"
 )
 
 type initialData struct {
@@ -156,7 +158,12 @@ func (r *messageRenderer) message() Message {
 type text struct {
 	SimpleText string `json:"simpleText"`
 	Runs       []struct {
-		Text  string `json:"text"`
+		Text               string `json:"text"`
+		NavigationEndpoint struct {
+			URLEndpoint *struct {
+				URL string `json:"url"`
+			} `json:"urlEndpoint"`
+		} `json:"navigationEndpoint"`
 		Emoji *struct {
 			EmojiID   string   `json:"emojiId"`
 			Shortcuts []string `json:"shortcuts"`
@@ -165,8 +172,8 @@ type text struct {
 	} `json:"runs"`
 }
 
-// Channel emojis become their shortcut, like :_MachiPat:, and standard
-// emojis their Unicode character.
+// Channel emojis become their shortcut, like :_MachiPat:, standard emojis
+// their Unicode character, and shortened links their full URL.
 func (t text) String() string {
 	if t.SimpleText != "" {
 		return t.SimpleText
@@ -176,7 +183,13 @@ func (t text) String() string {
 	for _, r := range t.Runs {
 		switch {
 		case r.Emoji == nil:
-			sb.WriteString(r.Text)
+			s := r.Text
+			if ep := r.NavigationEndpoint.URLEndpoint; ep != nil {
+				if link := youtube.LinkTarget(ep.URL); link != "" {
+					s = link
+				}
+			}
+			sb.WriteString(s)
 		case r.Emoji.IsCustom && len(r.Emoji.Shortcuts) > 0:
 			sb.WriteString(r.Emoji.Shortcuts[0])
 		default:

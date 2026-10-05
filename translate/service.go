@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
 	lru "github.com/hashicorp/golang-lru/v2"
@@ -23,18 +24,19 @@ const (
 )
 
 type Client interface {
-	Translate(ctx context.Context, text, target string) (Result, error)
+	Translate(ctx context.Context, text, target, background string) (Result, error)
 	Languages(ctx context.Context) ([]Language, error)
 	Usage(ctx context.Context) (count, limit int64, err error)
 }
 
 type key struct {
-	text, target string
+	text, target, background string
 }
 
-// Service translates each text once per target language. It counts the
-// characters it sends and stops at the budget, rechecking DeepL's own
-// count every few minutes, which also picks up the monthly reset.
+// Service translates each text once per target language and background. It
+// counts the characters it sends and stops at the budget, rechecking
+// DeepL's own count every few minutes, which also picks up the monthly
+// reset.
 type Service struct {
 	client Client
 	budget int64
@@ -96,8 +98,8 @@ func (s *Service) RefreshUsage(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) Translate(ctx context.Context, text, target string) (Result, error) {
-	k := key{text, target}
+func (s *Service) Translate(ctx context.Context, text, target, background string) (Result, error) {
+	k := key{text, target, background}
 	if r, ok := s.cache.Get(k); ok {
 		return r, nil
 	}
@@ -106,7 +108,7 @@ func (s *Service) Translate(ctx context.Context, text, target string) (Result, e
 		return Result{}, err
 	}
 
-	r, err := s.client.Translate(ctx, text, target)
+	r, err := s.client.Translate(ctx, text, target, background)
 	if err != nil {
 		var status *StatusError
 		if errors.As(err, &status) && status.Status == 456 {
@@ -165,6 +167,30 @@ func (s *Service) Languages(ctx context.Context) ([]Language, error) {
 	s.langs, s.langsAt = langs, time.Now()
 	s.mu.Unlock()
 	return langs, nil
+}
+
+// Unchanged reports whether a translation only differs from the original in
+// case, punctuation or stretched letters, like "lets go" and "Let's go".
+func Unchanged(original, translation string) bool {
+	return normalize(original) == normalize(translation)
+}
+
+func normalize(s string) string {
+	var sb strings.Builder
+	var last rune
+	for _, r := range strings.ToLower(s) {
+		switch {
+		case unicode.IsSpace(r):
+			r = ' '
+		case !unicode.IsLetter(r) && !unicode.IsDigit(r):
+			continue
+		}
+		if r != last {
+			sb.WriteRune(r)
+		}
+		last = r
+	}
+	return strings.TrimSpace(sb.String())
 }
 
 // SameLanguage reports whether DeepL's detected source is the target, so

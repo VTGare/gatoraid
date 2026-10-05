@@ -225,9 +225,9 @@ func japanese(s string) bool {
 	})
 }
 
-// YouTube writes its own emojis as :name:, which aren't worth translating.
-var shortcode = regexp.MustCompile(`:[^:\s]+:`)
+// Links, @handles and YouTube's :emoji: shortcodes aren't worth translating.
+var notWords = regexp.MustCompile(`https?://\S+|@\S+|:[^:\s]+:`)
 
 func hasWords(text string) bool {
-	return strings.ContainsFunc(shortcode.ReplaceAllString(text, ""), unicode.IsLetter)
+	return strings.ContainsFunc(notWords.ReplaceAllString(text, ""), unicode.IsLetter)
 }

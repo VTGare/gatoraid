@@ -10,9 +10,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
+
+	"github.com/VTGare/gatoraid/youtube"
 )
 
 const DefaultBaseURL = "https://www.youtube.com"
@@ -110,8 +111,6 @@ type text struct {
 	} `json:"runs"`
 }
 
-// Link runs show a shortened URL and point at a YouTube redirect whose q
-// parameter has the real one.
 func (t text) String() string {
 	if t.SimpleText != "" {
 		return t.SimpleText
@@ -121,12 +120,8 @@ func (t text) String() string {
 	for _, r := range t.Runs {
 		s := r.Text
 		if ep := r.NavigationEndpoint.URLEndpoint; ep != nil {
-			if u, err := url.Parse(ep.URL); err == nil {
-				if q := u.Query().Get("q"); q != "" {
-					s = q
-				} else if u.Host != "www.youtube.com" {
-					s = ep.URL
-				}
+			if link := youtube.LinkTarget(ep.URL); link != "" {
+				s = link
 			}
 		}
 		sb.WriteString(s)

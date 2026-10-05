@@ -179,12 +179,14 @@ func PostMessage(post posts.Post, roleID string, color int) *discordgo.MessageSe
 	var desc strings.Builder
 	desc.WriteString(relay.Truncate(post.Text, maxPostText))
 	if post.VideoID != "" {
-		desc.WriteString("\n\nhttps://youtu.be/" + post.VideoID)
+		desc.WriteString("\n\nhttps://youtu.be/")
+		desc.WriteString(post.VideoID)
 	}
 	if len(post.Poll) > 0 {
 		desc.WriteString("\n\n**Poll**")
 		for _, choice := range post.Poll {
-			desc.WriteString("\n- " + relay.EscapeMarkdown(choice))
+			desc.WriteString("\n- ")
+			desc.WriteString(relay.EscapeMarkdown(choice))
 		}
 	}
 

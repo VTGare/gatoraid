@@ -56,13 +56,21 @@ var _ = Describe("Formatter", func() {
 			c.Stream.Status, c.Stream.Title = stream.Upcoming, "【Schedule】Click here to see schedule!"
 			return c
 		}(), relay.KindTL, true,
-			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope · 【Schedule】Click here to see schedule!](<https://youtu.be/vid>)"),
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope](<https://youtu.be/vid>) · 【Schedule】Click here to see schedule!"),
 		Entry("a waiting room's long title, cut short", func() *relay.Comment {
 			c := comment("[EN] soon")
 			c.Stream.Status, c.Stream.Title = stream.Upcoming, strings.Repeat("あ", 60)
 			return c
 		}(), relay.KindTL, true,
-			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope · "+strings.Repeat("あ", 49)+"…](<https://youtu.be/vid>)"),
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope](<https://youtu.be/vid>) · "+strings.Repeat("あ", 49)+"…"),
+		Entry("emojis, kept out of the link", func() *relay.Comment {
+			c := comment("[EN] soon")
+			c.Host = nil
+			c.Stream.ChannelName = "Banzoin Hakka 🐦‍⬛"
+			c.Stream.Status, c.Stream.Title = stream.Upcoming, "I HAVE RETURNED FROM THE PHILIPPINES 🇵🇭‼️LET'S YAP"
+			return c
+		}(), relay.KindTL, true,
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Banzoin Hakka](<https://youtu.be/vid>) · I HAVE RETURNED FROM THE PHILIPPINES 🇵🇭‼️LET'S YAP"),
 		Entry("a channel the registry doesn't know", func() *relay.Comment {
 			c := comment("[EN] hi")
 			c.Host = nil

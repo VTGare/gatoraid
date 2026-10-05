@@ -157,6 +157,24 @@ var _ = Describe("Chat", func() {
 		Expect(chat.Wait()).To(Equal(30 * time.Second))
 	})
 
+	It("writes shortened links in full", func() {
+		yt.chats["live-chat-token"] = []byte(`{"continuationContents":{"liveChatContinuation":{
+			"continuations":[{"timedContinuationData":{"continuation":"links","timeoutMs":500}}],"actions":[]}}}`)
+		yt.chats["links"] = []byte(`{"continuationContents":{"liveChatContinuation":{
+			"continuations":[{"timedContinuationData":{"continuation":"x","timeoutMs":60000}}],
+			"actions":[{"addChatItemAction":{"item":{"liveChatTextMessageRenderer":{"id":"l","authorName":{"simpleText":"@a"},
+				"message":{"runs":[{"text":"look "},{"text":"https://x.com/ozq1d/status/2106907354...","navigationEndpoint":{"urlEndpoint":{
+					"url":"https://www.youtube.com/redirect?event=live_chat&redir_token=t&q=https%3A%2F%2Fx.com%2Fozq1d%2Fstatus%2F2106907354123456789","target":"TARGET_NEW_WINDOW","nofollow":true}}}]}}}}}]}}}`)
+
+		chat, err := client.Open(ctx, "live")
+		Expect(err).NotTo(HaveOccurred())
+		chat.Wait()
+
+		msgs, err := chat.Poll(ctx)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(msgs[0].Text).To(Equal("look https://x.com/ozq1d/status/2106907354123456789"))
+	})
+
 	It("reports the end of the chat", func() {
 		chat, err := client.Open(ctx, "live")
 		Expect(err).NotTo(HaveOccurred())

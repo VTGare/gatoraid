@@ -49,11 +49,11 @@ var _ = Describe("DeepL", func() {
 		d := translate.NewDeepL("key:fx", translate.WithBaseURL(srv.URL))
 		ctx := context.Background()
 
-		r, err := d.Translate(ctx, "こんにちは、みんな！", "EN-US")
+		r, err := d.Translate(ctx, "こんにちは、みんな！", "EN-US", "A live chat message.")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(r).To(Equal(translate.Result{Text: "Hello, everyone!", DetectedSource: "JA"}))
 		Expect(auth).To(Equal("DeepL-Auth-Key key:fx"))
-		Expect(body).To(Equal(map[string]any{"text": []any{"こんにちは、みんな！"}, "target_lang": "EN-US"}))
+		Expect(body).To(Equal(map[string]any{"text": []any{"こんにちは、みんな！"}, "target_lang": "EN-US", "context": "A live chat message."}))
 
 		langs, err := d.Languages(ctx)
 		Expect(err).NotTo(HaveOccurred())
@@ -67,7 +67,7 @@ var _ = Describe("DeepL", func() {
 
 	It("reports the quota running out", func() {
 		status = 456
-		_, err := translate.NewDeepL("key", translate.WithBaseURL(srv.URL)).Translate(context.Background(), "x", "EN-US")
+		_, err := translate.NewDeepL("key", translate.WithBaseURL(srv.URL)).Translate(context.Background(), "x", "EN-US", "")
 		Expect(err).To(MatchError("deepl: quota exceeded"))
 	})
 })
@@ -81,7 +81,7 @@ type fakeClient struct {
 	languageReq int
 }
 
-func (f *fakeClient) Translate(_ context.Context, text, target string) (translate.Result, error) {
+func (f *fakeClient) Translate(_ context.Context, text, target, _ string) (translate.Result, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.calls++
@@ -104,39 +104,53 @@ func (f *fakeClient) Usage(context.Context) (int64, int64, error) {
 	return f.count, f.limit, nil
 }
 
+var _ = DescribeTable("Unchanged",
+	func(original, translation string, want bool) {
+		Expect(translate.Unchanged(original, translation)).To(Equal(want))
+	},
+	Entry("the same text", "my mech", "my mech", true),
+	Entry("case and punctuation", "lets go", "Let's go", true),
+	Entry("stretched letters", "sooo goood", "So good", true),
+	Entry("spacing", "hey  cutie", "Hey, cutie", true),
+	Entry("a translation", "おはよう", "Good morning", false),
+	Entry("another word", "W", "In", false),
+)
+
 var _ = Describe("Service", func() {
 	ctx := context.Background()
 
-	It("translates each text once per target language", func() {
+	It("translates each text once per target language and background", func() {
 		client := &fakeClient{limit: 1000}
 		s := translate.NewService(client, 1000, nil)
 
 		for range 3 {
-			r, err := s.Translate(ctx, "やあ", "EN-US")
+			r, err := s.Translate(ctx, "やあ", "EN-US", "")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(r.Text).To(Equal("やあ in EN-US"))
 		}
-		_, err := s.Translate(ctx, "やあ", "DE")
+		_, err := s.Translate(ctx, "やあ", "DE", "")
+		Expect(err).NotTo(HaveOccurred())
+		_, err = s.Translate(ctx, "やあ", "DE", "Another stream.")
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(client.calls).To(Equal(2))
+		Expect(client.calls).To(Equal(3))
 	})
 
 	It("stops at the budget and resumes when the usage resets", func() {
 		client := &fakeClient{limit: 500000}
 		s := translate.NewService(client, 5, nil)
 
-		_, err := s.Translate(ctx, "abc", "EN-US")
+		_, err := s.Translate(ctx, "abc", "EN-US", "")
 		Expect(err).NotTo(HaveOccurred())
-		_, err = s.Translate(ctx, "def", "EN-US")
+		_, err = s.Translate(ctx, "def", "EN-US", "")
 		Expect(err).To(MatchError(translate.ErrBudget))
-		_, err = s.Translate(ctx, "g", "EN-US")
+		_, err = s.Translate(ctx, "g", "EN-US", "")
 		Expect(err).To(MatchError(translate.ErrBudget))
 		Expect(client.calls).To(Equal(1))
 
 		client.count = 0
 		Expect(s.RefreshUsage(ctx)).To(Succeed())
-		_, err = s.Translate(ctx, "g", "EN-US")
+		_, err = s.Translate(ctx, "g", "EN-US", "")
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -145,7 +159,7 @@ var _ = Describe("Service", func() {
 		s := translate.NewService(client, 500000, nil)
 		Expect(s.RefreshUsage(ctx)).To(Succeed())
 
-		_, err := s.Translate(ctx, "abc", "EN-US")
+		_, err := s.Translate(ctx, "abc", "EN-US", "")
 		Expect(err).To(MatchError(translate.ErrBudget))
 	})
 
@@ -153,9 +167,9 @@ var _ = Describe("Service", func() {
 		client := &fakeClient{limit: 500000, err: &translate.StatusError{Status: 456}}
 		s := translate.NewService(client, 500000, nil)
 
-		_, err := s.Translate(ctx, "abc", "EN-US")
+		_, err := s.Translate(ctx, "abc", "EN-US", "")
 		Expect(err).To(HaveOccurred())
-		_, err = s.Translate(ctx, "def", "EN-US")
+		_, err = s.Translate(ctx, "def", "EN-US", "")
 		Expect(err).To(MatchError(translate.ErrBudget))
 	})
 

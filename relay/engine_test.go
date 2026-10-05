@@ -67,23 +67,36 @@ func (f *fakeChats) Running() []string {
 }
 
 type fakeTranslator struct {
-	mu    sync.Mutex
-	calls []string
-	err   error
+	mu          sync.Mutex
+	calls       []string
+	backgrounds []string
+	err         error
 }
 
-func (f *fakeTranslator) Translate(_ context.Context, text, target string) (translate.Result, error) {
+// Like DeepL, it gets the language of short English lines wrong but
+// leaves them as they are.
+func (f *fakeTranslator) Translate(_ context.Context, text, target, background string) (translate.Result, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.calls = append(f.calls, target+":"+text)
+	f.backgrounds = append(f.backgrounds, background)
 	if f.err != nil {
 		return translate.Result{}, f.err
+	}
+	if len(strings.Fields(text)) <= 2 && !strings.ContainsFunc(text, func(r rune) bool { return r > unicode.MaxASCII }) {
+		return translate.Result{Text: text, DetectedSource: "CS"}, nil
 	}
 	detected := "JA"
 	if !strings.ContainsFunc(text, func(r rune) bool { return r > unicode.MaxASCII }) {
 		detected = "EN"
 	}
 	return translate.Result{Text: "<" + text + " in " + target + ">", DetectedSource: detected}, nil
+}
+
+func (f *fakeTranslator) backgroundList() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]string(nil), f.backgrounds...)
 }
 
 func (f *fakeTranslator) callList() []string {
@@ -524,6 +537,8 @@ var _ = Describe("Engine", func() {
 		say("calli-live", "UCviewer", "@viewer", "[EN] good morning")
 		say("calli-live", "UCrisu", "@risu", "おはようございます")
 		say("calli-live", kiaraID, "@kiara", ":_kiaraWave::_hic:")
+		say("calli-live", calliID, "@calli", "my mech")
+		say("calli-live", calliID, "@calli", "https://x.com/calli/status/1")
 
 		Eventually(snd.lines).Should(ContainElements(
 			"c1: 🎙️ **@calli:** `おはよう`\n🌐 **DeepL:** `<おはよう in EN-US>`",
@@ -531,8 +546,13 @@ var _ = Describe("Engine", func() {
 			"c2: 🎙️ **@calli:** `おはよう`",
 			"c1: 🎙️ **@risu:** `おはようございます`",
 			"c1: 🎙️ **@kiara:** `:_kiaraWave::_hic:`",
+			"c1: 🎙️ **@calli:** `my mech`",
+			"c2: 🎙️ **@calli:** `my mech`",
+			"c1: 🎙️ **@calli:** `https://x.com/calli/status/1`",
 		))
-		Consistently(tl.callList, 50*time.Millisecond).Should(ConsistOf("EN-US:おはよう", "JA:おはよう"))
+		Consistently(tl.callList, 50*time.Millisecond).Should(ConsistOf(
+			"EN-US:おはよう", "JA:おはよう", "EN-US:my mech", "JA:my mech"))
+		Expect(tl.backgroundList()).To(HaveEach(HavePrefix(`A message from the live chat of Mori Calliope's YouTube stream "`)))
 	})
 
 	It("posts lines without a translation when DeepL fails", func() {
@@ -564,7 +584,7 @@ var _ = Describe("Engine", func() {
 		say("calli-room", calliID, "@calli", "schedule's up")
 		Eventually(snd.lines).Should(ContainElements(
 			"c1: 🎙️ **@calli:** `hi`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-live>)",
-			"c1: ⏳ 🎙️ **@calli:** `schedule's up`\n**Chat:** [Mori Calliope · Free chat](<https://youtu.be/calli-room>)",
+			"c1: ⏳ 🎙️ **@calli:** `schedule's up`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-room>) · Free chat",
 		))
 	})
 

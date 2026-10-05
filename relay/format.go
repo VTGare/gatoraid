@@ -2,6 +2,7 @@ package relay
 
 import (
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/VTGare/gatoraid/store"
@@ -43,40 +44,39 @@ type Formatter struct {
 // a link to the chat for lines that could have come from more than one.
 func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation string) string {
 	var sb strings.Builder
+	write := func(parts ...string) {
+		for _, p := range parts {
+			sb.WriteString(p)
+		}
+	}
 
 	if c.Stream.Status == stream.Upcoming {
-		sb.WriteString(f.Emoji(EmojiPrechat, fallbackPrechat) + " ")
+		write(f.Emoji(EmojiPrechat, fallbackPrechat), " ")
 	}
 
 	name := EscapeMarkdown(c.AuthorName)
 	switch {
 	case kind == KindTL:
-		sb.WriteString(iconTL + " ||" + name + ":||")
+		write(iconTL, " ||", name, ":||")
 	case c.fromVTuber() || kind == KindOwner:
-		sb.WriteString(f.agencyEmoji(c.Author, EmojiVTuber, fallbackVTuber) + " **" + name + ":**")
+		write(f.agencyEmoji(c.Author, EmojiVTuber, fallbackVTuber), " **", name, ":**")
 	default:
-		sb.WriteString(iconOther + " **" + name + ":**")
+		write(iconOther, " **", name, ":**")
 	}
 
-	sb.WriteString(" " + code(c.Text))
+	write(" ", code(c.Text))
 
 	if translation != "" {
-		sb.WriteString("\n" + f.Emoji(EmojiDeepL, fallbackDeepL) + " **DeepL:** " + code(translation))
+		write("\n", f.Emoji(EmojiDeepL, fallbackDeepL), " **DeepL:** ", code(translation))
 	}
 
 	if showChat {
-		label := hostName(c)
+		write("\n**Chat:** [", linkLabel(hostName(c)), "](<", c.Stream.URL(), ">)")
 
 		// A streamer's waiting rooms only differ by title.
 		if c.Stream.Status == stream.Upcoming && c.Stream.Title != "" {
-			label += " · " + Truncate(c.Stream.Title, maxLinkTitle)
+			write(" · ", EscapeMarkdown(Truncate(c.Stream.Title, maxLinkTitle)))
 		}
-
-		sb.WriteString("\n**Chat:** [")
-		sb.WriteString(EscapeMarkdown(label))
-		sb.WriteString("](<")
-		sb.WriteString(c.Stream.URL())
-		sb.WriteString(">)")
 	}
 
 	return sb.String()
@@ -98,7 +98,7 @@ func (f *Formatter) Gossip(c *Comment) string {
 
 func (f *Formatter) elsewhere(c *Comment, author string) string {
 	return f.agencyEmoji(c.Author, EmojiPeek, fallbackPeek) + " **" + EscapeMarkdown(author) + "** in [**" +
-		EscapeMarkdown(hostName(c)) + "**'s chat](<" + c.Stream.URL() + ">): " + code(c.Text)
+		linkLabel(hostName(c)) + "**'s chat](<" + c.Stream.URL() + ">): " + code(c.Text)
 }
 
 // The nearest group with an emoji wins, so Hololive EN falls back to
@@ -119,6 +119,22 @@ func hostName(c *Comment) string {
 		return c.Host.Name
 	}
 	return c.Stream.ChannelName
+}
+
+// Discord shows a masked link as plain text when its label has emojis.
+func linkLabel(label string) string {
+	label = strings.Join(strings.Fields(strings.Map(func(r rune) rune {
+		if unicode.In(r, unicode.So, unicode.Sk, unicode.Cf, unicode.Variation_Selector) {
+			return -1
+		}
+		return r
+	}, label)), " ")
+
+	if label == "" {
+		label = "chat"
+	}
+
+	return EscapeMarkdown(label)
 }
 
 // Truncate cuts s to limit runes, the last one an ellipsis.

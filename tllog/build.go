@@ -65,16 +65,20 @@ func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, int) {
 
 	var sb strings.Builder
 	if meta.Title != "" {
-		sb.WriteString(meta.Title + "\n")
+		sb.WriteString(meta.Title)
+		sb.WriteString("\n")
 	}
-	sb.WriteString(meta.URL() + "\n")
+	sb.WriteString(meta.URL())
+	sb.WriteString("\n")
 
 	start := meta.Start
 	if start.IsZero() {
 		start = kept[0].SaidAt
 		sb.WriteString("Times count from the first line.\n\n")
 	} else {
-		sb.WriteString("Started " + start.UTC().Format("2006-01-02 15:04 MST") + "\n\n")
+		sb.WriteString("Started ")
+		sb.WriteString(start.UTC().Format("2006-01-02 15:04 MST"))
+		sb.WriteString("\n\n")
 	}
 
 	for _, l := range kept {

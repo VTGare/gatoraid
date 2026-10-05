@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"maps"
 	"slices"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -40,7 +42,7 @@ type Sender interface {
 }
 
 type Translator interface {
-	Translate(ctx context.Context, text, target string) (translate.Result, error)
+	Translate(ctx context.Context, text, target, background string) (translate.Result, error)
 }
 
 type Store interface {
@@ -422,8 +424,8 @@ func (e *Engine) translates(c *Comment, kind Kind, st *store.Settings) bool {
 }
 
 // translateAndPost asks for the translation off the engine's goroutine, so
-// a slow DeepL never holds up other lines. A line whose translation fails
-// goes out without one.
+// a slow DeepL never holds up other lines. A line whose translation fails,
+// or comes back the same, goes out without one.
 func (e *Engine) translateAndPost(c *Comment, target string, lines []waiting) {
 	// The engine updates its streams in place, so the goroutine gets its
 	// own copy.
@@ -436,9 +438,9 @@ func (e *Engine) translateAndPost(c *Comment, target string, lines []waiting) {
 		defer cancel()
 
 		translation := ""
-		r, err := e.cfg.Translator.Translate(ctx, own.Text, target)
+		r, err := e.cfg.Translator.Translate(ctx, own.Text, target, chatBackground(&own))
 		switch {
-		case err == nil && !translate.SameLanguage(r.DetectedSource, target):
+		case err == nil && !translate.SameLanguage(r.DetectedSource, target) && !translate.Unchanged(own.Text, r.Text):
 			translation = r.Text
 		case err != nil && !errors.Is(err, translate.ErrBudget):
 			e.cfg.Log.Warn("translation failed", slog.String("video_id", own.VideoID), slog.Any("error", err))
@@ -448,6 +450,24 @@ func (e *Engine) translateAndPost(c *Comment, target string, lines []waiting) {
 			e.post(&own, w.sub, w.kind, e.cfg.Formatter.Relay(&own, w.kind, w.showChat, translation))
 		}
 	})
+}
+
+const chatStyle = "Chat is informal and full of internet, gaming and VTuber slang, like W, kek, gg, pog and lmao. " +
+	"Leave slang, names and words that are already in the target language as they are."
+
+// chatBackground tells DeepL what it's translating.
+func chatBackground(c *Comment) string {
+	var sb strings.Builder
+	sb.WriteString("A message from the live chat of ")
+	sb.WriteString(hostName(c))
+	sb.WriteString("'s YouTube stream")
+	if c.Stream.Title != "" {
+		sb.WriteString(" ")
+		sb.WriteString(strconv.Quote(c.Stream.Title))
+	}
+	sb.WriteString(". ")
+	sb.WriteString(chatStyle)
+	return sb.String()
 }
 
 // SettingsChanged drops the guild's cached settings and rechecks which

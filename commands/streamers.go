@@ -182,7 +182,8 @@ func groupMembers(reg *streamers.Registry, g *store.Group) *discordgo.MessageEmb
 				omitted += len(sec.members) - i
 				break
 			}
-			sb.WriteString(st.Name + sep)
+			sb.WriteString(st.Name)
+			sb.WriteString(sep)
 		}
 	}
 
