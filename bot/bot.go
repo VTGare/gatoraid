@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/VTGare/gumi"
@@ -408,12 +409,12 @@ func (b *Bot) purge(ctx context.Context) {
 func discordLogger(log *slog.Logger) func(msgL, caller int, format string, a ...any) {
 	return func(msgL, _ int, format string, a ...any) {
 		level := slog.LevelDebug
-		switch msgL {
-		case discordgo.LogError:
+		switch {
+		case msgL == discordgo.LogError:
 			level = slog.LevelError
-		case discordgo.LogWarning:
+		case msgL == discordgo.LogWarning && !strings.HasPrefix(format, "unknown event"):
 			level = slog.LevelWarn
-		case discordgo.LogInformational:
+		case msgL == discordgo.LogInformational:
 			level = slog.LevelInfo
 		}
 
