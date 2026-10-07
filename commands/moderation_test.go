@@ -7,9 +7,11 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
+	dt "github.com/VTGare/gumi/v2/gumitest"
+
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/youtube/channel"
@@ -31,7 +33,7 @@ var _ = Describe("Moderation commands", func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
 
-		_, _, err := h.b.Store.JoinGuild(ctx, "guild")
+		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 
 		yt := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -46,11 +48,11 @@ var _ = Describe("Moderation commands", func() {
 		h.b.Channels = channel.New(channel.WithBaseURL(yt.URL))
 	})
 
-	asMod := func(i *discordgo.InteractionCreate) *discordgo.InteractionCreate {
-		return dt.WithPermissions(i, discordgo.PermissionManageMessages)
+	asMod := func(i *dt.Interaction) *dt.Interaction {
+		return i.WithPermissions(discord.PermissionManageMessages)
 	}
 
-	run := func(command, sub string, opts ...*discordgo.ApplicationCommandInteractionDataOption) string {
+	run := func(command, sub string, opts ...dt.Option) string {
 		GinkgoHelper()
 		data := h.run(asMod(dt.Command(user, command, dt.Sub(sub, opts...))))
 		Expect(ephemeral(data)).To(BeTrue())
@@ -58,7 +60,7 @@ var _ = Describe("Moderation commands", func() {
 	}
 
 	// Deferred replies arrive as an edit of the original response.
-	runDeferred := func(command, sub string, opts ...*discordgo.ApplicationCommandInteractionDataOption) string {
+	runDeferred := func(command, sub string, opts ...dt.Option) string {
 		GinkgoHelper()
 		before := len(h.rec.Edits())
 		h.run(asMod(dt.Command(user, command, dt.Sub(sub, opts...))))
@@ -73,22 +75,22 @@ var _ = Describe("Moderation commands", func() {
 	})
 
 	It("lets Blacklister and Manager roles in", func() {
-		Expect(h.b.Store.SetGuildRoles(ctx, "guild", store.RoleBlacklister, []string{"bl"})).To(Succeed())
-		Expect(h.b.Store.SetGuildRoles(ctx, "guild", store.RoleManager, []string{"mgr"})).To(Succeed())
+		Expect(h.b.Store.SetGuildRoles(ctx, testGuild, store.RoleBlacklister, []string{"12"})).To(Succeed())
+		Expect(h.b.Store.SetGuildRoles(ctx, testGuild, store.RoleManager, []string{"11"})).To(Succeed())
 
-		for _, role := range []string{"bl", "mgr"} {
-			data := h.run(dt.WithRoles(dt.Command(user, "filter", dt.Sub("list")), role))
+		for _, role := range []snowflake.ID{12, 11} {
+			data := h.run(dt.Command(user, "filter", dt.Sub("list")).WithRoles(role))
 			Expect(embed(data)["title"]).To(Equal("Filters"), role)
 		}
 
-		data := h.run(dt.WithRoles(dt.Command(user, "filter", dt.Sub("list")), "other"))
+		data := h.run(dt.Command(user, "filter", dt.Sub("list")).WithRoles(13))
 		Expect(replyText(data)).To(ContainSubstring("You need Manage Messages"))
 	})
 
 	It("blacklists a channel by handle and lists it", func() {
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "@spammer"), dt.String("reason", "ads"))).
 			To(Equal("Blacklisted **@spammer**. Their messages won't be relayed here.\n`/blacklist remove` undoes it."))
-		Expect(h.b.Moderation.Blacklisted("guild", "UCspamspamspamspamspamsp")).To(BeTrue())
+		Expect(h.b.Moderation.Blacklisted(testGuild, "UCspamspamspamspamspamsp")).To(BeTrue())
 
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "https://youtube.com/channel/UCspamspamspamspamspamsp"))).
 			To(ContainSubstring("**@spammer** is already blacklisted."))
@@ -106,55 +108,55 @@ var _ = Describe("Moderation commands", func() {
 
 	It("blacklists the author of a relayed line from the context menu", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
-			VideoID: "v", GuildID: "guild", ChannelID: "channel", MessageID: "m1",
+			VideoID: "v", GuildID: testGuild, ChannelID: testChannel, MessageID: "4001",
 			AuthorChannelID: "UCauthorauthorauthorauth", AuthorName: "@some_author", Body: "spam",
 			Kind: store.LineTL, SaidAt: time.Now(),
 		}})).To(Succeed())
 
-		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
+		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4001, 9)))
 		Expect(ephemeral(data)).To(BeTrue())
 		Expect(replyText(data)).To(Equal(`Blacklisted **@some\_author**. Their messages won't be relayed here.` + "\n`/blacklist remove` undoes it."))
-		Expect(h.b.Moderation.Blacklisted("guild", "UCauthorauthorauthorauth")).To(BeTrue())
+		Expect(h.b.Moderation.Blacklisted(testGuild, "UCauthorauthorauthorauth")).To(BeTrue())
 
-		data = h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m2")))
+		data = h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4002, 9)))
 		Expect(replyText(data)).To(ContainSubstring("That's not a line I relayed"))
 	})
 
 	It("blacklists MChad authors by name, not every MChad line", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
-			VideoID: "v", GuildID: "guild", MessageID: "m1", AuthorChannelID: "mchad:Some TLer", AuthorName: "Some TLer",
+			VideoID: "v", GuildID: testGuild, MessageID: "4001", AuthorChannelID: "mchad:Some TLer", AuthorName: "Some TLer",
 			Body: "TL line", Kind: store.LineTL, SaidAt: time.Now(),
 		}})).To(Succeed())
 
-		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
+		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4001, 9)))
 		Expect(replyText(data)).To(HavePrefix("Blacklisted **Some TLer**."))
-		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Some TLer")).To(BeTrue())
-		Expect(h.b.Moderation.Blacklisted("guild", "mchad:Someone Else")).To(BeFalse())
-		Expect(h.b.Moderation.Blacklisted("guild", "")).To(BeFalse())
+		Expect(h.b.Moderation.Blacklisted(testGuild, "mchad:Some TLer")).To(BeTrue())
+		Expect(h.b.Moderation.Blacklisted(testGuild, "mchad:Someone Else")).To(BeFalse())
+		Expect(h.b.Moderation.Blacklisted(testGuild, "")).To(BeFalse())
 	})
 
 	It("mentions that streamers' own lines are still relayed", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
-			VideoID: "v", GuildID: "guild", MessageID: "m1", AuthorChannelID: "UCstreamer", AuthorName: "@streamer",
+			VideoID: "v", GuildID: testGuild, MessageID: "4001", AuthorChannelID: "UCstreamer", AuthorName: "@streamer",
 			Body: "hi", Kind: store.LineOwner, SaidAt: time.Now(),
 		}})).To(Succeed())
 
-		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", "m1")))
+		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4001, 9)))
 		Expect(replyText(data)).To(ContainSubstring("only stops their cameos and gossip"))
 	})
 
 	It("removes by suggestion, by name, or the last one added", func() {
 		for _, e := range []store.BlacklistEntry{
-			{GuildID: "guild", ChannelID: "UCa", Name: "@a", AddedBy: "mod"},
-			{GuildID: "guild", ChannelID: "UCb", Name: "@b", AddedBy: "mod"},
-			{GuildID: "guild", ChannelID: "UCc", Name: "@c", AddedBy: "mod"},
+			{GuildID: testGuild, ChannelID: "UCa", Name: "@a", AddedBy: "mod"},
+			{GuildID: testGuild, ChannelID: "UCb", Name: "@b", AddedBy: "mod"},
+			{GuildID: testGuild, ChannelID: "UCc", Name: "@c", AddedBy: "mod"},
 		} {
 			_, err := h.b.Moderation.AddToBlacklist(ctx, e)
 			Expect(err).NotTo(HaveOccurred())
 			time.Sleep(2 * time.Millisecond)
 		}
 
-		suggested := choices(h.run(asMod(dt.Autocomplete(user, "blacklist", dt.Sub("remove", dt.Focused("channel", "@"))))))
+		suggested := choices(h.run(asMod(dt.Autocomplete(user, "blacklist", dt.Sub("remove", dt.Focused(dt.String("channel", "@")))))))
 		Expect(suggested).To(HaveExactElements("@c · UCc", "@b · UCb", "@a · UCa"))
 
 		Expect(run("blacklist", "remove", dt.String("channel", "UCa"))).To(Equal("Took **@a** off the blacklist."))
@@ -166,11 +168,11 @@ var _ = Describe("Moderation commands", func() {
 
 	It("suggests recently relayed authors to blacklist", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
-			VideoID: "v", GuildID: "guild", AuthorChannelID: "UCx", AuthorName: "@translator", Body: "[EN] hi",
+			VideoID: "v", GuildID: testGuild, AuthorChannelID: "UCx", AuthorName: "@translator", Body: "[EN] hi",
 			Kind: store.LineTL, SaidAt: time.Now(),
 		}})).To(Succeed())
 
-		suggested := choices(h.run(asMod(dt.Autocomplete(user, "blacklist", dt.Sub("add", dt.Focused("channel", "trans"))))))
+		suggested := choices(h.run(asMod(dt.Autocomplete(user, "blacklist", dt.Sub("add", dt.Focused(dt.String("channel", "trans")))))))
 		Expect(suggested).To(Equal([]string{"@translator · UCx"}))
 	})
 
@@ -182,7 +184,7 @@ var _ = Describe("Moderation commands", func() {
 		Expect(run("filter", "add", dt.String("type", "wanted"), dt.String("pattern", "es:"))).
 			To(ContainSubstring("`es:` is already a wanted filter."))
 
-		rules := h.b.Moderation.For("guild")
+		rules := h.b.Moderation.For(testGuild)
 		Expect(rules.Banned).To(Equal([]string{"spoiler"}))
 		Expect(rules.Wanted).To(Equal([]string{"es:"}))
 
@@ -190,7 +192,7 @@ var _ = Describe("Moderation commands", func() {
 		Expect(embed(data)["fields"]).To(HaveLen(2))
 
 		suggested := choices(h.run(asMod(dt.Autocomplete(user, "filter",
-			dt.Sub("remove", dt.String("type", "wanted"), dt.Focused("pattern", ""))))))
+			dt.Sub("remove", dt.String("type", "wanted"), dt.Focused(dt.String("pattern", "")))))))
 		Expect(suggested).To(Equal([]string{"es:"}))
 
 		Expect(run("filter", "remove", dt.String("type", "banned"), dt.String("pattern", "Spoiler"))).

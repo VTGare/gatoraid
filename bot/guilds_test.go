@@ -6,10 +6,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	gt "github.com/VTGare/gumi/v2/gumitest"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/disgo/gateway"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/internal/config"
-	"github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
 
@@ -18,12 +21,11 @@ import (
 )
 
 var _ = Describe("Guild lifecycle", func() {
-	const logChannel = "999"
+	const logChannel = 999
 
 	var (
 		b   *Bot
-		s   *discordgo.Session
-		rec *discordtest.Recorder
+		rec *gt.Recorder
 		ctx context.Context
 	)
 
@@ -34,16 +36,15 @@ var _ = Describe("Guild lifecycle", func() {
 		Expect(err).NotTo(HaveOccurred())
 		DeferCleanup(st.Close)
 
-		cfg := &config.Config{Discord: config.Discord{Token: "test", LogChannelID: logChannel}}
+		cfg := &config.Config{Discord: config.Discord{Token: gt.Token, LogChannelID: "999"}}
 		b, err = New(cfg, slog.New(slog.DiscardHandler), st)
 		Expect(err).NotTo(HaveOccurred())
 
-		s = b.Session
-		rec = discordtest.Attach(s)
+		rec = gt.Attach(b.Client)
 	})
 
-	guildCreate := func(id, name string) *discordgo.GuildCreate {
-		return &discordgo.GuildCreate{Guild: &discordgo.Guild{ID: id, Name: name, MemberCount: 42}}
+	created := func(id snowflake.ID, name string) {
+		b.guildCreated(discord.GatewayGuild{RestGuild: discord.RestGuild{Guild: discord.Guild{ID: id, Name: name, MemberCount: 42}}})
 	}
 
 	guild := func(id string) *store.Guild {
@@ -53,21 +54,21 @@ var _ = Describe("Guild lifecycle", func() {
 	}
 
 	It("records and announces a new guild", func() {
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
 
 		Expect(guild("1").Active()).To(BeTrue())
 		Expect(rec.Messages(logChannel)).To(ConsistOf("Joined **Pomu Fan Club** (`1`), 42 members."))
 	})
 
 	It("stays quiet for guilds it was already in, like on startup", func() {
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
+		created(1, "Pomu Fan Club")
 
 		Expect(rec.Messages(logChannel)).To(HaveLen(1))
 	})
 
 	It("ignores unavailable guilds", func() {
-		b.onGuildCreate(s, &discordgo.GuildCreate{Guild: &discordgo.Guild{ID: "1", Unavailable: true}})
+		b.guildCreated(discord.GatewayGuild{RestGuild: discord.RestGuild{Guild: discord.Guild{ID: 1}}, Unavailable: true})
 
 		_, err := b.Store.Guild(ctx, "1")
 		Expect(err).To(MatchError(store.ErrGuildNotFound))
@@ -75,15 +76,12 @@ var _ = Describe("Guild lifecycle", func() {
 	})
 
 	It("soft-deletes on leave and restores on rejoin", func() {
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
-		b.onGuildDelete(s, &discordgo.GuildDelete{
-			Guild:        &discordgo.Guild{ID: "1"},
-			BeforeDelete: &discordgo.Guild{ID: "1", Name: "Pomu Fan Club"},
-		})
+		created(1, "Pomu Fan Club")
+		b.guildLeft("1", "Pomu Fan Club")
 
 		Expect(guild("1").Active()).To(BeFalse())
 
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
 
 		Expect(guild("1").Active()).To(BeTrue())
 		Expect(rec.Messages(logChannel)).To(Equal([]string{
@@ -93,22 +91,43 @@ var _ = Describe("Guild lifecycle", func() {
 		}))
 	})
 
-	It("keeps guilds through outages", func() {
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
-		b.onGuildDelete(s, &discordgo.GuildDelete{Guild: &discordgo.Guild{ID: "1", Unavailable: true}})
+	It("names a left guild by its ID when it wasn't cached", func() {
+		created(1, "Pomu Fan Club")
+		b.guildLeft("1", "")
 
+		Expect(rec.Messages(logChannel)).To(ContainElement("Left **1** (`1`). Its data is kept for 30 days."))
+	})
+
+	It("keeps guilds through outages and handles DisGo's guild events", func() {
+		b.Client.AddEventListeners(b.listeners()...)
+		generic := &events.GenericGuild{GenericEvent: events.NewGenericEvent(b.Client, 0, 0), GuildID: 1}
+		gg := discord.GatewayGuild{RestGuild: discord.RestGuild{Guild: discord.Guild{ID: 1, Name: "Pomu Fan Club", MemberCount: 42}}}
+
+		b.Client.EventManager.DispatchEvent(&events.GuildJoin{GenericGuild: generic, Guild: gg})
+		Eventually(func() []string { return rec.Messages(logChannel) }).Should(HaveLen(1))
+
+		b.Client.EventManager.DispatchEvent(&events.GuildUnavailable{GenericGuild: generic})
+		b.Client.EventManager.DispatchEvent(&events.GuildAvailable{GenericGuild: generic, Guild: gg})
+		Consistently(func() []string { return rec.Messages(logChannel) }, 50*time.Millisecond).Should(HaveLen(1))
 		Expect(guild("1").Active()).To(BeTrue())
-		Expect(rec.Messages(logChannel)).To(HaveLen(1))
+
+		b.Client.EventManager.DispatchEvent(&events.GuildLeave{GenericGuild: generic, Guild: gg.Guild})
+		Eventually(func() bool { return guild("1").Active() }).Should(BeFalse())
+		Eventually(func() []string { return rec.Messages(logChannel) }).Should(ContainElement(
+			"Left **Pomu Fan Club** (`1`). Its data is kept for 30 days."))
 	})
 
 	It("marks guilds missing from READY as left", func() {
-		for _, id := range []string{"1", "2"} {
-			b.onGuildCreate(s, guildCreate(id, "g"+id))
+		for _, id := range []snowflake.ID{1, 2} {
+			created(id, "g"+id.String())
 		}
 
-		b.onReady(s, &discordgo.Ready{
-			User:   &discordgo.User{Username: "GatorAid"},
-			Guilds: []*discordgo.Guild{{ID: "1", Unavailable: true}},
+		b.onReady(&events.Ready{
+			GenericEvent: events.NewGenericEvent(b.Client, 0, 0),
+			EventReady: gateway.EventReady{
+				User:   discord.OAuth2User{User: discord.User{Username: "GatorAid"}},
+				Guilds: []discord.UnavailableGuild{{ID: 1, Unavailable: true}},
+			},
 		})
 
 		Expect(guild("1").Active()).To(BeTrue())
@@ -117,7 +136,7 @@ var _ = Describe("Guild lifecycle", func() {
 	})
 
 	It("drops a guild's subscriptions while it's gone", func() {
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
 		_, err := b.Subs.Add(ctx, store.Subscription{
 			GuildID: "1", Feature: store.FeatureGossip, Target: store.Target{Kind: store.TargetChannel, ID: "UCpomu"},
 			ChannelID: "c", CreatedBy: "u",
@@ -125,31 +144,31 @@ var _ = Describe("Guild lifecycle", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(b.Subs.All(store.FeatureGossip)).To(HaveLen(1))
 
-		b.onGuildDelete(s, &discordgo.GuildDelete{Guild: &discordgo.Guild{ID: "1"}})
+		b.guildLeft("1", "Pomu Fan Club")
 		Expect(b.Subs.All(store.FeatureGossip)).To(BeEmpty())
 
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
 		Expect(b.Subs.All(store.FeatureGossip)).To(HaveLen(1))
 	})
 
 	It("posts nothing without a log channel", func() {
 		b.Config.Discord.LogChannelID = ""
 
-		b.onGuildCreate(s, guildCreate("1", "Pomu Fan Club"))
+		created(1, "Pomu Fan Club")
 
 		Expect(rec.Requests()).To(BeEmpty())
 	})
 
 	It("purges only guilds past retention", func() {
-		b.onGuildCreate(s, guildCreate("old", "old"))
-		b.onGuildCreate(s, guildCreate("recent", "recent"))
-		Expect(b.Store.LeaveGuild(ctx, "old", time.Now().Add(-store.GuildRetention-time.Hour))).To(Succeed())
-		Expect(b.Store.LeaveGuild(ctx, "recent", time.Now())).To(Succeed())
+		created(1, "old")
+		created(2, "recent")
+		Expect(b.Store.LeaveGuild(ctx, "1", time.Now().Add(-store.GuildRetention-time.Hour))).To(Succeed())
+		Expect(b.Store.LeaveGuild(ctx, "2", time.Now())).To(Succeed())
 
 		b.purge(ctx)
 
-		_, err := b.Store.Guild(ctx, "old")
+		_, err := b.Store.Guild(ctx, "1")
 		Expect(err).To(MatchError(store.ErrGuildNotFound))
-		Expect(guild("recent").Active()).To(BeFalse())
+		Expect(guild("2").Active()).To(BeFalse())
 	})
 })

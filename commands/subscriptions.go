@@ -10,8 +10,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/holodex"
@@ -110,12 +110,12 @@ var (
 )
 
 // Channels the bot can post lines and notices in.
-var textChannels = []discordgo.ChannelType{
-	discordgo.ChannelTypeGuildText,
-	discordgo.ChannelTypeGuildNews,
-	discordgo.ChannelTypeGuildPublicThread,
-	discordgo.ChannelTypeGuildPrivateThread,
-	discordgo.ChannelTypeGuildNewsThread,
+var textChannels = []discord.ChannelType{
+	discord.ChannelTypeGuildText,
+	discord.ChannelTypeGuildNews,
+	discord.ChannelTypeGuildPublicThread,
+	discord.ChannelTypeGuildPrivateThread,
+	discord.ChannelTypeGuildNewsThread,
 }
 
 func subscriptionCommand(b *bot.Bot, f feature) *gumi.Command {
@@ -142,7 +142,7 @@ func managerCommand(b *bot.Bot, name, description string) *gumi.Command {
 		Description: description,
 		Category:    CategoryRelay,
 		Checks:      []gumi.Check{perms.Check(b.Store, perms.Manager)},
-		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Contexts:    []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 	}
 }
 
@@ -212,17 +212,17 @@ func subscriptionAdd(b *bot.Bot, f feature, ctx *gumi.Context) error {
 	}
 
 	sub := store.Subscription{
-		GuildID:   ctx.GuildID(),
+		GuildID:   ctx.GuildID().String(),
 		Feature:   f.Feature,
 		Target:    target,
-		ChannelID: ctx.Options.ID("channel"),
-		RoleID:    ctx.Options.ID("role"),
-		CreatedBy: ctx.AuthorID(),
+		ChannelID: idString(ctx.Options.ID("channel")),
+		RoleID:    idString(ctx.Options.ID("role")),
+		CreatedBy: ctx.AuthorID().String(),
 	}
 	if sub.ChannelID == "" {
-		sub.ChannelID = ctx.ChannelID()
+		sub.ChannelID = ctx.ChannelID().String()
 	}
-	if sub.RoleID == ctx.GuildID() {
+	if sub.RoleID == ctx.GuildID().String() {
 		return gumi.NewUserError("Pinging @everyone isn't supported. Pick a role.")
 	}
 
@@ -254,13 +254,13 @@ func subscriptionRemove(b *bot.Bot, f feature, ctx *gumi.Context) error {
 		return err
 	}
 
-	channelID := ctx.Options.ID("channel")
+	channelID := idString(ctx.Options.ID("channel"))
 	if channelID == "" {
-		channelID = ctx.ChannelID()
+		channelID = ctx.ChannelID().String()
 	}
 
 	doing := fmt.Sprintf(f.doing, describeTarget(b, target))
-	err = b.Subs.Remove(ctx.Context(), ctx.GuildID(), f.Feature, target, channelID)
+	err = b.Subs.Remove(ctx.Context(), ctx.GuildID().String(), f.Feature, target, channelID)
 	if errors.Is(err, store.ErrSubscriptionNotFound) {
 		return gumi.Errorf("I'm not %s in <#%s>.", doing, channelID)
 	}
@@ -272,12 +272,12 @@ func subscriptionRemove(b *bot.Bot, f feature, ctx *gumi.Context) error {
 }
 
 func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {
-	channelID := ctx.Options.ID("channel")
+	channelID := idString(ctx.Options.ID("channel"))
 	if channelID == "" {
-		channelID = ctx.ChannelID()
+		channelID = ctx.ChannelID().String()
 	}
 
-	n, err := b.Subs.Clear(ctx.Context(), ctx.GuildID(), f.Feature, channelID)
+	n, err := b.Subs.Clear(ctx.Context(), ctx.GuildID().String(), f.Feature, channelID)
 	if err != nil {
 		return err
 	}
@@ -294,12 +294,12 @@ func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {
 }
 
 func subscriptionList(b *bot.Bot, f feature, ctx *gumi.Context) error {
-	list, err := b.Subs.Guild(ctx.Context(), ctx.GuildID(), f.Feature)
+	list, err := b.Subs.Guild(ctx.Context(), ctx.GuildID().String(), f.Feature)
 	if err != nil {
 		return err
 	}
 
-	e := &discordgo.MessageEmbed{Title: f.title, Color: Color}
+	e := discord.Embed{Title: f.title, Color: Color}
 	if len(list) == 0 {
 		e.Description = fmt.Sprintf("Nothing yet. Add one with `/%s add`.", f.command)
 		return ctx.ReplyEmbed(e)
@@ -342,8 +342,8 @@ func subscriptionList(b *bot.Bot, f feature, ctx *gumi.Context) error {
 // relayed lines in the same channel. Mentions in it never ping anyone.
 func success(ctx *gumi.Context, msg string) error {
 	return ctx.Reply(&gumi.Response{
-		Embeds:          []*discordgo.MessageEmbed{{Description: "✅ " + msg, Color: Color}},
-		AllowedMentions: &discordgo.MessageAllowedMentions{},
+		Embeds:          []discord.Embed{{Description: "✅ " + msg, Color: Color}},
+		AllowedMentions: &discord.AllowedMentions{},
 	})
 }
 
@@ -379,7 +379,7 @@ func addUserChannel(b *bot.Bot, ctx *gumi.Context, query string) (store.Target, 
 		return target, nil
 	}
 
-	added, err := userChannels(ctx.Context(), b, ctx.GuildID())
+	added, err := userChannels(ctx.Context(), b, ctx.GuildID().String())
 	if err != nil {
 		return store.Target{}, err
 	}
@@ -414,7 +414,7 @@ func addUserChannel(b *bot.Bot, ctx *gumi.Context, query string) (store.Target, 
 		Twitter:      hc.Twitter,
 		AvatarURL:    cmp.Or(ch.AvatarURL, hc.Photo),
 		Source:       store.SourceUser,
-		AddedByGuild: ctx.GuildID(),
+		AddedByGuild: ctx.GuildID().String(),
 	})
 	return target, err
 }
@@ -540,12 +540,12 @@ func targetOption(b *bot.Bot, f feature, description string) *gumi.Option {
 // there is one.
 func subscribedOption(b *bot.Bot, f feature, name, description string) *gumi.Option {
 	return gumi.String(name, description).WithAutocomplete(func(ctx *gumi.AutocompleteContext) ([]gumi.Choice, error) {
-		list, err := b.Subs.Guild(ctx.Context(), ctx.GuildID(), f.Feature)
+		list, err := b.Subs.Guild(ctx.Context(), ctx.GuildID().String(), f.Feature)
 		if err != nil {
 			return nil, err
 		}
 
-		channelID := ctx.Options.ID("channel")
+		channelID := idString(ctx.Options.ID("channel"))
 		q := strings.ToLower(strings.TrimSpace(ctx.Value))
 
 		var (

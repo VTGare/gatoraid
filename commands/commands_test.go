@@ -7,12 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
+	dt "github.com/VTGare/gumi/v2/gumitest"
+	disgo "github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/commands"
 	"github.com/VTGare/gatoraid/internal/config"
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
 	"github.com/VTGare/gatoraid/streamers"
@@ -22,8 +23,14 @@ import (
 )
 
 const (
-	owner = "owner"
-	user  = "someone"
+	owner snowflake.ID = 1
+	user  snowflake.ID = 2
+)
+
+// Test interactions come from these, in the store's string form.
+var (
+	testGuild   = dt.GuildID.String()
+	testChannel = dt.ChannelID.String()
 )
 
 type harness struct {
@@ -39,7 +46,7 @@ func newHarness(seed *streamers.Seed) *harness {
 	DeferCleanup(db.Close)
 
 	cfg := &config.Config{
-		Discord: config.Discord{Token: "test", OwnerIDs: []string{owner}, OwnerGuildID: "guild"},
+		Discord: config.Discord{Token: dt.Token, OwnerIDs: []string{owner.String()}, OwnerGuildID: testGuild},
 		Limits:  config.Limits{UserChannels: config.DefaultUserChannels},
 	}
 	b, err := bot.New(cfg, slog.New(slog.DiscardHandler), db)
@@ -49,12 +56,12 @@ func newHarness(seed *streamers.Seed) *harness {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(commands.Register(b)).To(Succeed())
 
-	return &harness{b: b, rec: dt.Attach(b.Session)}
+	return &harness{b: b, rec: dt.Attach(b.Client)}
 }
 
-func (h *harness) run(i *discordgo.InteractionCreate) map[string]any {
+func (h *harness) run(i *dt.Interaction) map[string]any {
 	before := len(h.rec.Responses())
-	h.b.Router.HandleInteraction(h.b.Session, i)
+	h.b.Router.HandleInteraction(i.Event(h.b.Client))
 
 	responses := h.rec.Responses()
 	if len(responses) == before {
@@ -84,7 +91,7 @@ func replyText(data map[string]any) string {
 
 func ephemeral(data map[string]any) bool {
 	flags, _ := data["flags"].(float64)
-	return int(flags)&int(discordgo.MessageFlagsEphemeral) != 0
+	return disgo.MessageFlags(flags).Has(disgo.MessageFlagEphemeral)
 }
 
 func choices(data map[string]any) []string {
@@ -99,22 +106,22 @@ func choices(data map[string]any) []string {
 var _ = Describe("Register", func() {
 	register := func(discord config.Discord) ([]string, map[string][]string) {
 		GinkgoHelper()
-		discord.Token = "test"
+		discord.Token = dt.Token
 		b, err := bot.New(&config.Config{Discord: discord}, slog.New(slog.DiscardHandler), nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(commands.Register(b)).To(Succeed())
 
 		global, byGuild := b.Router.ApplicationCommands()
-		names := func(cmds []*discordgo.ApplicationCommand) []string {
+		names := func(cmds []disgo.ApplicationCommandCreate) []string {
 			out := make([]string, 0, len(cmds))
 			for _, c := range cmds {
-				out = append(out, c.Name)
+				out = append(out, c.CommandName())
 			}
 			return out
 		}
 		guilds := map[string][]string{}
 		for id, cmds := range byGuild {
-			guilds[id] = names(cmds)
+			guilds[id.String()] = names(cmds)
 		}
 		return names(global), guilds
 	}
@@ -123,18 +130,18 @@ var _ = Describe("Register", func() {
 		"Blacklist author", "filter", "streamers"}
 
 	It("registers everything but /owner globally", func() {
-		global, guilds := register(config.Discord{OwnerGuildID: "owner-guild"})
+		global, guilds := register(config.Discord{OwnerGuildID: "77"})
 
 		Expect(global).To(ConsistOf(everyone))
-		Expect(guilds).To(Equal(map[string][]string{"owner-guild": {"owner"}}))
+		Expect(guilds).To(Equal(map[string][]string{"77": {"owner"}}))
 	})
 
-	It("puts /owner in the dev guild when there's no owner guild", func() {
-		_, guilds := register(config.Discord{DevGuildID: "dev"})
-		Expect(guilds).To(Equal(map[string][]string{"dev": {"owner"}}))
+	It("puts /owner in the dev testGuild when there's no owner guild", func() {
+		_, guilds := register(config.Discord{DevGuildID: "88"})
+		Expect(guilds).To(Equal(map[string][]string{"88": {"owner"}}))
 	})
 
-	It("leaves /owner out without a guild for it", func() {
+	It("leaves /owner out without a testGuild for it", func() {
 		global, guilds := register(config.Discord{})
 
 		Expect(global).To(ConsistOf(everyone))
@@ -192,10 +199,10 @@ var _ = Describe("/streamers", func() {
 	})
 
 	It("suggests streamers and groups while typing", func() {
-		Expect(choices(h.run(dt.Autocomplete(user, "streamers", dt.Sub("info", dt.Focused("streamer", "takanashi")))))).
+		Expect(choices(h.run(dt.Autocomplete(user, "streamers", dt.Sub("info", dt.Focused(dt.String("streamer", "takanashi"))))))).
 			To(Equal([]string{"Takanashi Kiara · Hololive EN", "Takanashi Kiara SubCh · Hololive EN"}))
 
-		Expect(choices(h.run(dt.Autocomplete(user, "streamers", dt.Sub("list", dt.Focused("group", "niji")))))).
+		Expect(choices(h.run(dt.Autocomplete(user, "streamers", dt.Sub("list", dt.Focused(dt.String("group", "niji"))))))).
 			To(HaveExactElements("Nijisanji", "Nijisanji JP", "Nijisanji EN", "Nijisanji ID", "Nijisanji KR"))
 	})
 })
@@ -233,7 +240,7 @@ var _ = Describe("/owner streamers", func() {
 		reg = h.b.Streamers
 	})
 
-	ownerRun := func(sub string, opts ...*discordgo.ApplicationCommandInteractionDataOption) map[string]any {
+	ownerRun := func(sub string, opts ...dt.Option) map[string]any {
 		return h.run(dt.Command(owner, "owner", dt.Group("streamers", dt.Sub(sub, opts...))))
 	}
 

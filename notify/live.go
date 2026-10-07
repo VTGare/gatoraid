@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
@@ -110,14 +110,15 @@ func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer
 	return nil
 }
 
-func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int) *discordgo.MessageSend {
+func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int) discord.MessageCreate {
 	e := relay.StreamEmbed(&s, host, color)
 	e.Description = "Live now"
 	if s.MembersOnly {
 		e.Description = "Members-only stream"
 	}
 	if !s.StartedAt.IsZero() {
-		e.Timestamp = s.StartedAt.Format(time.RFC3339)
+		started := s.StartedAt
+		e.Timestamp = &started
 	}
 
 	return relay.RoleMessage(e, roleID)

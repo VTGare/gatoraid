@@ -7,8 +7,9 @@ import (
 	"net/http/httptest"
 	"time"
 
+	dt "github.com/VTGare/gumi/v2/gumitest"
+
 	"github.com/VTGare/gatoraid/holodex"
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/stream"
 	"github.com/VTGare/gatoraid/streamers"
 

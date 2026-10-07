@@ -164,7 +164,7 @@ go run ./cmd/chatwatch [-tldex] VIDEO_ID...
 ```
 cmd/gatoraid/         entry point
 cmd/chatwatch/        prints live chat as the bot reads it
-bot/                  Discord session, router wiring, guild lifecycle
+bot/                  Discord client, router wiring, guild lifecycle
 chat/                 one reader per stream, YouTube chat merged with TLdex
 commands/             slash commands and the /settings panel
 relay/                which chats to read and where their lines go: rules, formatting, engine
@@ -180,7 +180,6 @@ perms/                who may manage the bot: Discord permissions or bot roles
 stream/               stream tracker: Holodex polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup
-internal/discordtest/ fake Discord API for tests
 store/                persistence interfaces and models
 store/sqlite/         SQLite implementation and its migrations
 streamers/            streamer registry; seed/ holds the curated list

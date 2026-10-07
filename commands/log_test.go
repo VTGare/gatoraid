@@ -6,8 +6,9 @@ import (
 	"net/http/httptest"
 	"time"
 
+	dt "github.com/VTGare/gumi/v2/gumitest"
+
 	"github.com/VTGare/gatoraid/holodex"
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/streamers"
 
@@ -27,7 +28,7 @@ var _ = Describe("/log", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
-		_, _, err := h.b.Store.JoinGuild(ctx, "guild")
+		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -58,10 +59,10 @@ var _ = Describe("/log", func() {
 	}
 
 	It("sends the server's lines, with its blacklist applied", func() {
-		save("guild", 0, "a", "[EN] one")
-		save("guild", time.Minute, "spam", "[EN] buy")
+		save(testGuild, 0, "a", "[EN] one")
+		save(testGuild, time.Minute, "spam", "[EN] buy")
 		save("", 0, "archived", "[EN] archive only")
-		_, err := h.b.Moderation.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: "guild", ChannelID: "UCspam", AddedBy: "mod"})
+		_, err := h.b.Moderation.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: testGuild, ChannelID: "UCspam", AddedBy: "mod"})
 		Expect(err).NotTo(HaveOccurred())
 
 		content, file := logFile("https://www.youtube.com/watch?v=" + videoID + "&t=10")
@@ -84,7 +85,7 @@ var _ = Describe("/log", func() {
 		}))
 		DeferCleanup(srv.Close)
 		h.b.Holodex = holodex.New("key", holodex.WithBaseURL(srv.URL))
-		save("guild", 90*time.Second, "a", "[EN] one")
+		save(testGuild, 90*time.Second, "a", "[EN] one")
 
 		content, file := logFile(videoID)
 		Expect(content).To(Equal("Karaoke | Stream log · 1 h 1 min · 1 line"))
@@ -100,9 +101,9 @@ var _ = Describe("/log", func() {
 	})
 
 	It("is open to everyone", func() {
-		save("guild", 0, "a", "[EN] one")
+		save(testGuild, 0, "a", "[EN] one")
 		i := dt.Command(user, "log", dt.String("video", videoID))
-		i.Member.Permissions = 0
+		i.WithPermissions(0)
 		h.run(i)
 		Expect(h.rec.Edits()[len(h.rec.Edits())-1].Files).To(HaveKey(videoID + ".txt"))
 	})

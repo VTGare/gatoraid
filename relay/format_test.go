@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disgoorg/snowflake/v2"
+
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
@@ -104,7 +106,7 @@ var _ = Describe("Notice", func() {
 		msg := f.Notice(store.NoticeRelay, s, &host, "123")
 
 		Expect(msg.Content).To(Equal("<@&123>"))
-		Expect(msg.AllowedMentions.Roles).To(Equal([]string{"123"}))
+		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
 		Expect(msg.AllowedMentions.Parse).To(BeEmpty())
 		e := msg.Embeds[0]
 		Expect(e.Title).To(Equal("【MINECRAFT】dig"))

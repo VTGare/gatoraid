@@ -6,8 +6,9 @@ import (
 	"context"
 	"slices"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/store"
 )
@@ -23,11 +24,11 @@ const (
 
 // Allowed reports whether a member with these permissions and roles has
 // the level. Administrators always do, and managers can blacklist too.
-func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Level, permissions int64, roles []string) (bool, error) {
-	if permissions&discordgo.PermissionAdministrator != 0 || permissions&discordgo.PermissionManageGuild != 0 {
+func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Level, permissions discord.Permissions, roles []snowflake.ID) (bool, error) {
+	if permissions.Has(discord.PermissionAdministrator) || permissions.Has(discord.PermissionManageGuild) {
 		return true, nil
 	}
-	if level == Blacklister && permissions&discordgo.PermissionManageMessages != 0 {
+	if level == Blacklister && permissions.Has(discord.PermissionManageMessages) {
 		return true, nil
 	}
 
@@ -41,7 +42,7 @@ func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Leve
 		if err != nil {
 			return false, err
 		}
-		if slices.ContainsFunc(roles, func(r string) bool { return slices.Contains(ids, r) }) {
+		if slices.ContainsFunc(roles, func(r snowflake.ID) bool { return slices.Contains(ids, r.String()) }) {
 			return true, nil
 		}
 	}
@@ -51,7 +52,7 @@ func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Leve
 
 func Check(st store.RoleStore, level Level) gumi.Check {
 	return func(ctx *gumi.Context) error {
-		if ctx.GuildID() == "" {
+		if ctx.GuildID() == 0 {
 			return &gumi.CheckError{Check: "guild_only", Message: "This command can only be used in a server."}
 		}
 
@@ -60,12 +61,12 @@ func Check(st store.RoleStore, level Level) gumi.Check {
 			return err
 		}
 
-		var roles []string
+		var roles []snowflake.ID
 		if m := ctx.Member(); m != nil {
-			roles = m.Roles
+			roles = m.RoleIDs
 		}
 
-		ok, err := Allowed(ctx.Context(), st, ctx.GuildID(), level, p, roles)
+		ok, err := Allowed(ctx.Context(), st, ctx.GuildID().String(), level, p, roles)
 		if err != nil {
 			return err
 		}

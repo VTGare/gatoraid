@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
@@ -181,7 +181,7 @@ func (w *Writer) send(ctx context.Context, meta Meta, guildID, channelID string,
 }
 
 // Message is a short summary with the log attached as a .txt file.
-func Message(meta Meta, text string, lines int, color int) *discordgo.MessageSend {
+func Message(meta Meta, text string, lines int, color int) discord.MessageCreate {
 	title := meta.Title
 	if title == "" {
 		title = meta.VideoID
@@ -197,20 +197,20 @@ func Message(meta Meta, text string, lines int, color int) *discordgo.MessageSen
 		desc = append(desc, fmt.Sprintf("%d lines", lines))
 	}
 
-	e := &discordgo.MessageEmbed{
+	e := discord.Embed{
 		Title:       title,
 		URL:         meta.URL(),
 		Description: strings.Join(desc, " · "),
 		Color:       color,
 	}
 	if meta.Author != "" {
-		e.Author = &discordgo.MessageEmbedAuthor{Name: meta.Author, IconURL: meta.AuthorIcon}
+		e.Author = &discord.EmbedAuthor{Name: meta.Author, IconURL: meta.AuthorIcon}
 	}
 
-	return &discordgo.MessageSend{
-		Embeds:          []*discordgo.MessageEmbed{e},
-		Files:           []*discordgo.File{{Name: meta.VideoID + ".txt", ContentType: "text/plain", Reader: strings.NewReader(text)}},
-		AllowedMentions: &discordgo.MessageAllowedMentions{},
+	return discord.MessageCreate{
+		Embeds:          []discord.Embed{e},
+		Files:           []*discord.File{discord.NewFile(meta.VideoID+".txt", "", strings.NewReader(text))},
+		AllowedMentions: &discord.AllowedMentions{},
 	}
 }
 

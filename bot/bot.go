@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"strings"
+	"runtime"
 	"time"
 
-	"github.com/VTGare/gumi"
-	"github.com/VTGare/gumi/middleware"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/VTGare/gumi/v2/middleware"
+	"github.com/disgoorg/disgo"
+	disgobot "github.com/disgoorg/disgo/bot"
+	"github.com/disgoorg/disgo/cache"
+	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/disgo/gateway"
 
 	"github.com/VTGare/gatoraid/chat"
 	"github.com/VTGare/gatoraid/holodex"
@@ -32,6 +36,7 @@ import (
 
 const (
 	eventTimeout    = 10 * time.Second
+	closeTimeout    = 10 * time.Second
 	commandTimeout  = 2 * time.Minute
 	pruneInterval   = time.Hour
 	purgeInterval   = 24 * time.Hour
@@ -54,7 +59,7 @@ type Bot struct {
 	Channels *channel.Client
 	// Nil without a DeepL API key.
 	Translator *translate.Service
-	Session    *discordgo.Session
+	Client     *disgobot.Client
 	Router     *gumi.Router
 	// Nil without a Holodex API key.
 	Holodex *holodex.Client
@@ -79,22 +84,32 @@ type Bot struct {
 }
 
 func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
-	s, err := discordgo.New("Bot " + cfg.Discord.Token)
+	discordLog := log.With("component", "disgo")
+	c, err := disgo.New(
+		cfg.Discord.Token,
+		disgobot.WithLogger(discordLog),
+		disgobot.WithCacheConfigOpts(cache.WithCaches(cache.FlagGuilds)),
+		disgobot.WithEventManagerConfigOpts(disgobot.WithAsyncEventsEnabled()),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("bot: create session: %w", err)
+		return nil, fmt.Errorf("bot: create client: %w", err)
 	}
 
-	// No message events needed, so no privileged intents either.
-	s.Identify.Intents = discordgo.IntentsGuilds
-	s.LogLevel = discordgo.LogWarning
-	discordgo.Logger = discordLogger(log.With("component", "discordgo"))
+	c.Gateway = gateway.New(
+		cfg.Discord.Token, c.EventManager.HandleGatewayEvent,
+		gateway.WithIntents(gateway.IntentGuilds),
+		gateway.WithLogger(discordLog),
+		gateway.WithOS(runtime.GOOS),
+		gateway.WithBrowser(disgo.Name),
+		gateway.WithDevice(disgo.Name),
+	)
 
 	b := &Bot{
 		Config:    cfg,
 		Log:       log,
 		Store:     st,
 		Streamers: streamers.New(st),
-		Session:   s,
+		Client:    c,
 		ctx:       context.Background(),
 	}
 	b.Subs = subs.New(st, b.Streamers)
@@ -107,8 +122,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 
 	b.Router = gumi.New(gumi.Config{
 		DisablePrefixCommands: true,
-		OwnerIDs:              cfg.Discord.OwnerIDs,
-		DevGuildID:            cfg.Discord.DevGuildID,
+		OwnerIDs:              cfg.Discord.Owners(),
+		DevGuildID:            config.ID(cfg.Discord.DevGuildID),
 		BaseContext:           func() context.Context { return b.ctx },
 		AutocompleteErrorHandler: func(ctx *gumi.AutocompleteContext, err error) {
 			log.Warn("autocomplete failed",
@@ -159,7 +174,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 
 	b.Chats = NewChatManager(b.TLdex, minWait, log.With("component", "chat"))
 
-	b.Sender = sender.New(sender.Config{Poster: s, Log: log.With("component", "sender")})
+	b.Sender = sender.New(sender.Config{Poster: c.Rest, Log: log.With("component", "sender")})
 
 	b.Logs = tllog.NewWriter(tllog.Config{
 		Store:      st,
@@ -246,22 +261,20 @@ func NewChatManager(tl *tldex.Client, minWait func(videoID string) time.Duration
 func (b *Bot) Start(ctx context.Context) error {
 	b.ctx = ctx
 
-	b.Session.AddHandler(b.onReady)
-	b.Session.AddHandler(b.onGuildCreate)
-	b.Session.AddHandler(b.onGuildDelete)
-	unbind := b.Router.Bind(b.Session)
-	defer unbind()
+	listeners := b.listeners()
+	b.Client.AddEventListeners(listeners...)
+	defer b.Client.RemoveEventListeners(listeners...)
 
-	if err := b.Session.Open(); err != nil {
+	if err := b.Client.OpenGateway(ctx); err != nil {
 		return fmt.Errorf("bot: connect: %w", err)
 	}
 	defer func() {
-		if err := b.Session.Close(); err != nil {
-			b.Log.Warn("failed to close the Discord session", slog.Any("error", err))
-		}
+		ctx, cancel := context.WithTimeout(context.Background(), closeTimeout)
+		defer cancel()
+		b.Client.Close(ctx)
 	}()
 
-	if err := b.Router.Sync(b.Session); err != nil {
+	if err := b.Router.Sync(b.Client); err != nil {
 		return fmt.Errorf("bot: sync commands: %w", err)
 	}
 
@@ -302,6 +315,20 @@ func (b *Bot) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (b *Bot) listeners() []disgobot.EventListener {
+	return []disgobot.EventListener{
+		disgobot.NewListenerFunc(b.onReady),
+		disgobot.NewListenerFunc(func(e *events.GuildReady) { b.guildCreated(e.Guild) }),
+		disgobot.NewListenerFunc(func(e *events.GuildAvailable) { b.guildCreated(e.Guild) }),
+		disgobot.NewListenerFunc(func(e *events.GuildJoin) { b.guildCreated(e.Guild) }),
+		disgobot.NewListenerFunc(func(e *events.GuildUnavailable) {
+			b.Log.Warn("guild unavailable", slog.String("guild_id", e.GuildID.String()))
+		}),
+		disgobot.NewListenerFunc(func(e *events.GuildLeave) { b.guildLeft(e.GuildID.String(), e.Guild.Name) }),
+		b.Router,
+	}
 }
 
 // SettingsChanged tells everything that caches guild settings to reload
@@ -403,21 +430,5 @@ func (b *Bot) purge(ctx context.Context) {
 	}
 	if _, err := b.Store.PruneSeen(ctx, time.Now().Add(-store.DedupeRetention)); err != nil {
 		b.Log.Error("failed to prune seen posts", slog.Any("error", err))
-	}
-}
-
-func discordLogger(log *slog.Logger) func(msgL, caller int, format string, a ...any) {
-	return func(msgL, _ int, format string, a ...any) {
-		level := slog.LevelDebug
-		switch {
-		case msgL == discordgo.LogError:
-			level = slog.LevelError
-		case msgL == discordgo.LogWarning && !strings.HasPrefix(format, "unknown event"):
-			level = slog.LevelWarn
-		case msgL == discordgo.LogInformational:
-			level = slog.LevelInfo
-		}
-
-		log.Log(context.Background(), level, fmt.Sprintf(format, a...))
 	}
 }

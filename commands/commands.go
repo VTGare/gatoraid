@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"github.com/VTGare/gumi"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/bot"
 )
@@ -38,4 +39,12 @@ func Register(b *bot.Bot) error {
 		cmds = append(cmds, ownerCommand(b, guild))
 	}
 	return b.Router.Register(cmds...)
+}
+
+// The store keeps Discord IDs as strings, with "" for none.
+func idString(id snowflake.ID) string {
+	if id == 0 {
+		return ""
+	}
+	return id.String()
 }

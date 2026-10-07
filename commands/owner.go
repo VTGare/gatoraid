@@ -4,10 +4,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/bot"
+	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/store"
 )
 
@@ -19,7 +21,7 @@ const clearValue = "-"
 func ownerCommand(b *bot.Bot, guildID string) *gumi.Command {
 	// Zero permissions hides the command from everyone but the guild's admins.
 	// OwnerOnly is what actually keeps them out.
-	hidden := int64(0)
+	hidden := discord.PermissionsNone
 
 	return &gumi.Command{
 		Name:                     "owner",
@@ -28,7 +30,7 @@ func ownerCommand(b *bot.Bot, guildID string) *gumi.Command {
 		Hidden:                   true,
 		Checks:                   []gumi.Check{gumi.OwnerOnly},
 		DefaultMemberPermissions: &hidden,
-		GuildIDs:                 []string{guildID},
+		GuildIDs:                 []snowflake.ID{config.ID(guildID)},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "streamers",
@@ -194,7 +196,7 @@ func ownerStreamerExport(b *bot.Bot) *gumi.Command {
 
 			return ctx.Reply(&gumi.Response{
 				Content: note,
-				Files:   []*discordgo.File{{Name: "streamers.toml", ContentType: "text/plain", Reader: strings.NewReader(out)}},
+				Files:   []*discord.File{discord.NewFile("streamers.toml", "", strings.NewReader(out))},
 			})
 		},
 	}
@@ -258,6 +260,6 @@ func replySaved(b *bot.Bot, ctx *gumi.Context, verb, channelID string) error {
 
 	return ctx.Reply(&gumi.Response{
 		Content: verb + " " + st.Name + ".",
-		Embeds:  []*discordgo.MessageEmbed{streamerEmbed(b.Streamers, st)},
+		Embeds:  []discord.Embed{streamerEmbed(b.Streamers, st)},
 	})
 }

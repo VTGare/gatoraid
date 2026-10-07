@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
@@ -175,7 +175,7 @@ func (p *Posts) announce(post posts.Post) {
 	}
 }
 
-func PostMessage(post posts.Post, roleID string, color int) *discordgo.MessageSend {
+func PostMessage(post posts.Post, roleID string, color int) discord.MessageCreate {
 	var desc strings.Builder
 	desc.WriteString(relay.Truncate(post.Text, maxPostText))
 	if post.VideoID != "" {
@@ -190,25 +190,25 @@ func PostMessage(post posts.Post, roleID string, color int) *discordgo.MessageSe
 		}
 	}
 
-	e := &discordgo.MessageEmbed{
+	e := discord.Embed{
 		Title:       "New post",
 		URL:         post.URL(),
 		Description: strings.TrimSpace(desc.String()),
 		Color:       color,
-		Author: &discordgo.MessageEmbedAuthor{
+		Author: &discord.EmbedAuthor{
 			Name:    post.Author,
 			URL:     "https://www.youtube.com/channel/" + post.ChannelID,
 			IconURL: post.AvatarURL,
 		},
 	}
 	if len(post.Images) > 0 {
-		e.Image = &discordgo.MessageEmbedImage{URL: post.Images[0]}
+		e.Image = &discord.EmbedResource{URL: post.Images[0]}
 	}
 	switch more := len(post.Images) - 1; {
 	case more == 1:
-		e.Footer = &discordgo.MessageEmbedFooter{Text: "1 more image on YouTube"}
+		e.Footer = &discord.EmbedFooter{Text: "1 more image on YouTube"}
 	case more > 1:
-		e.Footer = &discordgo.MessageEmbedFooter{Text: fmt.Sprintf("%d more images on YouTube", more)}
+		e.Footer = &discord.EmbedFooter{Text: fmt.Sprintf("%d more images on YouTube", more)}
 	}
 
 	return relay.RoleMessage(e, roleID)

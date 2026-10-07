@@ -7,7 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/notify"
 	"github.com/VTGare/gatoraid/sender"
@@ -37,7 +38,7 @@ func (f *fakeSender) Send(m sender.Message) bool {
 	f.sent = append(f.sent, m)
 	f.mu.Unlock()
 	if m.OnSent != nil {
-		m.OnSent(&discordgo.Message{ID: "m", ChannelID: m.ChannelID})
+		m.OnSent(&discord.Message{ID: 1})
 	}
 	return true
 }
@@ -134,7 +135,7 @@ var _ = Describe("Live", func() {
 	}
 
 	It("announces live streams once, pinging the role", func() {
-		w.subscribe("g1", store.FeatureYouTube, store.TargetGroup, "holo-en", "c1", "role")
+		w.subscribe("g1", store.FeatureYouTube, store.TargetGroup, "holo-en", "c1", "42")
 		w.subscribe("g2", store.FeatureYouTube, store.TargetChannel, kiaraID, "c2", "")
 		run()
 
@@ -143,12 +144,12 @@ var _ = Describe("Live", func() {
 		streams <- live("kiara", kiaraID, time.Minute)
 
 		Eventually(w.snd.contents).Should(ConsistOf(
-			"c1: <@&role> | Mori Calliope: Karaoke_time (Live now)",
-			"c1: <@&role> | Takanashi Kiara: Karaoke_time (Live now)",
+			"c1: <@&42> | Mori Calliope: Karaoke_time (Live now)",
+			"c1: <@&42> | Takanashi Kiara: Karaoke_time (Live now)",
 			"c2:  | Takanashi Kiara: Karaoke_time (Live now)",
 		))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(3))
-		Expect(w.snd.messages()[0].Send.AllowedMentions.Roles).To(Equal([]string{"role"}))
+		Expect(w.snd.messages()[0].Send.AllowedMentions.Roles).To(Equal([]snowflake.ID{42}))
 	})
 
 	It("skips streams that went live a while ago", func() {
@@ -216,7 +217,7 @@ var _ = Describe("Posts", func() {
 	})
 
 	It("records what's there on the first look and announces new posts after", func() {
-		w.subscribe("g1", store.FeaturePosts, store.TargetGroup, "holo-en", "c1", "role")
+		w.subscribe("g1", store.FeaturePosts, store.TargetGroup, "holo-en", "c1", "42")
 		src.posts[calliID] = []posts.Post{post("old", calliID, true)}
 
 		Expect(p.Check(w.ctx, calliID)).To(BeTrue())
@@ -231,7 +232,7 @@ var _ = Describe("Posts", func() {
 		}
 		Expect(p.Check(w.ctx, calliID)).To(BeTrue())
 		Expect(ids()).To(Equal([]string{"c1: post new", "c1: post newer"}))
-		Expect(w.snd.messages()[0].Send.Content).To(Equal("<@&role>"))
+		Expect(w.snd.messages()[0].Send.Content).To(Equal("<@&42>"))
 
 		Expect(p.Check(w.ctx, calliID)).To(BeTrue())
 		Expect(w.snd.messages()).To(HaveLen(2))
@@ -279,9 +280,9 @@ var _ = Describe("LiveMessage", func() {
 
 		msg := notify.LiveMessage(stream.Stream{
 			VideoID: "vid", ChannelID: calliID, ChannelName: "Calli Ch.", Title: "Karaoke", StartedAt: started,
-		}, host, "role", 7)
+		}, host, "42", 7)
 
-		Expect(msg.Content).To(Equal("<@&role>"))
+		Expect(msg.Content).To(Equal("<@&42>"))
 		e := msg.Embeds[0]
 		Expect(e.Title).To(Equal("Karaoke"))
 		Expect(e.URL).To(Equal("https://youtu.be/vid"))
@@ -289,7 +290,7 @@ var _ = Describe("LiveMessage", func() {
 		Expect(e.Author.IconURL).To(Equal("calli.png"))
 		Expect(e.Author.URL).To(Equal("https://www.youtube.com/channel/UCcalli"))
 		Expect(e.Image.URL).To(Equal("https://i.ytimg.com/vi/vid/hqdefault.jpg"))
-		Expect(e.Timestamp).To(Equal("2026-10-02T12:00:00Z"))
+		Expect(e.Timestamp.UTC().Format(time.RFC3339)).To(Equal("2026-10-02T12:00:00Z"))
 		Expect(e.Color).To(Equal(7))
 	})
 })

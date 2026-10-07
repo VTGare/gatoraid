@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
 
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
+	dt "github.com/VTGare/gumi/v2/gumitest"
+
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/translate"
@@ -26,38 +27,38 @@ var _ = Describe("/settings", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
-		_, _, err := h.b.Store.JoinGuild(ctx, "guild")
+		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	id := func(action string, arg ...string) string {
-		s := "rt:settings:" + user + ":" + action
+		s := "rt:settings:" + user.String() + ":" + action
 		for _, a := range arg {
 			s += ":" + a
 		}
 		return s
 	}
 
-	click := func(i *discordgo.InteractionCreate) map[string]any {
+	click := func(i *dt.Interaction) map[string]any {
 		GinkgoHelper()
 		data := h.run(i)
 		Expect(data).NotTo(BeNil())
 		return data
 	}
 
-	asManager := func(i *discordgo.InteractionCreate) *discordgo.InteractionCreate {
-		return dt.WithPermissions(i, discordgo.PermissionManageGuild)
+	asManager := func(i *dt.Interaction) *dt.Interaction {
+		return i.WithPermissions(discord.PermissionManageGuild)
 	}
 
 	settings := func() store.Settings {
 		GinkgoHelper()
-		g, err := h.b.Store.Guild(ctx, "guild")
+		g, err := h.b.Store.Guild(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 		return g.Settings
 	}
 
 	It("opens an overview anyone can read", func() {
-		_, err := h.b.Moderation.AddFilter(ctx, store.Filter{GuildID: "guild", Kind: store.FilterBanned, Pattern: "x"})
+		_, err := h.b.Moderation.AddFilter(ctx, store.Filter{GuildID: testGuild, Kind: store.FilterBanned, Pattern: "x"})
 		Expect(err).NotTo(HaveOccurred())
 
 		data := click(dt.Command(user, "settings"))
@@ -71,55 +72,55 @@ var _ = Describe("/settings", func() {
 	})
 
 	It("lets anyone browse but only managers change things", func() {
-		data := click(dt.Component(user, id("nav"), "relay"))
+		data := click(dt.Select(user, id("nav"), "relay"))
 		Expect(embed(data)["title"]).To(Equal("Relay"))
 		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Waiting rooms: On"))
 
-		data = click(dt.Component(user, id("toggle", "prechat")))
+		data = click(dt.Button(user, id("toggle", "prechat")))
 		Expect(data["content"]).To(ContainSubstring("You need Manage Server, or a Manager role"))
 		Expect(settings().Prechat).To(BeTrue())
 
-		data = click(asManager(dt.Component(user, id("toggle", "prechat"))))
+		data = click(asManager(dt.Button(user, id("toggle", "prechat"))))
 		Expect(embed(data)["title"]).To(Equal("Relay"))
 		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Waiting rooms: Off"))
 		Expect(settings().Prechat).To(BeFalse())
 	})
 
 	It("only answers the person who opened it", func() {
-		data := click(dt.Component("someone else", id("nav"), "relay"))
+		data := click(dt.Select(9, id("nav"), "relay"))
 		Expect(data["content"]).To(ContainSubstring("someone else's"))
 	})
 
 	It("lets Manager roles change settings", func() {
-		Expect(h.b.Store.SetGuildRoles(ctx, "guild", store.RoleManager, []string{"mgr"})).To(Succeed())
+		Expect(h.b.Store.SetGuildRoles(ctx, testGuild, store.RoleManager, []string{"11"})).To(Succeed())
 
-		click(dt.WithRoles(dt.Component(user, id("toggle", "relayfreechat")), "mgr"))
+		click(dt.Button(user, id("toggle", "relayfreechat")).WithRoles(11))
 		Expect(settings().RelayFreeChat).To(BeTrue())
 	})
 
 	It("sets the language and the log channel", func() {
-		data := click(asManager(dt.Component(user, id("lang"), "JA")))
+		data := click(asManager(dt.Select(user, id("lang"), "JA")))
 		Expect(embed(data)["description"]).To(ContainSubstring("**Language** Japanese"))
 		Expect(settings().TargetLanguage).To(Equal("JA"))
 
-		data = click(asManager(dt.Component(user, id("logchannel"), "logs")))
-		Expect(embed(data)["description"]).To(ContainSubstring("<#logs>"))
-		Expect(settings().LogChannelID).To(Equal("logs"))
+		data = click(asManager(dt.SelectOf(discord.ComponentTypeChannelSelectMenu, user, id("logchannel"), "3002")))
+		Expect(embed(data)["description"]).To(ContainSubstring("<#3002>"))
+		Expect(settings().LogChannelID).To(Equal("3002"))
 
-		click(asManager(dt.Component(user, id("logclear"))))
+		click(asManager(dt.Button(user, id("logclear"))))
 		Expect(settings().LogChannelID).To(BeEmpty())
 	})
 
 	It("sets and clears bot roles", func() {
-		data := click(asManager(dt.Component(user, id("roles", "manager"), "r1", "r2")))
-		Expect(embed(data)["description"]).To(ContainSubstring("**Managers** <@&r1> <@&r2>"))
+		data := click(asManager(dt.SelectOf(discord.ComponentTypeRoleSelectMenu, user, id("roles", "manager"), "21", "22")))
+		Expect(embed(data)["description"]).To(ContainSubstring("**Managers** <@&21> <@&22>"))
 
-		roles, err := h.b.Store.GuildRoles(ctx, "guild", store.RoleManager)
+		roles, err := h.b.Store.GuildRoles(ctx, testGuild, store.RoleManager)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(roles).To(Equal([]string{"r1", "r2"}))
+		Expect(roles).To(Equal([]string{"21", "22"}))
 
-		click(asManager(dt.Component(user, id("roles", "manager"), []string{}...)))
-		roles, err = h.b.Store.GuildRoles(ctx, "guild", store.RoleManager)
+		click(asManager(dt.SelectOf(discord.ComponentTypeRoleSelectMenu, user, id("roles", "manager"))))
+		roles, err = h.b.Store.GuildRoles(ctx, testGuild, store.RoleManager)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(roles).To(BeEmpty())
 	})
@@ -131,7 +132,7 @@ var _ = Describe("/settings", func() {
 		DeferCleanup(deepl.Close)
 		h.b.Translator = translate.NewService(translate.NewDeepL("key", translate.WithBaseURL(deepl.URL)), 1000, nil)
 
-		data := click(asManager(dt.Component(user, id("otherlang"))))
+		data := click(asManager(dt.Button(user, id("otherlang"))))
 		Expect(data["custom_id"]).To(Equal(id("langcode")))
 
 		click(asManager(dt.ModalSubmit(user, id("langcode"), map[string]string{"code": " fi "})))
@@ -146,7 +147,7 @@ var _ = Describe("/settings", func() {
 		click(asManager(dt.ModalSubmit(user, id("langcode"), map[string]string{"code": "pt-br"})))
 		Expect(settings().TargetLanguage).To(Equal("PT-BR"))
 
-		data := click(dt.Component(user, id("nav"), "translation"))
+		data := click(dt.Select(user, id("nav"), "translation"))
 		Expect(embed(data)["description"]).To(ContainSubstring("DeepL isn't set up for this bot"))
 	})
 })

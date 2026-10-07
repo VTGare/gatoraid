@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/perms"
@@ -58,7 +59,7 @@ func settingsCommand(b *bot.Bot) *gumi.Command {
 		Category:    CategoryGeneral,
 		Ephemeral:   true,
 		Checks:      []gumi.Check{gumi.GuildOnly},
-		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Contexts:    []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 	}
 	p := &settingsPanel{b: b, cmd: cmd}
 	cmd.Handler = p.open
@@ -75,7 +76,7 @@ type settingsPanel struct {
 }
 
 func (p *settingsPanel) open(ctx *gumi.Context) error {
-	v, err := p.view(ctx.Context(), ctx.Session, ctx.GuildID(), ctx.AuthorID())
+	v, err := p.view(ctx.Context(), ctx.GuildID(), ctx.AuthorID().String())
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func (p *settingsPanel) open(ctx *gumi.Context) error {
 func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 	owner, action, arg := ctx.Arg(0), ctx.Arg(1), ctx.Arg(2)
 
-	if ctx.UserID() != owner {
+	if ctx.UserID().String() != owner {
 		return ctx.Reply(gumi.Text("This panel is someone else's. Run `/settings` for your own.").Private())
 	}
 
@@ -99,11 +100,11 @@ func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 	case "nav":
 		section = first(ctx.Values())
 	default:
-		var roles []string
-		if m := ctx.Interaction.Member; m != nil {
-			roles = m.Roles
+		var roles []snowflake.ID
+		if m := ctx.Member(); m != nil {
+			roles = m.RoleIDs
 		}
-		ok, err := perms.Allowed(reqCtx, p.b.Store, ctx.GuildID(), perms.Manager, ctx.Permissions(), roles)
+		ok, err := perms.Allowed(reqCtx, p.b.Store, ctx.GuildID().String(), perms.Manager, ctx.Permissions(), roles)
 		if err != nil {
 			return err
 		}
@@ -112,10 +113,9 @@ func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 		}
 
 		if action == "otherlang" {
-			return ctx.Modal(gumi.ComponentID(p.cmd, owner, "langcode"), "Translation language", discordgo.TextInput{
-				CustomID: "code", Label: "DeepL language code, like FI or PT-BR", Style: discordgo.TextInputShort,
-				Required: true, MinLength: 2, MaxLength: 10,
-			})
+			return ctx.Modal(gumi.ComponentID(p.cmd, owner, "langcode"), "Translation language",
+				discord.NewLabel("DeepL language code, like FI or PT-BR",
+					discord.NewShortTextInput("code").WithRequired(true).WithMinLength(2).WithMaxLength(10)))
 		}
 
 		if section, err = p.apply(reqCtx, ctx, action, arg); err != nil {
@@ -123,7 +123,7 @@ func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 		}
 	}
 
-	v, err := p.view(reqCtx, ctx.Session, ctx.GuildID(), owner)
+	v, err := p.view(reqCtx, ctx.GuildID(), owner)
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 
 // apply makes one change and returns the section to show next.
 func (p *settingsPanel) apply(ctx context.Context, cc *gumi.ComponentContext, action, arg string) (string, error) {
-	guildID := cc.GuildID()
+	guildID := cc.GuildID().String()
 
 	if action == "roles" {
 		kind := store.RoleKind(arg)
@@ -196,7 +196,8 @@ func (p *settingsPanel) knownLanguage(ctx context.Context, code string) bool {
 	return slices.ContainsFunc(translate.Common, func(l translate.Language) bool { return l.Code == code })
 }
 
-func (p *settingsPanel) view(ctx context.Context, s *discordgo.Session, guildID, owner string) (*panelView, error) {
+func (p *settingsPanel) view(ctx context.Context, guild snowflake.ID, owner string) (*panelView, error) {
+	guildID := guild.String()
 	g, err := p.b.Store.Guild(ctx, guildID)
 	if err != nil {
 		return nil, err
@@ -228,10 +229,11 @@ func (p *settingsPanel) view(ctx context.Context, s *discordgo.Session, guildID,
 		return nil, err
 	}
 
-	// Only the state cache, so opening the panel never waits on Discord.
-	if s.State != nil {
-		if dg, err := s.State.Guild(guildID); err == nil {
-			v.name, v.icon = dg.Name, dg.IconURL("128")
+	// Only the cache, so opening the panel never waits on Discord.
+	if dg, ok := p.b.Client.Caches.Guild(guild); ok {
+		v.name = dg.Name
+		if icon := dg.IconURL(discord.WithSize(128)); icon != nil {
+			v.icon = *icon
 		}
 	}
 
@@ -260,19 +262,19 @@ func (v *panelView) id(action string, arg ...string) string {
 }
 
 func (v *panelView) render(key string) *gumi.Response {
-	e := &discordgo.MessageEmbed{Color: Color}
+	e := &discord.Embed{Color: Color}
 	if v.name != "" {
-		e.Author = &discordgo.MessageEmbedAuthor{Name: v.name, IconURL: v.icon}
+		e.Author = &discord.EmbedAuthor{Name: v.name, IconURL: v.icon}
 	}
 
-	back := button("Back to settings", discordgo.SecondaryButton, v.id("go", "home"))
-	var rows []discordgo.MessageComponent
+	back := button("Back to settings", discord.ButtonStyleSecondary, v.id("go", "home"))
+	var rows []discord.LayoutComponent
 
 	switch key {
 	case "relay", "streams":
 		e.Title = sectionTitle(key)
 		var lines []string
-		var buttons []discordgo.MessageComponent
+		var buttons []discord.InteractiveComponent
 		for _, t := range toggles {
 			if t.section != key {
 				continue
@@ -290,16 +292,16 @@ func (v *panelView) render(key string) *gumi.Response {
 		if !v.translation {
 			e.Description += "\n\n-# DeepL isn't set up for this bot, so nothing is translated for now."
 		}
-		rows = append([]discordgo.MessageComponent{v.languageSelect()},
-			buttonRows(button("Other language…", discordgo.SecondaryButton, v.id("otherlang")), back)...)
+		rows = append([]discord.LayoutComponent{v.languageSelect()},
+			buttonRows(button("Other language…", discord.ButtonStyleSecondary, v.id("otherlang")), back)...)
 	case "logs":
 		e.Title = "Logs"
 		e.Description = "When a stream ends, its log goes here as a text file.\n\n" +
 			settingLine("Log channel", v.logChannel(), "Without one, each relay channel gets its own log")
-		rows = []discordgo.MessageComponent{v.channelSelect()}
-		var buttons []discordgo.MessageComponent
+		rows = []discord.LayoutComponent{v.channelSelect()}
+		var buttons []discord.InteractiveComponent
 		if v.settings.LogChannelID != "" {
-			buttons = append(buttons, button("Post in the relay channels", discordgo.SecondaryButton, v.id("logclear")))
+			buttons = append(buttons, button("Post in the relay channels", discord.ButtonStyleSecondary, v.id("logclear")))
 		}
 		rows = append(rows, buttonRows(append(buttons, back)...)...)
 	case "permissions":
@@ -308,20 +310,20 @@ func (v *panelView) render(key string) *gumi.Response {
 			"edit the blacklist and filters. These roles can too.\n\n" +
 			settingLine("Managers", roleList(v.managers), "Subscriptions, settings, the blacklist and filters") + "\n\n" +
 			settingLine("Blacklisters", roleList(v.blacklisters), "The blacklist and filters")
-		rows = []discordgo.MessageComponent{
+		rows = []discord.LayoutComponent{
 			v.roleSelect(store.RoleManager, "Manager roles…", v.managers),
 			v.roleSelect(store.RoleBlacklister, "Blacklister roles…", v.blacklisters),
 		}
 		rows = append(rows, buttonRows(back)...)
 	default:
 		v.renderHome(e)
-		rows = []discordgo.MessageComponent{v.navSelect()}
+		rows = []discord.LayoutComponent{v.navSelect()}
 	}
 
-	return &gumi.Response{Embeds: []*discordgo.MessageEmbed{e}, Components: compact(rows)}
+	return &gumi.Response{Embeds: []discord.Embed{*e}, Components: compact(rows)}
 }
 
-func (v *panelView) renderHome(e *discordgo.MessageEmbed) {
+func (v *panelView) renderHome(e *discord.Embed) {
 	s := v.settings
 	c := v.counts
 
@@ -332,7 +334,7 @@ func (v *panelView) renderHome(e *discordgo.MessageEmbed) {
 		c[store.FeatureRelay], c[store.FeatureCameos], c[store.FeatureGossip], c[store.FeatureYouTube], c[store.FeaturePosts],
 		v.outside, v.blacklisted, v.filters)
 
-	e.Fields = []*discordgo.MessageEmbedField{
+	e.Fields = []discord.EmbedField{
 		{Name: "Relay", Value: fmt.Sprintf("Mod messages **%s** · Waiting rooms **%s** · Chat link **%s** · Auto-translate **%s**",
 			onOff(s.ModMessages), onOff(s.Prechat), onOff(s.ShowChat), onOff(s.AutoTranslate))},
 		{Name: "Translation", Value: "Into **" + translate.Name(s.TargetLanguage) + "**"},
@@ -341,9 +343,9 @@ func (v *panelView) renderHome(e *discordgo.MessageEmbed) {
 			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat))},
 		{Name: "Permissions", Value: "Managers " + roleList(v.managers) + " · Blacklisters " + roleList(v.blacklisters)},
 	}
-	e.Footer = &discordgo.MessageEmbedFooter{Text: "Changing settings needs Manage Server or a Manager role"}
+	e.Footer = &discord.EmbedFooter{Text: "Changing settings needs Manage Server or a Manager role"}
 	if v.icon != "" {
-		e.Thumbnail = &discordgo.MessageEmbedThumbnail{URL: v.icon}
+		e.Thumbnail = &discord.EmbedResource{URL: v.icon}
 	}
 }
 
@@ -354,60 +356,55 @@ func (v *panelView) logChannel() string {
 	return "<#" + v.settings.LogChannelID + ">"
 }
 
-func (v *panelView) toggleButton(t toggle, on bool) discordgo.MessageComponent {
+func (v *panelView) toggleButton(t toggle, on bool) discord.InteractiveComponent {
 	if on {
-		return button(t.label+": On", discordgo.SuccessButton, v.id("toggle", t.name))
+		return button(t.label+": On", discord.ButtonStyleSuccess, v.id("toggle", t.name))
 	}
-	return button(t.label+": Off", discordgo.SecondaryButton, v.id("toggle", t.name))
+	return button(t.label+": Off", discord.ButtonStyleSecondary, v.id("toggle", t.name))
 }
 
-func (v *panelView) navSelect() discordgo.MessageComponent {
-	options := make([]discordgo.SelectMenuOption, 0, len(sections))
+func (v *panelView) navSelect() discord.LayoutComponent {
+	options := make([]discord.StringSelectMenuOption, 0, len(sections))
 	for _, s := range sections {
-		options = append(options, discordgo.SelectMenuOption{Label: s.title, Value: s.key, Description: s.summary})
+		options = append(options, discord.StringSelectMenuOption{Label: s.title, Value: s.key, Description: s.summary})
 	}
-	return selectRow(discordgo.SelectMenu{
-		MenuType: discordgo.StringSelectMenu, CustomID: v.id("nav"), Placeholder: "Change a section…", Options: options,
-	})
+	return selectRow(discord.StringSelectMenuComponent{CustomID: v.id("nav"), Placeholder: "Change a section…", Options: options})
 }
 
-func (v *panelView) languageSelect() discordgo.MessageComponent {
-	options := make([]discordgo.SelectMenuOption, 0, len(translate.Common))
+func (v *panelView) languageSelect() discord.LayoutComponent {
+	options := make([]discord.StringSelectMenuOption, 0, len(translate.Common))
 	for _, l := range translate.Common {
-		options = append(options, discordgo.SelectMenuOption{
+		options = append(options, discord.StringSelectMenuOption{
 			Label: l.Name, Value: l.Code, Default: l.Code == v.settings.TargetLanguage,
 		})
 	}
-	return selectRow(discordgo.SelectMenu{
-		MenuType: discordgo.StringSelectMenu, CustomID: v.id("lang"), Placeholder: "Translate into…", Options: options,
-	})
+	return selectRow(discord.StringSelectMenuComponent{CustomID: v.id("lang"), Placeholder: "Translate into…", Options: options})
 }
 
-func (v *panelView) channelSelect() discordgo.MessageComponent {
-	menu := discordgo.SelectMenu{
-		MenuType:     discordgo.ChannelSelectMenu,
+func (v *panelView) channelSelect() discord.LayoutComponent {
+	menu := discord.ChannelSelectMenuComponent{
 		CustomID:     v.id("logchannel"),
 		Placeholder:  "Log channel…",
 		ChannelTypes: textChannels,
 	}
-	if id := v.settings.LogChannelID; id != "" {
-		menu.DefaultValues = []discordgo.SelectMenuDefaultValue{{ID: id, Type: discordgo.SelectMenuDefaultValueChannel}}
+	if id, err := snowflake.Parse(v.settings.LogChannelID); err == nil {
+		menu.DefaultValues = []discord.SelectMenuDefaultValue{discord.NewSelectMenuDefaultChannel(id)}
 	}
 	return selectRow(menu)
 }
 
 // MinValues of zero lets people clear every role.
-func (v *panelView) roleSelect(kind store.RoleKind, placeholder string, current []string) discordgo.MessageComponent {
-	zero := 0
-	menu := discordgo.SelectMenu{
-		MenuType:    discordgo.RoleSelectMenu,
+func (v *panelView) roleSelect(kind store.RoleKind, placeholder string, current []string) discord.LayoutComponent {
+	menu := discord.RoleSelectMenuComponent{
 		CustomID:    v.id("roles", string(kind)),
 		Placeholder: placeholder,
-		MinValues:   &zero,
+		MinValues:   new(0),
 		MaxValues:   25,
 	}
-	for _, id := range current {
-		menu.DefaultValues = append(menu.DefaultValues, discordgo.SelectMenuDefaultValue{ID: id, Type: discordgo.SelectMenuDefaultValueRole})
+	for _, s := range current {
+		if id, err := snowflake.Parse(s); err == nil {
+			menu.DefaultValues = append(menu.DefaultValues, discord.NewSelectMenuDefaultRole(id))
+		}
 	}
 	return selectRow(menu)
 }
@@ -450,42 +447,42 @@ func first(values []string) string {
 	return values[0]
 }
 
-func button(label string, style discordgo.ButtonStyle, id string) discordgo.MessageComponent {
+func button(label string, style discord.ButtonStyle, id string) discord.InteractiveComponent {
 	if id == "" {
 		return nil
 	}
-	return discordgo.Button{Label: label, Style: style, CustomID: id}
+	return discord.NewButton(style, label, id, "", 0)
 }
 
-func selectRow(menu discordgo.SelectMenu) discordgo.MessageComponent {
-	if menu.CustomID == "" {
+func selectRow(menu discord.InteractiveComponent) discord.LayoutComponent {
+	if menu.GetCustomID() == "" {
 		return nil
 	}
-	return discordgo.ActionsRow{Components: []discordgo.MessageComponent{menu}}
+	return discord.NewActionRow(menu)
 }
 
 // buttonRows packs buttons into rows of Discord's maximum of five.
-func buttonRows(buttons ...discordgo.MessageComponent) []discordgo.MessageComponent {
-	var rows []discordgo.MessageComponent
-	row := make([]discordgo.MessageComponent, 0, 5)
+func buttonRows(buttons ...discord.InteractiveComponent) []discord.LayoutComponent {
+	var rows []discord.LayoutComponent
+	row := make([]discord.InteractiveComponent, 0, 5)
 	for _, b := range buttons {
 		if b == nil {
 			continue
 		}
 		if len(row) == 5 {
-			rows = append(rows, discordgo.ActionsRow{Components: row})
-			row = make([]discordgo.MessageComponent, 0, 5)
+			rows = append(rows, discord.NewActionRow(row...))
+			row = make([]discord.InteractiveComponent, 0, 5)
 		}
 		row = append(row, b)
 	}
 	if len(row) > 0 {
-		rows = append(rows, discordgo.ActionsRow{Components: row})
+		rows = append(rows, discord.NewActionRow(row...))
 	}
 	return rows
 }
 
-func compact(rows []discordgo.MessageComponent) []discordgo.MessageComponent {
-	out := make([]discordgo.MessageComponent, 0, len(rows))
+func compact(rows []discord.LayoutComponent) []discord.LayoutComponent {
+	out := make([]discord.LayoutComponent, 0, len(rows))
 	for _, r := range rows {
 		if r != nil {
 			out = append(out, r)

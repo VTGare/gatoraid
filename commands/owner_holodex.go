@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/store"
@@ -53,11 +53,11 @@ func ownerStreams(b *bot.Bot) *gumi.Command {
 				sb.WriteString("Nobody's live right now.\n")
 			}
 
-			return ctx.ReplyEmbed(&discordgo.MessageEmbed{
+			return ctx.ReplyEmbed(discord.Embed{
 				Title:       fmt.Sprintf("Live (%d)", len(live)),
 				Description: sb.String(),
 				Color:       Color,
-				Footer: &discordgo.MessageEmbedFooter{
+				Footer: &discord.EmbedFooter{
 					Text: fmt.Sprintf("Also tracking %d upcoming, %d members-only and %d free chat rooms", upcoming, members, freeChat),
 				},
 			})
@@ -133,15 +133,11 @@ func ownerStreamerSync(b *bot.Bot) *gumi.Command {
 				if err != nil {
 					return err
 				}
-				resp.Files = append(resp.Files, &discordgo.File{
-					Name: "missing.toml", ContentType: "text/plain", Reader: strings.NewReader(out),
-				})
+				resp.Files = append(resp.Files, discord.NewFile("missing.toml", "", strings.NewReader(out)))
 			}
 
 			if len(resp.Content) > maxInlineExport {
-				resp.Files = append(resp.Files, &discordgo.File{
-					Name: "report.md", ContentType: "text/plain", Reader: strings.NewReader(resp.Content),
-				})
+				resp.Files = append(resp.Files, discord.NewFile("report.md", "", strings.NewReader(resp.Content)))
 				resp.Content = fmt.Sprintf("**%s**: %d inactive in the registry, %d missing. Details attached.", org, len(inactive), len(missing))
 			}
 

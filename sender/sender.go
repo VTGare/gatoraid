@@ -1,10 +1,9 @@
 // Package sender posts messages to Discord through one queue per channel,
 // so a busy or broken channel doesn't hold up the others.
 //
-// discordgo already waits out rate limits, retries 429s and retries 502s.
-// The sender retries the other server errors and stops posting to channels
-// that refuse the bot for a while: Discord bans IPs that send too many
-// invalid requests.
+// DisGo already waits out rate limits and retries 429s. The sender retries
+// server errors and stops posting to channels that refuse the bot for a
+// while, because Discord bans IPs that send too many invalid requests.
 package sender
 
 import (
@@ -16,7 +15,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/rest"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 const (
@@ -28,14 +29,14 @@ const (
 )
 
 type Poster interface {
-	ChannelMessageSendComplex(channelID string, data *discordgo.MessageSend, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	CreateMessage(channelID snowflake.ID, messageCreate discord.MessageCreate, opts ...rest.RequestOpt) (*discord.Message, error)
 }
 
 type Message struct {
 	ChannelID string
-	Send      *discordgo.MessageSend
+	Send      discord.MessageCreate
 	// Called with the posted message, from the channel's goroutine.
-	OnSent func(*discordgo.Message)
+	OnSent func(*discord.Message)
 }
 
 type Config struct {
@@ -172,9 +173,15 @@ func (s *Sender) post(msg Message) {
 	log := s.cfg.Log.With(slog.String("channel_id", msg.ChannelID))
 	backoff := s.cfg.Backoff
 
+	channelID, err := snowflake.Parse(msg.ChannelID)
+	if err != nil {
+		log.Error("can't send to an invalid channel ID", slog.Any("error", err))
+		return
+	}
+
 	for attempt := 0; ; attempt++ {
 		rewind(msg.Send)
-		sent, err := s.cfg.Poster.ChannelMessageSendComplex(msg.ChannelID, msg.Send, discordgo.WithContext(s.ctx))
+		sent, err := s.cfg.Poster.CreateMessage(channelID, msg.Send, rest.WithCtx(s.ctx))
 		if err == nil {
 			if msg.OnSent != nil {
 				msg.OnSent(sent)
@@ -222,7 +229,7 @@ func (s *Sender) refuse(channelID string, err error) {
 
 // A failed attempt may have read attachments partway, and a retry would
 // upload what's left.
-func rewind(m *discordgo.MessageSend) {
+func rewind(m discord.MessageCreate) {
 	for _, f := range m.Files {
 		if s, ok := f.Reader.(io.Seeker); ok {
 			_, _ = s.Seek(0, io.SeekStart)
@@ -231,19 +238,19 @@ func rewind(m *discordgo.MessageSend) {
 }
 
 func refused(err error) bool {
-	var rest *discordgo.RESTError
-	if !errors.As(err, &rest) || rest.Response == nil {
+	var restErr *rest.Error
+	if !errors.As(err, &restErr) || restErr.Response == nil {
 		return false
 	}
-	return rest.Response.StatusCode == http.StatusForbidden || rest.Response.StatusCode == http.StatusNotFound
+	return restErr.Response.StatusCode == http.StatusForbidden || restErr.Response.StatusCode == http.StatusNotFound
 }
 
 // Other 4xx errors are the message's fault, so sending it again won't
 // help.
 func retryable(err error) bool {
-	var rest *discordgo.RESTError
-	if errors.As(err, &rest) && rest.Response != nil {
-		return rest.Response.StatusCode >= http.StatusInternalServerError
+	var restErr *rest.Error
+	if errors.As(err, &restErr) && restErr.Response != nil {
+		return restErr.Response.StatusCode >= http.StatusInternalServerError
 	}
 	return true
 }

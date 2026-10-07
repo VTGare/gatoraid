@@ -3,14 +3,15 @@ package relay
 import (
 	"fmt"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 )
 
 // Notice builds the message that tells a channel a relay started.
-func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string) *discordgo.MessageSend {
+func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string) discord.MessageCreate {
 	e := StreamEmbed(s, host, f.Color)
 
 	switch kind {
@@ -28,13 +29,13 @@ func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.
 
 // StreamEmbed links the stream with its thumbnail. host, if known, puts
 // the registry's name and avatar on it.
-func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) *discordgo.MessageEmbed {
-	e := &discordgo.MessageEmbed{
+func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) discord.Embed {
+	e := discord.Embed{
 		Title: s.Title,
 		URL:   s.URL(),
 		Color: color,
-		Image: &discordgo.MessageEmbedImage{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"},
-		Author: &discordgo.MessageEmbedAuthor{
+		Image: &discord.EmbedResource{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"},
+		Author: &discord.EmbedAuthor{
 			Name: s.ChannelName,
 			URL:  "https://www.youtube.com/channel/" + s.ChannelID,
 		},
@@ -50,14 +51,14 @@ func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) *discordgo.M
 
 // RoleMessage pings roleID if set, and nobody else. The role has to be in
 // the message text to notify anyone.
-func RoleMessage(e *discordgo.MessageEmbed, roleID string) *discordgo.MessageSend {
-	msg := &discordgo.MessageSend{
-		Embeds:          []*discordgo.MessageEmbed{e},
-		AllowedMentions: &discordgo.MessageAllowedMentions{},
+func RoleMessage(e discord.Embed, roleID string) discord.MessageCreate {
+	msg := discord.MessageCreate{
+		Embeds:          []discord.Embed{e},
+		AllowedMentions: &discord.AllowedMentions{},
 	}
-	if roleID != "" {
-		msg.Content = "<@&" + roleID + ">"
-		msg.AllowedMentions.Roles = []string{roleID}
+	if id, err := snowflake.Parse(roleID); err == nil && id != 0 {
+		msg.Content = discord.RoleMention(id)
+		msg.AllowedMentions.Roles = []snowflake.ID{id}
 	}
 
 	return msg

@@ -8,7 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/rest"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/sender"
 
@@ -41,7 +43,8 @@ func newFake() *fakePoster {
 	return &fakePoster{sent: map[string][]string{}, errs: map[string][]error{}}
 }
 
-func (f *fakePoster) ChannelMessageSendComplex(channelID string, data *discordgo.MessageSend, _ ...discordgo.RequestOption) (*discordgo.Message, error) {
+func (f *fakePoster) CreateMessage(id snowflake.ID, data discord.MessageCreate, _ ...rest.RequestOpt) (*discord.Message, error) {
+	channelID := id.String()
 	if f.block != nil {
 		f.started <- struct{}{}
 		<-f.block
@@ -68,7 +71,7 @@ func (f *fakePoster) ChannelMessageSendComplex(channelID string, data *discordgo
 
 	f.nextID++
 	f.sent[channelID] = append(f.sent[channelID], content)
-	return &discordgo.Message{ID: string(rune('a' + f.nextID - 1)), ChannelID: channelID}, nil
+	return &discord.Message{ID: snowflake.ID(f.nextID), ChannelID: id}, nil
 }
 
 func (f *fakePoster) messages(channelID string) []string {
@@ -84,11 +87,11 @@ func (f *fakePoster) callCount() int {
 }
 
 func status(code int) error {
-	return &discordgo.RESTError{Response: &http.Response{StatusCode: code}}
+	return &rest.Error{Response: &http.Response{StatusCode: code, Status: http.StatusText(code)}}
 }
 
 func msg(channel, text string) sender.Message {
-	return sender.Message{ChannelID: channel, Send: &discordgo.MessageSend{Content: text}}
+	return sender.Message{ChannelID: channel, Send: discord.MessageCreate{Content: text}}
 }
 
 var _ = Describe("Sender", func() {
@@ -116,69 +119,69 @@ var _ = Describe("Sender", func() {
 			ids []string
 		)
 		for _, text := range []string{"1", "2", "3"} {
-			m := msg("a", text)
-			m.OnSent = func(sent *discordgo.Message) {
+			m := msg("1", text)
+			m.OnSent = func(sent *discord.Message) {
 				mu.Lock()
-				ids = append(ids, sent.ID)
+				ids = append(ids, sent.ID.String())
 				mu.Unlock()
 			}
 			Expect(s.Send(m)).To(BeTrue())
 		}
-		Expect(s.Send(msg("b", "x"))).To(BeTrue())
+		Expect(s.Send(msg("2", "x"))).To(BeTrue())
 
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"1", "2", "3"}))
-		Eventually(func() []string { return fake.messages("b") }).Should(Equal([]string{"x"}))
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"1", "2", "3"}))
+		Eventually(func() []string { return fake.messages("2") }).Should(Equal([]string{"x"}))
 		Eventually(func() int { mu.Lock(); defer mu.Unlock(); return len(ids) }).Should(Equal(3))
 	})
 
 	It("keeps working after idle channels shut down", func() {
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(HaveLen(1))
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(HaveLen(1))
 		time.Sleep(50 * time.Millisecond)
 
-		Expect(s.Send(msg("a", "2"))).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"1", "2"}))
+		Expect(s.Send(msg("1", "2"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"1", "2"}))
 	})
 
 	It("retries server and network errors", func() {
-		fake.errs["a"] = []error{status(http.StatusInternalServerError), errors.New("connection reset")}
+		fake.errs["1"] = []error{status(http.StatusInternalServerError), errors.New("connection reset")}
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"1"}))
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"1"}))
 		Expect(fake.callCount()).To(Equal(3))
 	})
 
 	It("sends attachments whole when retrying", func() {
-		fake.errs["a"] = []error{status(http.StatusInternalServerError)}
+		fake.errs["1"] = []error{status(http.StatusInternalServerError)}
 		start()
 
-		m := msg("a", "log")
-		m.Send.Files = []*discordgo.File{{Name: "v.txt", Reader: strings.NewReader("lines")}}
+		m := msg("1", "log")
+		m.Send.Files = []*discord.File{discord.NewFile("v.txt", "", strings.NewReader("lines"))}
 		Expect(s.Send(m)).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"log v.txt=lines"}))
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"log v.txt=lines"}))
 	})
 
 	It("gives up after the retries", func() {
 		cfg.Retries = 1
-		fake.errs["a"] = []error{status(http.StatusServiceUnavailable), status(http.StatusServiceUnavailable)}
+		fake.errs["1"] = []error{status(http.StatusServiceUnavailable), status(http.StatusServiceUnavailable)}
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
-		Expect(s.Send(msg("a", "2"))).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"2"}))
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
+		Expect(s.Send(msg("1", "2"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"2"}))
 		Expect(fake.callCount()).To(Equal(3))
 	})
 
 	It("drops bad requests without retrying", func() {
-		fake.errs["a"] = []error{status(http.StatusBadRequest)}
+		fake.errs["1"] = []error{status(http.StatusBadRequest)}
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
-		Expect(s.Send(msg("a", "2"))).To(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"2"}))
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
+		Expect(s.Send(msg("1", "2"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"2"}))
 		Expect(fake.callCount()).To(Equal(2))
 	})
 
@@ -186,21 +189,21 @@ var _ = Describe("Sender", func() {
 		cfg.Cooldown = 100 * time.Millisecond
 		refused := make(chan string, 1)
 		cfg.OnRefused = func(channelID string, _ error) { refused <- channelID }
-		fake.errs["a"] = []error{status(http.StatusForbidden)}
+		fake.errs["1"] = []error{status(http.StatusForbidden)}
 		fake.hold()
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
-		Expect(s.Send(msg("a", "queued"))).To(BeTrue())
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
+		Expect(s.Send(msg("1", "queued"))).To(BeTrue())
 		fake.release()
 
 		Eventually(func() int { return fake.callCount() }).Should(Equal(1))
-		Eventually(func() bool { return s.Send(msg("a", "paused")) }).Should(BeFalse())
+		Eventually(func() bool { return s.Send(msg("1", "paused")) }).Should(BeFalse())
 		Consistently(func() int { return fake.callCount() }, 30*time.Millisecond).Should(Equal(1))
-		Expect(refused).To(Receive(Equal("a")))
+		Expect(refused).To(Receive(Equal("1")))
 
-		Eventually(func() bool { return s.Send(msg("a", "back")) }, time.Second).Should(BeTrue())
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"back"}))
+		Eventually(func() bool { return s.Send(msg("1", "back")) }, time.Second).Should(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"back"}))
 	})
 
 	It("drops messages beyond the queue size", func() {
@@ -208,19 +211,28 @@ var _ = Describe("Sender", func() {
 		fake.hold()
 		start()
 
-		Expect(s.Send(msg("a", "1"))).To(BeTrue())
+		Expect(s.Send(msg("1", "1"))).To(BeTrue())
 		Eventually(fake.started).Should(Receive())
-		Expect(s.Send(msg("a", "2"))).To(BeTrue())
-		Expect(s.Send(msg("a", "3"))).To(BeTrue())
-		Expect(s.Send(msg("a", "4"))).To(BeFalse())
+		Expect(s.Send(msg("1", "2"))).To(BeTrue())
+		Expect(s.Send(msg("1", "3"))).To(BeTrue())
+		Expect(s.Send(msg("1", "4"))).To(BeFalse())
 		fake.release()
 
-		Eventually(func() []string { return fake.messages("a") }).Should(Equal([]string{"1", "2", "3"}))
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"1", "2", "3"}))
 	})
 
 	It("refuses messages after Close", func() {
 		start()
 		s.Close()
-		Expect(s.Send(msg("a", "1"))).To(BeFalse())
+		Expect(s.Send(msg("1", "1"))).To(BeFalse())
+	})
+
+	It("drops messages to channel IDs that don't parse", func() {
+		start()
+
+		Expect(s.Send(msg("general", "1"))).To(BeTrue())
+		Expect(s.Send(msg("1", "2"))).To(BeTrue())
+		Eventually(func() []string { return fake.messages("1") }).Should(Equal([]string{"2"}))
+		Expect(fake.callCount()).To(Equal(1))
 	})
 })

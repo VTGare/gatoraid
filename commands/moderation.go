@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/perms"
@@ -32,7 +32,7 @@ func blacklistCommand(b *bot.Bot) *gumi.Command {
 		Description: "Stop relaying someone's messages in this server",
 		Category:    CategoryModeration,
 		Checks:      moderatorChecks(b),
-		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Contexts:    []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "add",
@@ -68,10 +68,10 @@ func blacklistAuthorCommand(b *bot.Bot) *gumi.Command {
 		Type:      gumi.MessageContext,
 		Category:  CategoryModeration,
 		Checks:    moderatorChecks(b),
-		Contexts:  []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Contexts:  []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 		Ephemeral: true,
 		Handler: func(ctx *gumi.Context) error {
-			line, err := b.Store.LineByMessage(ctx.Context(), ctx.GuildID(), ctx.TargetMessage.ID)
+			line, err := b.Store.LineByMessage(ctx.Context(), ctx.GuildID().String(), ctx.TargetMessage.ID.String())
 			if errors.Is(err, store.ErrLineNotFound) {
 				return gumi.NewUserError("That's not a line I relayed in this server in the last week.")
 			}
@@ -80,10 +80,10 @@ func blacklistAuthorCommand(b *bot.Bot) *gumi.Command {
 			}
 
 			msg, err := addToBlacklist(b, ctx, store.BlacklistEntry{
-				GuildID:   ctx.GuildID(),
+				GuildID:   ctx.GuildID().String(),
 				ChannelID: line.AuthorChannelID,
 				Name:      line.AuthorName,
-				AddedBy:   ctx.AuthorID(),
+				AddedBy:   ctx.AuthorID().String(),
 			})
 			if err != nil {
 				return err
@@ -117,11 +117,11 @@ func blacklistAdd(b *bot.Bot, ctx *gumi.Context) error {
 	}
 
 	msg, err := addToBlacklist(b, ctx, store.BlacklistEntry{
-		GuildID:   ctx.GuildID(),
+		GuildID:   ctx.GuildID().String(),
 		ChannelID: ch.ID,
 		Name:      name,
 		Reason:    strings.TrimSpace(ctx.Options.String("reason")),
-		AddedBy:   ctx.AuthorID(),
+		AddedBy:   ctx.AuthorID().String(),
 	})
 	if err != nil {
 		return err
@@ -156,7 +156,7 @@ func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
 		}
 	}
 
-	e, err := b.Moderation.RemoveFromBlacklist(ctx.Context(), ctx.GuildID(), channelID)
+	e, err := b.Moderation.RemoveFromBlacklist(ctx.Context(), ctx.GuildID().String(), channelID)
 	switch {
 	case errors.Is(err, store.ErrNotBlacklisted) && channelID == "":
 		return gumi.NewUserError("The blacklist is empty.")
@@ -174,7 +174,7 @@ func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
 func findBlacklisted(b *bot.Bot, ctx *gumi.Context) (string, error) {
 	input := strings.TrimSpace(ctx.Options.String("channel"))
 
-	for _, e := range b.Moderation.Blacklist(ctx.GuildID()) {
+	for _, e := range b.Moderation.Blacklist(ctx.GuildID().String()) {
 		if e.ChannelID == input || strings.EqualFold(e.Name, input) {
 			return e.ChannelID, nil
 		}
@@ -191,7 +191,7 @@ func findBlacklisted(b *bot.Bot, ctx *gumi.Context) (string, error) {
 }
 
 func blacklistList(b *bot.Bot, ctx *gumi.Context) error {
-	entries := b.Moderation.Blacklist(ctx.GuildID())
+	entries := b.Moderation.Blacklist(ctx.GuildID().String())
 	if len(entries) == 0 {
 		return ctx.ReplyText("The blacklist is empty.")
 	}
@@ -208,7 +208,7 @@ func blacklistList(b *bot.Bot, ctx *gumi.Context) error {
 
 	return ctx.Reply(&gumi.Response{
 		Content: count,
-		Files:   []*discordgo.File{{Name: "blacklist.txt", ContentType: "text/plain", Reader: strings.NewReader(sb.String())}},
+		Files:   []*discord.File{discord.NewFile("blacklist.txt", "", strings.NewReader(sb.String()))},
 	})
 }
 
@@ -221,7 +221,7 @@ func blacklistName(e store.BlacklistEntry) string {
 
 func recentAuthorOption(b *bot.Bot, name, description string) *gumi.Option {
 	return gumi.String(name, description).WithAutocomplete(func(ctx *gumi.AutocompleteContext) ([]gumi.Choice, error) {
-		lines, err := b.Store.RecentAuthors(ctx.Context(), ctx.GuildID(), strings.TrimSpace(ctx.Value), 25)
+		lines, err := b.Store.RecentAuthors(ctx.Context(), ctx.GuildID().String(), strings.TrimSpace(ctx.Value), 25)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +239,7 @@ func blacklistedOption(b *bot.Bot, name, description string) *gumi.Option {
 		q := strings.ToLower(strings.TrimSpace(ctx.Value))
 
 		var choices []gumi.Choice
-		for _, e := range b.Moderation.Blacklist(ctx.GuildID()) {
+		for _, e := range b.Moderation.Blacklist(ctx.GuildID().String()) {
 			label := e.ChannelID
 			if e.Name != "" {
 				label = e.Name + " · " + e.ChannelID
@@ -270,7 +270,7 @@ func filterCommand(b *bot.Bot) *gumi.Command {
 		Description: "Drop lines with banned words, or mark lines with a prefix as translations",
 		Category:    CategoryModeration,
 		Checks:      moderatorChecks(b),
-		Contexts:    []discordgo.InteractionContextType{discordgo.InteractionContextGuild},
+		Contexts:    []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "add",
@@ -304,7 +304,7 @@ func filterCommand(b *bot.Bot) *gumi.Command {
 
 func filterAdd(b *bot.Bot, ctx *gumi.Context) error {
 	f := store.Filter{
-		GuildID: ctx.GuildID(),
+		GuildID: ctx.GuildID().String(),
 		Kind:    store.FilterKind(ctx.Options.String("type")),
 		Pattern: normalizePattern(ctx.Options.String("pattern")),
 	}
@@ -332,7 +332,7 @@ func filterRemove(b *bot.Bot, ctx *gumi.Context) error {
 	kind := store.FilterKind(ctx.Options.String("type"))
 	pattern := normalizePattern(ctx.Options.String("pattern"))
 
-	err := b.Moderation.RemoveFilter(ctx.Context(), ctx.GuildID(), kind, pattern)
+	err := b.Moderation.RemoveFilter(ctx.Context(), ctx.GuildID().String(), kind, pattern)
 	if errors.Is(err, store.ErrFilterNotFound) {
 		return gumi.Errorf("%s isn't a %s filter.", inlineCode(pattern), kind)
 	}
@@ -356,7 +356,7 @@ func filterList(b *bot.Bot, ctx *gumi.Context) error {
 	}
 
 	empty := true
-	for _, f := range b.Moderation.Filters(ctx.GuildID()) {
+	for _, f := range b.Moderation.Filters(ctx.GuildID().String()) {
 		for i := range sections {
 			if sections[i].kind == f.Kind {
 				sections[i].patterns = append(sections[i].patterns, f.Pattern)
@@ -365,7 +365,7 @@ func filterList(b *bot.Bot, ctx *gumi.Context) error {
 		}
 	}
 
-	e := &discordgo.MessageEmbed{Title: "Filters", Color: Color}
+	e := discord.Embed{Title: "Filters", Color: Color}
 	if empty {
 		e.Description = "No filters yet. Add one with `/filter add`."
 		return ctx.ReplyEmbed(e)
@@ -384,7 +384,7 @@ func filterList(b *bot.Bot, ctx *gumi.Context) error {
 		}
 		value := strings.Join(codes, ", ")
 		fits = fits && len(value) <= maxFieldLength
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{Name: sec.title, Value: value})
+		e.Fields = append(e.Fields, discord.EmbedField{Name: sec.title, Value: value})
 
 		fmt.Fprintf(&file, "%s\n%s\n\n", sec.title, strings.Join(sec.patterns, "\n"))
 	}
@@ -395,7 +395,7 @@ func filterList(b *bot.Bot, ctx *gumi.Context) error {
 
 	return ctx.Reply(&gumi.Response{
 		Content: "Too many filters to show here, so here's a file.",
-		Files:   []*discordgo.File{{Name: "filters.txt", ContentType: "text/plain", Reader: strings.NewReader(file.String())}},
+		Files:   []*discord.File{discord.NewFile("filters.txt", "", strings.NewReader(file.String()))},
 	})
 }
 
@@ -405,7 +405,7 @@ func filterOption(b *bot.Bot, name, description string) *gumi.Option {
 		q := normalizePattern(ctx.Value)
 
 		var choices []gumi.Choice
-		for _, f := range b.Moderation.Filters(ctx.GuildID()) {
+		for _, f := range b.Moderation.Filters(ctx.GuildID().String()) {
 			if (kind != "" && f.Kind != kind) || !strings.Contains(f.Pattern, q) {
 				continue
 			}

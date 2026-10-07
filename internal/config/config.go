@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 const EnvPrefix = "GATORAID_"
@@ -148,6 +151,20 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Errorf("config: a Discord token is required (%sDISCORD_TOKEN or discord.token)", EnvPrefix))
 	}
 
+	ids := map[string]string{
+		"dev_guild_id": c.Discord.DevGuildID, "owner_guild_id": c.Discord.OwnerGuildID, "log_channel_id": c.Discord.LogChannelID,
+	}
+	for i, id := range c.Discord.OwnerIDs {
+		ids[fmt.Sprintf("owner_ids[%d]", i)] = id
+	}
+	for _, name := range slices.Sorted(maps.Keys(ids)) {
+		if id := ids[name]; id != "" {
+			if _, err := snowflake.Parse(id); err != nil {
+				errs = append(errs, fmt.Errorf("config: discord.%s %q is not a Discord ID", name, id))
+			}
+		}
+	}
+
 	switch c.Log.Level {
 	case "debug", "info", "warn", "error":
 	default:
@@ -177,6 +194,20 @@ func (c *Config) Validate() error {
 
 // OwnerGuild is where /owner goes. Empty means nowhere: owner tools are
 // never registered globally.
+// Unset IDs come back as 0. Validate rejects the ones that don't parse.
+func ID(s string) snowflake.ID {
+	id, _ := snowflake.Parse(s)
+	return id
+}
+
+func (d Discord) Owners() []snowflake.ID {
+	ids := make([]snowflake.ID, 0, len(d.OwnerIDs))
+	for _, s := range d.OwnerIDs {
+		ids = append(ids, ID(s))
+	}
+	return ids
+}
+
 func (c *Config) OwnerGuild() string {
 	if c.Discord.OwnerGuildID != "" {
 		return c.Discord.OwnerGuildID

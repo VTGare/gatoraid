@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VTGare/gumi"
+	"github.com/VTGare/gumi/v2"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/holodex"
@@ -65,11 +65,11 @@ func logCommand(b *bot.Bot) *gumi.Command {
 // The server's own relays come first. Without any, it's the archive of
 // every chat the bot read, which only goes back a day.
 func buildLog(b *bot.Bot, ctx *gumi.Context, meta tllog.Meta) (string, int, error) {
-	mod := b.Moderation.For(ctx.GuildID())
+	mod := b.Moderation.For(idString(ctx.GuildID()))
 
 	var sources []string
-	if ctx.GuildID() != "" {
-		sources = append(sources, ctx.GuildID())
+	if ctx.GuildID() != 0 {
+		sources = append(sources, ctx.GuildID().String())
 	}
 	sources = append(sources, "")
 

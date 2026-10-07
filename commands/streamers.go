@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/VTGare/gumi"
-	"github.com/bwmarrin/discordgo"
+	"github.com/VTGare/gumi/v2"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/store"
@@ -114,7 +114,7 @@ func resolveGroup(reg *streamers.Registry, query string) (*store.Group, error) {
 	return nil, gumi.Errorf("There's no group called %q. Try `/streamers list`.", query)
 }
 
-func groupOverview(reg *streamers.Registry) *discordgo.MessageEmbed {
+func groupOverview(reg *streamers.Registry) discord.Embed {
 	var sb strings.Builder
 	for _, g := range reg.Groups() {
 		if g.ParentID != "" {
@@ -127,15 +127,15 @@ func groupOverview(reg *streamers.Registry) *discordgo.MessageEmbed {
 		}
 	}
 
-	return &discordgo.MessageEmbed{
+	return discord.Embed{
 		Title:       "Streamer groups",
 		Description: sb.String(),
 		Color:       Color,
-		Footer:      &discordgo.MessageEmbedFooter{Text: "/streamers list group:<name> shows who's in a group"},
+		Footer:      &discord.EmbedFooter{Text: "/streamers list group:<name> shows who's in a group"},
 	}
 }
 
-func groupMembers(reg *streamers.Registry, g *store.Group) *discordgo.MessageEmbed {
+func groupMembers(reg *streamers.Registry, g *store.Group) discord.Embed {
 	type section struct {
 		title   string
 		members []*store.Streamer
@@ -195,15 +195,15 @@ func groupMembers(reg *streamers.Registry, g *store.Group) *discordgo.MessageEmb
 		desc = "Nobody yet."
 	}
 
-	return &discordgo.MessageEmbed{
+	return discord.Embed{
 		Title:       fmt.Sprintf("%s (%d)", g.Name, len(reg.Members(g.ID))),
 		Description: desc,
 		Color:       Color,
 	}
 }
 
-func streamerEmbed(reg *streamers.Registry, st *store.Streamer) *discordgo.MessageEmbed {
-	e := &discordgo.MessageEmbed{
+func streamerEmbed(reg *streamers.Registry, st *store.Streamer) discord.Embed {
+	e := discord.Embed{
 		Title: st.Name,
 		URL:   "https://www.youtube.com/channel/" + st.ChannelID,
 		Color: Color,
@@ -214,25 +214,25 @@ func streamerEmbed(reg *streamers.Registry, st *store.Streamer) *discordgo.Messa
 		for i, g := range lineage {
 			names[len(lineage)-1-i] = g.Name
 		}
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{Name: "Group", Value: strings.Join(names, " › "), Inline: true})
+		e.Fields = append(e.Fields, discord.EmbedField{Name: "Group", Value: strings.Join(names, " › "), Inline: new(true)})
 	}
 
 	if st.ChannelName != "" {
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{Name: "Channel", Value: st.ChannelName, Inline: true})
+		e.Fields = append(e.Fields, discord.EmbedField{Name: "Channel", Value: st.ChannelName, Inline: new(true)})
 	}
 
 	if st.Twitter != "" {
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{
-			Name: "Twitter", Value: fmt.Sprintf("[@%s](https://x.com/%s)", st.Twitter, st.Twitter), Inline: true,
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name: "Twitter", Value: fmt.Sprintf("[@%s](https://x.com/%s)", st.Twitter, st.Twitter), Inline: new(true),
 		})
 	}
 
 	if len(st.Aliases) > 0 {
-		e.Fields = append(e.Fields, &discordgo.MessageEmbedField{Name: "Aliases", Value: strings.Join(st.Aliases, ", ")})
+		e.Fields = append(e.Fields, discord.EmbedField{Name: "Aliases", Value: strings.Join(st.Aliases, ", ")})
 	}
 
 	if st.AvatarURL != "" {
-		e.Thumbnail = &discordgo.MessageEmbedThumbnail{URL: st.AvatarURL}
+		e.Thumbnail = &discord.EmbedResource{URL: st.AvatarURL}
 	}
 
 	footer := []string{st.ChannelID}
@@ -242,7 +242,7 @@ func streamerEmbed(reg *streamers.Registry, st *store.Streamer) *discordgo.Messa
 	case store.SourceUser:
 		footer = append(footer, "added by a server")
 	}
-	e.Footer = &discordgo.MessageEmbedFooter{Text: strings.Join(footer, " · ")}
+	e.Footer = &discord.EmbedFooter{Text: strings.Join(footer, " · ")}
 
 	return e
 }

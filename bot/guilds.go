@@ -6,17 +6,20 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
+
+	"github.com/VTGare/gatoraid/internal/config"
 
 	"github.com/VTGare/gatoraid/store"
 )
 
 // READY lists every guild the bot is in, including unavailable ones, so
 // anything missing removed the bot while it was offline.
-func (b *Bot) onReady(s *discordgo.Session, r *discordgo.Ready) {
+func (b *Bot) onReady(r *events.Ready) {
 	ids := make([]string, 0, len(r.Guilds))
 	for _, g := range r.Guilds {
-		ids = append(ids, g.ID)
+		ids = append(ids, g.ID.String())
 	}
 
 	b.Log.Info("connected to Discord",
@@ -34,7 +37,7 @@ func (b *Bot) onReady(s *discordgo.Session, r *discordgo.Ready) {
 
 	for _, id := range left {
 		b.Log.Info("left guild while offline", slog.String("guild_id", id))
-		b.notify(s, fmt.Sprintf("Removed from `%s` while offline. Its data is kept for 30 days.", id))
+		b.notify(fmt.Sprintf("Removed from `%s` while offline. Its data is kept for 30 days.", id))
 	}
 	if len(left) > 0 {
 		b.reloadSubs(ctx)
@@ -43,17 +46,18 @@ func (b *Bot) onReady(s *discordgo.Session, r *discordgo.Ready) {
 
 // Discord sends GUILD_CREATE for every guild on startup and after outages,
 // not just on joins, so only new and restored guilds get a notice.
-func (b *Bot) onGuildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
-	if g.Guild == nil || g.Unavailable {
+func (b *Bot) guildCreated(gg discord.GatewayGuild) {
+	g := gg.Guild
+	if gg.Unavailable {
 		return
 	}
 
 	ctx, cancel := context.WithTimeout(b.ctx, eventTimeout)
 	defer cancel()
 
-	_, kind, err := b.Store.JoinGuild(ctx, g.ID)
+	_, kind, err := b.Store.JoinGuild(ctx, g.ID.String())
 	if err != nil {
-		b.Log.Error("failed to record guild", slog.String("guild_id", g.ID), slog.Any("error", err))
+		b.Log.Error("failed to record guild", slog.String("guild_id", g.ID.String()), slog.Any("error", err))
 		return
 	}
 
@@ -63,41 +67,31 @@ func (b *Bot) onGuildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
 
 	switch kind {
 	case store.JoinNew:
-		b.Log.Info("joined guild", guildAttrs(g.Guild)...)
-		b.notify(s, fmt.Sprintf("Joined **%s** (`%s`), %d members.", g.Name, g.ID, g.MemberCount))
+		b.Log.Info("joined guild", guildAttrs(g)...)
+		b.notify(fmt.Sprintf("Joined **%s** (`%s`), %d members.", g.Name, g.ID, g.MemberCount))
 	case store.JoinRestored:
-		b.Log.Info("rejoined guild", guildAttrs(g.Guild)...)
-		b.notify(s, fmt.Sprintf("Rejoined **%s** (`%s`), %d members. Settings restored.", g.Name, g.ID, g.MemberCount))
+		b.Log.Info("rejoined guild", guildAttrs(g)...)
+		b.notify(fmt.Sprintf("Rejoined **%s** (`%s`), %d members. Settings restored.", g.Name, g.ID, g.MemberCount))
 	}
 }
 
-// Outages send GUILD_DELETE too, with Unavailable set.
-func (b *Bot) onGuildDelete(s *discordgo.Session, g *discordgo.GuildDelete) {
-	if g.Guild == nil {
-		return
-	}
-
-	if g.Unavailable {
-		b.Log.Warn("guild unavailable", slog.String("guild_id", g.ID))
-		return
-	}
-
+// name is from the cache, so it's empty if the guild never got there.
+func (b *Bot) guildLeft(id, name string) {
 	ctx, cancel := context.WithTimeout(b.ctx, eventTimeout)
 	defer cancel()
 
-	if err := b.Store.LeaveGuild(ctx, g.ID, time.Now()); err != nil {
-		b.Log.Error("failed to record leaving guild", slog.String("guild_id", g.ID), slog.Any("error", err))
+	if err := b.Store.LeaveGuild(ctx, id, time.Now()); err != nil {
+		b.Log.Error("failed to record leaving guild", slog.String("guild_id", id), slog.Any("error", err))
 		return
 	}
 	b.reloadSubs(ctx)
 
-	name := g.ID
-	if g.BeforeDelete != nil && g.BeforeDelete.Name != "" {
-		name = g.BeforeDelete.Name
+	if name == "" {
+		name = id
 	}
 
-	b.Log.Info("left guild", slog.String("guild_id", g.ID), slog.String("guild", name))
-	b.notify(s, fmt.Sprintf("Left **%s** (`%s`). Its data is kept for 30 days.", name, g.ID))
+	b.Log.Info("left guild", slog.String("guild_id", id), slog.String("guild", name))
+	b.notify(fmt.Sprintf("Left **%s** (`%s`). Its data is kept for 30 days.", name, id))
 }
 
 func (b *Bot) reloadSubs(ctx context.Context) {
@@ -106,24 +100,24 @@ func (b *Bot) reloadSubs(ctx context.Context) {
 	}
 }
 
-func (b *Bot) notify(s *discordgo.Session, msg string) {
-	ch := b.Config.Discord.LogChannelID
-	if ch == "" {
+func (b *Bot) notify(msg string) {
+	ch := config.ID(b.Config.Discord.LogChannelID)
+	if ch == 0 {
 		return
 	}
 
-	_, err := s.ChannelMessageSendComplex(ch, &discordgo.MessageSend{
+	_, err := b.Client.Rest.CreateMessage(ch, discord.MessageCreate{
 		Content:         msg,
-		AllowedMentions: &discordgo.MessageAllowedMentions{},
+		AllowedMentions: &discord.AllowedMentions{},
 	})
 	if err != nil {
-		b.Log.Warn("failed to post to the log channel", slog.String("channel_id", ch), slog.Any("error", err))
+		b.Log.Warn("failed to post to the log channel", slog.String("channel_id", ch.String()), slog.Any("error", err))
 	}
 }
 
-func guildAttrs(g *discordgo.Guild) []any {
+func guildAttrs(g discord.Guild) []any {
 	return []any{
-		slog.String("guild_id", g.ID),
+		slog.String("guild_id", g.ID.String()),
 		slog.String("guild", g.Name),
 		slog.Int("members", g.MemberCount),
 	}

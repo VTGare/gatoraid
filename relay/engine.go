@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/chat"
 	"github.com/VTGare/gatoraid/sender"
@@ -328,7 +328,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	c.Author, _ = e.cfg.Registry.Streamer(cc.AuthorChannelID)
 
 	if kind, ok := Relay(c, &archiveSettings, nil); ok {
-		e.save(c, kind, "", nil)
+		e.save(c, kind, "", "", nil)
 	}
 
 	sent := map[string]bool{}
@@ -399,8 +399,8 @@ func (e *Engine) openChats(channelID string) int {
 func (e *Engine) post(c *Comment, sub *store.Subscription, kind Kind, content string) {
 	e.cfg.Sender.Send(sender.Message{
 		ChannelID: sub.ChannelID,
-		Send:      &discordgo.MessageSend{Content: content, AllowedMentions: &discordgo.MessageAllowedMentions{}},
-		OnSent:    func(m *discordgo.Message) { e.save(c, kind, sub.GuildID, m) },
+		Send:      discord.MessageCreate{Content: content, AllowedMentions: &discord.AllowedMentions{}},
+		OnSent:    func(m *discord.Message) { e.save(c, kind, sub.GuildID, sub.ChannelID, m) },
 	})
 }
 
@@ -508,7 +508,7 @@ func (e *Engine) guildSettings(guildID string) *store.Settings {
 }
 
 // Called from sender goroutines too, so it only touches the channel.
-func (e *Engine) save(c *Comment, kind Kind, guildID string, sent *discordgo.Message) {
+func (e *Engine) save(c *Comment, kind Kind, guildID, channelID string, sent *discord.Message) {
 	l := store.Line{
 		VideoID:         c.VideoID,
 		GuildID:         guildID,
@@ -518,8 +518,8 @@ func (e *Engine) save(c *Comment, kind Kind, guildID string, sent *discordgo.Mes
 		Kind:            kind,
 		SaidAt:          c.Time,
 	}
-	if sent != nil {
-		l.ChannelID, l.MessageID = sent.ChannelID, sent.ID
+	if sent != nil && sent.ID != 0 {
+		l.ChannelID, l.MessageID = channelID, sent.ID.String()
 	}
 
 	select {

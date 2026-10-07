@@ -3,7 +3,6 @@ package relay_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -11,7 +10,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/chat"
 	"github.com/VTGare/gatoraid/relay"
@@ -107,7 +107,7 @@ func (f *fakeTranslator) callList() []string {
 
 type sent struct {
 	channel string
-	msg     *discordgo.MessageSend
+	msg     discord.MessageCreate
 }
 
 type fakeSender struct {
@@ -122,7 +122,7 @@ func (f *fakeSender) Send(m sender.Message) bool {
 	f.mu.Unlock()
 
 	if m.OnSent != nil {
-		m.OnSent(&discordgo.Message{ID: fmt.Sprint("m", n), ChannelID: m.ChannelID})
+		m.OnSent(&discord.Message{ID: snowflake.ID(n)})
 	}
 	return true
 }
@@ -258,13 +258,13 @@ var _ = Describe("Engine", func() {
 	}
 
 	It("reads relayed streams, sends a notice with the role and relays lines", func() {
-		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "role")
+		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "42")
 		start()
 
 		streams <- live("calli-live", calliID)
 		streams <- live("kiara-live", kiaraID)
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
-		Eventually(snd.lines).Should(Equal([]string{"c1: notice <@&role> Relaying the live chat here."}))
+		Eventually(snd.lines).Should(Equal([]string{"c1: notice <@&42> Relaying the live chat here."}))
 
 		say("calli-live", "UCviewer", "@viewer", "lol")
 		say("calli-live", "UCviewer", "@viewer", "[EN] hello")
@@ -279,7 +279,7 @@ var _ = Describe("Engine", func() {
 		lines, err := db.VideoLines(ctx, "calli-live", "g1")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(lines).To(HaveExactElements(
-			And(HaveField("Kind", store.LineTL), HaveField("ChannelID", "c1"), HaveField("MessageID", "m2")),
+			And(HaveField("Kind", store.LineTL), HaveField("ChannelID", "c1"), HaveField("MessageID", "2")),
 			HaveField("Kind", store.LineOwner),
 		))
 		archive, err := db.VideoLines(ctx, "calli-live", "")

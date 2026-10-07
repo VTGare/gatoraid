@@ -7,10 +7,11 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgo/discord"
+
+	dt "github.com/VTGare/gumi/v2/gumitest"
 
 	"github.com/VTGare/gatoraid/holodex"
-	dt "github.com/VTGare/gatoraid/internal/discordtest"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/streamers"
 	"github.com/VTGare/gatoraid/youtube/channel"
@@ -39,7 +40,7 @@ var _ = Describe("Channels outside the registry", func() {
 		seed, err := streamers.LoadSeed()
 		Expect(err).NotTo(HaveOccurred())
 		h = newHarness(seed)
-		_, _, err = h.b.Store.JoinGuild(context.Background(), "guild")
+		_, _, err = h.b.Store.JoinGuild(context.Background(), testGuild)
 		Expect(err).NotTo(HaveOccurred())
 
 		pages := map[string]string{
@@ -80,13 +81,13 @@ var _ = Describe("Channels outside the registry", func() {
 	add := func(command string, sub string, target string) string {
 		GinkgoHelper()
 		before := len(h.rec.Edits())
-		var opts *discordgo.ApplicationCommandInteractionDataOption
+		var opts dt.Option
 		if command == "notify" {
 			opts = dt.Group(sub, dt.Sub("add", dt.String("target", target)))
 		} else {
 			opts = dt.Sub("add", dt.String("target", target))
 		}
-		data := h.run(dt.WithPermissions(dt.Command(user, command, opts), discordgo.PermissionManageGuild))
+		data := h.run(dt.Command(user, command, opts).WithPermissions(discord.PermissionManageGuild))
 		if edits := h.rec.Edits(); len(edits) > before {
 			return replyText(edits[len(edits)-1].Body)
 		}
@@ -94,22 +95,22 @@ var _ = Describe("Channels outside the registry", func() {
 	}
 
 	It("adds channels Holodex tracks as user channels", func() {
-		Expect(add("relay", "", "https://www.youtube.com/@tracked")).To(Equal("Now relaying **Tracked** in <#channel>."))
+		Expect(add("relay", "", "https://www.youtube.com/@tracked")).To(Equal("Now relaying **Tracked** in <#3000>."))
 
 		st, ok := h.b.Streamers.Streamer(tracked)
 		Expect(ok).To(BeTrue())
 		Expect(st.Source).To(Equal(store.SourceUser))
-		Expect(st.AddedByGuild).To(Equal("guild"))
+		Expect(st.AddedByGuild).To(Equal(testGuild))
 		Expect(st.ChannelName).To(Equal("Tracked Ch."))
 		Expect(st.Twitter).To(Equal("tracked"))
 		Expect(h.b.Streamers.ChannelIDs()).To(ContainElement(tracked))
 		Expect(h.b.Subs.Match(store.FeatureRelay, tracked)).To(HaveLen(1))
 
-		Expect(add("notify", "posts", tracked)).To(Equal("Now posting new posts by **Tracked** in <#channel>."))
+		Expect(add("notify", "posts", tracked)).To(Equal("Now posting new posts by **Tracked** in <#3000>."))
 	})
 
 	It("uses the registry entry when the link is a registry streamer", func() {
-		Expect(add("relay", "", "@MoriCalliope")).To(Equal("Now relaying **Mori Calliope** in <#channel>."))
+		Expect(add("relay", "", "@MoriCalliope")).To(Equal("Now relaying **Mori Calliope** in <#3000>."))
 		st, _ := h.b.Streamers.Streamer(calliID)
 		Expect(st.Source).To(Equal(store.SourceSeed))
 	})
