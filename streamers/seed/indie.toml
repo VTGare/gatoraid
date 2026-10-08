@@ -1400,6 +1400,56 @@ channel_name = "Ashton Marten Ch."
 twitter = "furraridriver"
 
 
+# Atelier Live
+
+[[streamer]]
+name = "Artemis of the Blue"
+channel_id = "UCWImOidHDmm0KK20bkF-rSQ"
+channel_name = "Artemis of the Blue Ch."
+twitter = "artemisvtuber"
+aliases = ["Artemis"]
+
+[[streamer]]
+name = "Chaikitsu"
+channel_id = "UCeZsdcN25H3YmjXAKARorQA"
+channel_name = "yueko"
+twitter = "yueko__"
+aliases = ["yueko"]
+
+[[streamer]]
+name = "Europa Yuu"
+channel_id = "UC5Ejf_RIWMVDAjA4B-GV5Zg"
+channel_name = "Europa Yuu"
+twitter = "EuropaYuu"
+aliases = ["Europa", "Yuu"]
+
+[[streamer]]
+name = "Kani Kanizawa"
+channel_id = "UC55-Y4cBl6alNaaOVVEYgSA"
+channel_name = "Kani Kanizawa Ch."
+twitter = "kanikanizawa"
+aliases = ["Kani", "Kanizawa"]
+
+[[streamer]]
+name = "klaeia"
+channel_id = "UCguTLlIfEP-1KzkogRUcAKw"
+channel_name = "klaeia"
+twitter = "cloverkuri"
+
+[[streamer]]
+name = "Rosuuri"
+channel_id = "UC-Z8ZmHmvv_5tinNQSDw0xg"
+channel_name = "Rosuuri"
+twitter = "Ganbarosuu"
+
+[[streamer]]
+name = "Yamane Chiika"
+channel_id = "UCfIZ5P7BcgIyLpfOj66DwtA"
+channel_name = "Chiika Ch. 山根ちいか"
+twitter = "chiikadayo"
+aliases = ["Chiika", "Yamane"]
+
+
 # Cosmia
 
 [[streamer]]
