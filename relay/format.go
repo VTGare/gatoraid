@@ -29,8 +29,6 @@ const (
 // message has to fit Discord's 2000 with names and links around it.
 const maxText = 1500
 
-const maxLinkTitle = 50
-
 type Formatter struct {
 	// Returns fallback when the key isn't configured.
 	Emoji func(key, fallback string) string
@@ -41,7 +39,8 @@ type Formatter struct {
 }
 
 // Relay formats a relayed line. translation adds a DeepL line, and showChat
-// a link to the chat for lines that could have come from more than one.
+// a footer with the chat's link and title for lines that could have come from
+// more than one.
 func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation string) string {
 	var sb strings.Builder
 	write := func(parts ...string) {
@@ -71,11 +70,9 @@ func (f *Formatter) Relay(c *Comment, kind Kind, showChat bool, translation stri
 	}
 
 	if showChat {
-		write("\n**Chat:** [", linkLabel(hostName(c)), "](<", c.Stream.URL(), ">)")
-
-		// A streamer's waiting rooms only differ by title.
-		if c.Stream.Status == stream.Upcoming && c.Stream.Title != "" {
-			write(" · ", EscapeMarkdown(Truncate(c.Stream.Title, maxLinkTitle)))
+		write("\n-# [", linkLabel(hostName(c)), "](<", c.Stream.URL(), ">)")
+		if c.Stream.Title != "" {
+			write(" · ", EscapeMarkdown(c.Stream.Title))
 		}
 	}
 

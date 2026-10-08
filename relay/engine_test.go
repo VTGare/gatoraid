@@ -583,8 +583,8 @@ var _ = Describe("Engine", func() {
 		say("calli-live", calliID, "@calli", "hi")
 		say("calli-room", calliID, "@calli", "schedule's up")
 		Eventually(snd.lines).Should(ContainElements(
-			"c1: 🎙️ **@calli:** `hi`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-live>)",
-			"c1: ⏳ 🎙️ **@calli:** `schedule's up`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-room>) · Free chat",
+			"c1: 🎙️ **@calli:** `hi`\n-# [Mori Calliope](<https://youtu.be/calli-live>) · stream",
+			"c1: ⏳ 🎙️ **@calli:** `schedule's up`\n-# [Mori Calliope](<https://youtu.be/calli-room>) · Free chat",
 		))
 	})
 
@@ -596,6 +596,6 @@ var _ = Describe("Engine", func() {
 		streams <- live("calli-live", calliID)
 		Eventually(chats.Running).Should(HaveLen(1))
 		say("calli-live", calliID, "@calli", "hi")
-		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `hi`\n**Chat:** [Mori Calliope](<https://youtu.be/calli-live>)"))
+		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `hi`\n-# [Mori Calliope](<https://youtu.be/calli-live>) · stream"))
 	})
 })

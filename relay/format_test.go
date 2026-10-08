@@ -47,7 +47,7 @@ var _ = Describe("Formatter", func() {
 			return c
 		}(), relay.KindMod, false, `🛠️ **@under\_score\*:** `+"`use 'code'`"),
 		Entry("the chat link", comment("[EN] hi"), relay.KindTL, true,
-			"💬 ||@viewer:|| `[EN] hi`\n**Chat:** [Mori Calliope](<https://youtu.be/vid>)"),
+			"💬 ||@viewer:|| `[EN] hi`\n-# [Mori Calliope](<https://youtu.be/vid>)"),
 		Entry("prechat", func() *relay.Comment {
 			c := comment("[EN] soon")
 			c.Stream.Status = stream.Upcoming
@@ -58,13 +58,13 @@ var _ = Describe("Formatter", func() {
 			c.Stream.Status, c.Stream.Title = stream.Upcoming, "【Schedule】Click here to see schedule!"
 			return c
 		}(), relay.KindTL, true,
-			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope](<https://youtu.be/vid>) · 【Schedule】Click here to see schedule!"),
-		Entry("a waiting room's long title, cut short", func() *relay.Comment {
-			c := comment("[EN] soon")
-			c.Stream.Status, c.Stream.Title = stream.Upcoming, strings.Repeat("あ", 60)
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n-# [Mori Calliope](<https://youtu.be/vid>) · 【Schedule】Click here to see schedule!"),
+		Entry("a live stream's whole title, escaped", func() *relay.Comment {
+			c := comment("[EN] hi")
+			c.Stream.Title = "How Long Dis *Damn* Game【BALAN WONDERWORLD】 and a title long enough to need more than fifty"
 			return c
 		}(), relay.KindTL, true,
-			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Mori Calliope](<https://youtu.be/vid>) · "+strings.Repeat("あ", 49)+"…"),
+			"💬 ||@viewer:|| `[EN] hi`\n-# [Mori Calliope](<https://youtu.be/vid>) · How Long Dis \\*Damn\\* Game【BALAN WONDERWORLD】 and a title long enough to need more than fifty"),
 		Entry("emojis, kept out of the link", func() *relay.Comment {
 			c := comment("[EN] soon")
 			c.Host = nil
@@ -72,12 +72,12 @@ var _ = Describe("Formatter", func() {
 			c.Stream.Status, c.Stream.Title = stream.Upcoming, "I HAVE RETURNED FROM THE PHILIPPINES 🇵🇭‼️LET'S YAP"
 			return c
 		}(), relay.KindTL, true,
-			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n**Chat:** [Banzoin Hakka](<https://youtu.be/vid>) · I HAVE RETURNED FROM THE PHILIPPINES 🇵🇭‼️LET'S YAP"),
+			"<:pre:2> 💬 ||@viewer:|| `[EN] soon`\n-# [Banzoin Hakka](<https://youtu.be/vid>) · I HAVE RETURNED FROM THE PHILIPPINES 🇵🇭‼️LET'S YAP"),
 		Entry("a channel the registry doesn't know", func() *relay.Comment {
 			c := comment("[EN] hi")
 			c.Host = nil
 			return c
-		}(), relay.KindTL, true, "💬 ||@viewer:|| `[EN] hi`\n**Chat:** [Mori Calliope Ch.](<https://youtu.be/vid>)"),
+		}(), relay.KindTL, true, "💬 ||@viewer:|| `[EN] hi`\n-# [Mori Calliope Ch.](<https://youtu.be/vid>)"),
 	)
 
 	It("formats cameos and gossip", func() {
@@ -90,7 +90,7 @@ var _ = Describe("Formatter", func() {
 	It("keeps long lines under Discord's limit", func() {
 		line := f.Relay(comment(strings.Repeat("あ", 2000)), relay.KindTL, true, "")
 		Expect(len(line)).To(BeNumerically("<", 2000))
-		Expect(line).To(ContainSubstring("あ…`\n**Chat:**"))
+		Expect(line).To(ContainSubstring("あ…`\n-# "))
 	})
 })
 
