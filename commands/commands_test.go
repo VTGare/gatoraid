@@ -273,6 +273,27 @@ var _ = Describe("/owner streamers", func() {
 		Expect(st.Aliases).To(Equal([]string{"newbie", "NB"}))
 	})
 
+	It("takes a Twitch username or link and refuses bad or taken ones", func() {
+		data := ownerRun("add", dt.String("channel", "UCaaaaaaaaaaaaaaaaaaaaaa"), dt.String("name", "New Indie"),
+			dt.String("twitch", "https://www.twitch.tv/New_Indie/videos"))
+		Expect(data["content"]).To(Equal("Added New Indie."))
+		Expect(fmt.Sprint(embed(data)["fields"])).To(ContainSubstring("[new_indie](https://www.twitch.tv/new_indie)"))
+
+		st, ok := reg.TwitchStreamer("new_indie")
+		Expect(ok).To(BeTrue())
+		Expect(st.ChannelID).To(Equal("UCaaaaaaaaaaaaaaaaaaaaaa"))
+
+		Expect(ownerRun("edit", dt.String("streamer", "calli"), dt.String("twitch", "not a username"))["content"]).
+			To(ContainSubstring("isn't a Twitch username"))
+		Expect(ownerRun("edit", dt.String("streamer", "calli"), dt.String("twitch", "new_indie"))["content"]).
+			To(ContainSubstring("New Indie already has that Twitch username"))
+
+		Expect(ownerRun("edit", dt.String("streamer", "New Indie"), dt.String("twitch", "-"))["content"]).
+			To(Equal("Updated New Indie."))
+		_, ok = reg.TwitchStreamer("new_indie")
+		Expect(ok).To(BeFalse())
+	})
+
 	It("refuses duplicates and bad channels", func() {
 		Expect(ownerRun("add", dt.String("channel", "UCL_qhgtOy0dy1Agp8vkySQg"), dt.String("name", "x"))["content"]).
 			To(ContainSubstring("Mori Calliope is already in the registry"))

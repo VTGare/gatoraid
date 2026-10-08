@@ -63,7 +63,7 @@ var _ = Describe("Channels outside the registry", func() {
 		hdx := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch strings.TrimPrefix(r.URL.Path, "/channels/") {
 			case tracked:
-				_, _ = w.Write([]byte(`{"id":"` + tracked + `","name":"Tracked Ch.","english_name":"Tracked","twitter":"tracked"}`))
+				_, _ = w.Write([]byte(`{"id":"` + tracked + `","name":"Tracked Ch.","english_name":"Tracked","twitter":"tracked","twitch":"Tracked_TV"}`))
 			case tracked2:
 				_, _ = w.Write([]byte(`{"id":"` + tracked2 + `","name":"Second Ch."}`))
 			case inactive:
@@ -103,6 +103,7 @@ var _ = Describe("Channels outside the registry", func() {
 		Expect(st.AddedByGuild).To(Equal(testGuild))
 		Expect(st.ChannelName).To(Equal("Tracked Ch."))
 		Expect(st.Twitter).To(Equal("tracked"))
+		Expect(st.Twitch).To(Equal("tracked_tv"))
 		Expect(h.b.Streamers.ChannelIDs()).To(ContainElement(tracked))
 		Expect(h.b.Subs.Match(store.FeatureRelay, tracked)).To(HaveLen(1))
 
@@ -128,7 +129,7 @@ var _ = Describe("Channels outside the registry", func() {
 		h.b.Config.Limits.UserChannels = 1
 
 		Expect(add("relay", "", "@tracked")).To(HavePrefix("Now relaying"))
-		Expect(add("notify", "youtube", "@tracked")).To(HavePrefix("Now posting live notifications"))
+		Expect(add("notify", "youtube", "@tracked")).To(HavePrefix("Now posting YouTube live notifications"))
 		Expect(add("relay", "", "@tracked2")).To(ContainSubstring("reached its limit for channels from outside the streamer list (1)"))
 	})
 

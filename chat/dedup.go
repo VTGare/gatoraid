@@ -31,7 +31,7 @@ func (d *deduper) first(c *Comment) bool {
 		return true
 	}
 
-	key := c.AuthorChannelID + "\x00" + normalize(c.Text)
+	key := c.AuthorChannelID + "\x00" + Normalize(c.Text)
 	now := d.now()
 
 	d.mu.Lock()
@@ -52,9 +52,10 @@ func (d *deduper) first(c *Comment) bool {
 
 var emojiOrURL = regexp.MustCompile(`:[^\s:]+:|https?://\S+`)
 
-// The sources write emojis differently, so emoji shortcodes and image URLs
+// Normalize keeps what two copies of a line from different sources have in
+// common. They write emojis differently, so emoji shortcodes and image URLs
 // are dropped and only letters and digits count.
-func normalize(s string) string {
+func Normalize(s string) string {
 	var sb strings.Builder
 	for _, r := range strings.ToLower(emojiOrURL.ReplaceAllString(s, "")) {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {

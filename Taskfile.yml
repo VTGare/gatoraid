@@ -36,9 +36,9 @@ tasks:
       - go test -race -timeout {{.TEST_TIMEOUT}} {{.CLI_ARGS | default "./..."}}
 
   test:live:
-    desc: Test against Holodex, YouTube and DeepL (keys from .env; tests without their key are skipped)
+    desc: Test against Holodex, YouTube, Twitch and DeepL (keys from .env; tests without their key are skipped)
     cmds:
-      - go test -v -tags live -count=1 -timeout 5m ./holodex/... ./stream/... ./youtube/... ./chat/... ./translate/... -args -ginkgo.v {{.CLI_ARGS}}
+      - go test -v -tags live -count=1 -timeout 5m ./holodex/... ./stream/... ./youtube/... ./chat/... ./translate/... ./twitch/... -args -ginkgo.v {{.CLI_ARGS}}
 
   cover:
     desc: Run the tests with coverage and print a per-function summary

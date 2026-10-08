@@ -72,6 +72,7 @@ var _ = Describe("Subscriptions", func() {
 			sub("g1", store.FeatureRelay, holoEN, "c1"),
 			sub("g1", store.FeatureRelay, store.Target{Kind: store.TargetAll}, "c1"),
 			sub("g1", store.FeatureCameos, calli, "c1"),
+			sub("g1", store.FeatureTwitch, calli, "c1"),
 			sub("g2", store.FeatureRelay, calli, "c1"),
 		} {
 			created, err := db.AddSubscription(ctx, s)
@@ -97,7 +98,7 @@ var _ = Describe("Subscriptions", func() {
 
 		all, err := db.Subscriptions(ctx)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(all).To(HaveLen(3))
+		Expect(all).To(HaveLen(4))
 	})
 
 	It("lists only guilds the bot is in and drops them with the guild", func() {

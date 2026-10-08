@@ -10,7 +10,7 @@ import (
 	"github.com/VTGare/gatoraid/store"
 )
 
-const streamerColumns = `channel_id, name, channel_name, group_id, twitter, aliases, avatar_url,
+const streamerColumns = `channel_id, name, channel_name, group_id, twitter, twitch, aliases, avatar_url,
 	free_chat_streams, source, added_by_guild, updated_at, removed_at`
 
 func (s *Store) StreamerGroups(ctx context.Context) ([]store.Group, error) {
@@ -116,10 +116,10 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 			switch {
 			case !exists:
 				if _, err := tx.ExecContext(ctx, `
-					INSERT INTO streamers (channel_id, name, channel_name, group_id, twitter, aliases,
+					INSERT INTO streamers (channel_id, name, channel_name, group_id, twitter, twitch, aliases,
 						free_chat_streams, source, updated_at)
-					VALUES (?, ?, ?, ?, ?, ?, ?, 'seed', ?)`,
-					st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter,
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'seed', ?)`,
+					st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, st.Twitch,
 					string(aliases), st.FreeChatStreams, now); err != nil {
 					return err
 				}
@@ -130,8 +130,8 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 				r, err := tx.ExecContext(ctx, `
 					UPDATE streamers SET source = 'seed', added_by_guild = NULL, removed_at = NULL, updated_at = ?
 					WHERE channel_id = ? AND name IS ? AND channel_name IS ? AND group_id IS ? AND twitter IS ?
-						AND aliases IS ? AND free_chat_streams IS ?`,
-					now, st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter,
+						AND twitch IS ? AND aliases IS ? AND free_chat_streams IS ?`,
+					now, st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, st.Twitch,
 					string(aliases), st.FreeChatStreams)
 				if err != nil {
 					return err
@@ -144,13 +144,14 @@ func (s *Store) SyncSeed(ctx context.Context, groups []store.Group, streamers []
 			default:
 				// Avatars come from Holodex, so the seed doesn't touch them.
 				r, err := tx.ExecContext(ctx, `
-					UPDATE streamers SET name = ?, channel_name = ?, group_id = ?, twitter = ?, aliases = ?,
+					UPDATE streamers SET name = ?, channel_name = ?, group_id = ?, twitter = ?, twitch = ?, aliases = ?,
 						free_chat_streams = ?, source = 'seed', added_by_guild = NULL, removed_at = NULL, updated_at = ?
 					WHERE channel_id = ? AND (name IS NOT ? OR channel_name IS NOT ? OR group_id IS NOT ?
-						OR twitter IS NOT ? OR aliases IS NOT ? OR free_chat_streams IS NOT ? OR source IS NOT 'seed'
-						OR removed_at IS NOT NULL)`,
-					st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, string(aliases), st.FreeChatStreams, now,
-					st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, string(aliases), st.FreeChatStreams)
+						OR twitter IS NOT ? OR twitch IS NOT ? OR aliases IS NOT ? OR free_chat_streams IS NOT ?
+						OR source IS NOT 'seed' OR removed_at IS NOT NULL)`,
+					st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, st.Twitch, string(aliases), st.FreeChatStreams, now,
+					st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, st.Twitch, string(aliases),
+					st.FreeChatStreams)
 				if err != nil {
 					return err
 				}
@@ -183,20 +184,21 @@ func (s *Store) SaveStreamer(ctx context.Context, st store.Streamer) error {
 
 	_, err = s.write.ExecContext(ctx, `
 		INSERT INTO streamers (`+streamerColumns+`)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
 		ON CONFLICT (channel_id) DO UPDATE SET
 			removed_at = NULL,
 			name = excluded.name,
 			channel_name = excluded.channel_name,
 			group_id = excluded.group_id,
 			twitter = excluded.twitter,
+			twitch = excluded.twitch,
 			aliases = excluded.aliases,
 			avatar_url = excluded.avatar_url,
 			free_chat_streams = excluded.free_chat_streams,
 			source = excluded.source,
 			added_by_guild = excluded.added_by_guild,
 			updated_at = excluded.updated_at`,
-		st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, string(aliases), st.AvatarURL,
+		st.ChannelID, st.Name, st.ChannelName, nullString(st.GroupID), st.Twitter, st.Twitch, string(aliases), st.AvatarURL,
 		st.FreeChatStreams, string(st.Source), nullString(st.AddedByGuild), time.Now().UnixMilli())
 
 	return err
@@ -301,7 +303,7 @@ func scanStreamer(row scanner) (*store.Streamer, error) {
 		removedAt      sql.NullInt64
 	)
 
-	err := row.Scan(&st.ChannelID, &st.Name, &st.ChannelName, &group, &st.Twitter, &aliases, &st.AvatarURL,
+	err := row.Scan(&st.ChannelID, &st.Name, &st.ChannelName, &group, &st.Twitter, &st.Twitch, &aliases, &st.AvatarURL,
 		&st.FreeChatStreams, &source, &addedBy, &updatedAt, &removedAt)
 	if err != nil {
 		return nil, err

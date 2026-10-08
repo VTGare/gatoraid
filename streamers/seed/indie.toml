@@ -17,6 +17,7 @@ name = "Luto Araka"
 channel_id = "UCnYhIk9aGEx_bIgheVjs53w"
 channel_name = "Luto Araka / 新火ると [PRISM Project]"
 twitter = "LutoAraka"
+twitch = "luto_araka"
 aliases = ["Araka", "Luto"]
 
 [[streamer]]
@@ -31,6 +32,7 @@ name = "Jun Akane"
 channel_id = "UCuTNHY_b7EvqhRO7COboxsQ"
 channel_name = "Jun Akane / 赤金ジュン [PRISM Project]"
 twitter = "akanejun_"
+twitch = "akanejun_"
 aliases = ["Akane", "Jun"]
 
 [[streamer]]
@@ -45,6 +47,7 @@ name = "Nana Asteria"
 channel_id = "UCJwnGUjoniJA3It-P2snc-A"
 channel_name = "Nana Asteria Ch. アステリアなな [PRISM Project]"
 twitter = "NanaAsteria"
+twitch = "nanaasteria"
 aliases = ["Asteria", "Nana"]
 
 [[streamer]]
@@ -59,6 +62,7 @@ name = "kson"
 channel_id = "UC9ruVYPv7yJmV0Rh0NKA-Lw"
 channel_name = "kson ONAIR"
 twitter = "ksonONAIR"
+twitch = "ksonsouchou"
 aliases = ["kson ONAIR"]
 free_chat_streams = true
 
@@ -67,6 +71,7 @@ name = "Raki Kazuki"
 channel_id = "UCtuoyOZhnxJ12pE294FdH8Q"
 channel_name = "Raki Kazuki Ch.【PixelLink】"
 twitter = "RakiKazuki"
+twitch = "rakikazuki"
 aliases = ["Raki", "Kazuki"]
 
 [[streamer]]
@@ -74,6 +79,7 @@ name = "Iida Pochi"
 channel_id = "UC22BVlBsZc6ta3Dqz75NU6Q"
 channel_name = "Iida Pochi."
 twitter = "lizhi3"
+twitch = "iida_pochi"
 aliases = ["Pochi", "Iida"]
 
 [[streamer]]
@@ -88,6 +94,7 @@ name = "Mikeneko"
 channel_id = "UC54JqsuIbMw_d1Ieb4hjKoQ"
 channel_name = "みけねこch"
 twitter = "95rn16"
+twitch = "nekoko88"
 aliases = ["みけねこ"]
 
 [[streamer]]
@@ -101,6 +108,7 @@ name = "Kou Mariya"
 channel_id = "UCqyL0oB2jl-5GpSg-GWZ_gw"
 channel_name = "Kou Mariya Ch.【V4Mirai】"
 twitter = "koumariya"
+twitch = "mariya"
 aliases = ["Kou"]
 
 [[streamer]]
@@ -115,6 +123,7 @@ name = "Nikki Rei"
 channel_id = "UCBnmfjpmhGxao6v54fIIMUA"
 channel_name = "Nikki Rei Ch. idol"
 twitter = "nikki_rei_idol"
+twitch = "nikkireivtuber"
 aliases = ["Nikki", "Rei"]
 
 [[streamer]]
@@ -122,6 +131,7 @@ name = "Juna Unagi"
 channel_id = "UCTFCSCPvqjXEs3zq91aeOVg"
 channel_name = "Juna Unagi Ch. idol-EN"
 twitter = "JunaUnagi"
+twitch = "junaunagi"
 aliases = ["Juna", "Unagi"]
 
 [[streamer]]
@@ -129,6 +139,7 @@ name = "Fuyo Cloverfield"
 channel_id = "UC8zgKaS8LiyL28mdhRC2nBg"
 channel_name = "Fuyo Cloverfield Ch. idol-EN"
 twitter = "FuyoCloverfield"
+twitch = "fuyocloverfield"
 aliases = ["Fuyo", "Cloverfield"]
 
 [[streamer]]
@@ -136,6 +147,7 @@ name = "Meica05"
 channel_id = "UCp4G83RMBDN0EgZFSUDK7zw"
 channel_name = "Meica05 Ch. idol-ES"
 twitter = "Meica05"
+twitch = "meica05"
 aliases = ["Meica"]
 
 [[streamer]]
@@ -143,6 +155,7 @@ name = "Chikafuji Lisa"
 channel_id = "UCdureux7B_V-xhM7tYImASQ"
 channel_name = "Chikafuji Lisa Ch. idol-EN"
 twitter = "ChikafujiLisa"
+twitch = "chikafujilisa"
 aliases = ["Chikafuji", "Lisa"]
 
 [[streamer]]
@@ -214,6 +227,7 @@ name = "Daruma is god"
 channel_id = "UCRRKdB87Oj-FkqS4L9QQRiQ"
 channel_name = "だるまいずごっど"
 twitter = "darumaisgod"
+twitch = "darumaisgod"
 
 [[streamer]]
 name = "Mythia Batford"
@@ -225,6 +239,7 @@ twitter = "MythiaVTuber"
 name = "PrettyHerb"
 channel_id = "UCtCnnCUn9IDDQRU9_04JD3g"
 channel_name = "쁘허"
+twitch = "gjqm056"
 
 [[streamer]]
 name = "Yuuki Sakuna"
@@ -243,6 +258,7 @@ name = "GreatMoonAroma"
 channel_id = "UCWL_9MaaMy8ObTDPmVHemjA"
 channel_name = "GreatMoonAroma 대월향"
 twitter = "aroma_great"
+twitch = "greatmoonaroma"
 
 [[streamer]]
 name = "Suou Patra"
@@ -285,18 +301,21 @@ name = "Hanamiya Rica"
 channel_id = "UCz4jhqrCfthF8NnldZeK_rw"
 channel_name = "Rica Ch. / 花宮莉歌"
 twitter = "hanamiya_rica"
+twitch = "ricaaaas2"
 
 [[streamer]]
 name = "rachie Music"
 channel_id = "UCRbsmnDTHD9-4pEIuG7zYRw"
 channel_name = "rachie 🎀💌"
 twitter = "splendiferachie"
+twitch = "rachie"
 
 [[streamer]]
 name = "Marikyuun"
 channel_id = "UCNz4hh9wLzfB-vf8JZmVwSQ"
 channel_name = "Marikyuun"
 twitter = "marikyuunn"
+twitch = "marikyuun"
 
 [[streamer]]
 name = "Sakura Coromin"
@@ -309,12 +328,14 @@ name = "Kairyu Crocodile"
 channel_id = "UCSEkHiOVY56frY1RcEsUAvA"
 channel_name = "Kairyu Crocodile"
 twitter = "KairyuCrocodile"
+twitch = "kairyucrocodile"
 
 [[streamer]]
 name = "Punkalopi"
 channel_id = "UCZhgX5W2iLfUm2NfyD7BSvw"
 channel_name = "Punkalopi"
 twitter = "punkalopi"
+twitch = "punkalopi"
 
 [[streamer]]
 name = "Ito Life"
@@ -333,6 +354,7 @@ name = "Kotoha"
 channel_id = "UC3ql_EU4JnaE3Rh3cqbHu6g"
 channel_name = "Kotoha"
 twitter = "Kotoha_ktnh"
+twitch = "kotoha_hkll"
 
 [[streamer]]
 name = "Souta Izumi"
@@ -345,12 +367,14 @@ name = "Nerumero"
 channel_id = "UCiR6oBbZBlAuOLInDTMzYuw"
 channel_name = "ねるめろ / Nerumero"
 twitter = "nerumero_OwO"
+twitch = "nerumerotwitch"
 
 [[streamer]]
 name = "Utai Meika"
 channel_id = "UC7-N7MvN5muVIHqyQx9LFbA"
 channel_name = "メイカちゃんねる"
 twitter = "meikahaotoko"
+twitch = "utaimeika"
 
 [[streamer]]
 name = "Peanuts-kun"
@@ -363,12 +387,14 @@ name = "Kamito"
 channel_id = "UCgYCMluaLpERsyNXlPOvBtA"
 channel_name = "かみと-KamitoChannel-"
 twitter = "kamito_otaku"
+twitch = "kamito_jp"
 
 [[streamer]]
 name = "dooby"
 channel_id = "UC6T7TJZbW6nO-qsc5coo8Pg"
 channel_name = "dooby"
 twitter = "dooby3D"
+twitch = "dooby3d"
 
 [[streamer]]
 name = "KyOresu"
@@ -429,6 +455,7 @@ name = "Unnamed"
 channel_id = "UCrIs26bEKOvA_lRnO2Hgscw"
 channel_name = "Unnämed"
 twitter = "unnamednow00"
+twitch = "unnamednow00"
 
 [[streamer]]
 name = "Amau Syrup"
@@ -459,12 +486,14 @@ name = "Annin Miru"
 channel_id = "UCFahBR2wixu0xOex84bXFvg"
 channel_name = "Annin Miru Channel"
 twitter = "AnninMirudayo"
+twitch = "anninmiru_"
 
 [[streamer]]
 name = "Nene Amano"
 channel_id = "UCu1INzefw3R7M9-3QEHYmMQ"
 channel_name = "Nene Amano Ch. 天野寧々"
 twitter = "NeneAmanoVTuber"
+twitch = "amano_nene"
 
 [[streamer]]
 name = "Kirschtorte"
@@ -477,6 +506,7 @@ name = "Kitsui Akira"
 channel_id = "UCcpgDsHDYHO1UyfpwjyNx1g"
 channel_name = "Kiichan Ch. 狐井アキラ"
 twitter = "KitsuiAkira"
+twitch = "kiichan"
 
 [[streamer]]
 name = "Zakuro Shiro"
@@ -489,6 +519,7 @@ name = "Kagura Mea"
 channel_id = "UCWCc8tO-uUl_7SJXIKJACMw"
 channel_name = "神楽めあ / KaguraMea"
 twitter = "KaguraMea_VoV"
+twitch = "kagura0mea"
 
 [[streamer]]
 name = "Natori Sana"
@@ -519,12 +550,14 @@ name = "Soma Nahiro"
 channel_id = "UCftJR3Qm0LyEuEQue1QYytA"
 channel_name = "Nahiro Ch. 蒼真なひろ"
 twitter = "soma_nahiro"
+twitch = "somanahiro"
 
 [[streamer]]
 name = "Ruroro"
 channel_id = "UCRf7OJA3azS4RsGd_G96FUw"
 channel_name = "璐洛洛 Ruroro【人造人Vtuber】"
 twitter = "ruroroisme"
+twitch = "ruroroisme"
 
 [[streamer]]
 name = "Towano Kanae"
@@ -555,6 +588,7 @@ name = "uruca"
 channel_id = "UChrTMfNcD1eN2ENGWBD7lUQ"
 channel_name = "Uruca ch /うるか"
 twitter = "ow_uruca"
+twitch = "ow_uruca"
 
 [[streamer]]
 name = "Hebi."
@@ -573,6 +607,7 @@ name = "Yubari Rei"
 channel_id = "UCnn1Pb_JtyHbiDTELf7mgSA"
 channel_name = "Rei Ch. 悠針れい"
 twitter = "yubarirei"
+twitch = "yubarirei"
 
 [[streamer]]
 name = "Marika"
@@ -597,12 +632,14 @@ name = "Tenjin Kotone"
 channel_id = "UCAr7rLi_Wn09G-XfTA07d4g"
 channel_name = "天神 子兎音 Tenjin Kotone"
 twitter = "kotonegami"
+twitch = "kotonetenjin"
 
 [[streamer]]
 name = "Kitune-san"
 channel_id = "UCrKD8cwv_Wrpx22SO-VeWAQ"
 channel_name = "きつねさん / Kitune-san"
 twitter = "tebukuro_55"
+twitch = "kitune_san_dae"
 
 [[streamer]]
 name = "Kurageu Roa"
@@ -639,6 +676,7 @@ name = "kinako"
 channel_id = "UCrWkFUu3DK5XpYBUPDC5uLA"
 channel_name = "kinako"
 twitter = "kinako_pop"
+twitch = "kinapoppo"
 
 [[streamer]]
 name = "Kurokumo"
@@ -673,12 +711,14 @@ twitter = "naco_mochizuki"
 name = "MerryMa"
 channel_id = "UCxJVZE-A65Vdjg9J0XsGf6A"
 channel_name = "MerryMa 메리마"
+twitch = "merryma__"
 
 [[streamer]]
 name = "DELUTAYA"
 channel_id = "UC7YXqPO3eUnxbJ6rN0z2z1Q"
 channel_name = "DELUTAYA Δ."
 twitter = "mgmgoi4"
+twitch = "delutaya_ch"
 
 [[streamer]]
 name = "Mizuchima Komori"
@@ -727,6 +767,7 @@ name = "Amon Yuuku"
 channel_id = "UCxpmipyCaJ07EHwKlrIKHkA"
 channel_name = "鴉紋ゆうく / Amon Yuuku"
 twitter = "Amon_Yuuku"
+twitch = "amon_yuuku"
 
 [[streamer]]
 name = "Aitsuki Nakuru"
@@ -745,6 +786,7 @@ name = "Mina Aoyama"
 channel_id = "UCNPn2INOtplZRLl2-6dnJIA"
 channel_name = "Mina Aoyama Ch"
 twitter = "MinaAoyama"
+twitch = "minaaoyama"
 
 [[streamer]]
 name = "MonsterZ MATE"
@@ -757,6 +799,7 @@ name = "Takakura Muki"
 channel_id = "UCEYU-OEI9FnbeC5hna_cbhw"
 channel_name = "高倉むきASMR -Muki-"
 twitter = "takamukikurage"
+twitch = "takakuramukii"
 
 [[streamer]]
 name = "Azuma Lim"
@@ -781,6 +824,7 @@ name = "Kirara Mimi"
 channel_id = "UCfol9ZU2HpEajyBDj-EbiOQ"
 channel_name = "雲母ミミl KiraraMimi"
 twitter = "Kirara_Mimi"
+twitch = "kirara_mimi"
 
 [[streamer]]
 name = "RLuo"
@@ -817,6 +861,7 @@ name = "DipperDog"
 channel_id = "UC29M0uAc9KHk0zvKvEF5J9g"
 channel_name = "DipperDog"
 twitter = "DipperDogRPG"
+twitch = "dipperdog_rpg"
 
 [[streamer]]
 name = "Sakusan Canon"
@@ -835,18 +880,21 @@ name = "Nanami Mituboshi"
 channel_id = "UCO-n4ZDDXKPKK29c5eaytpA"
 channel_name = "三星ナナミ / Nanami Mituboshi Ch."
 twitter = "nanamin_777"
+twitch = "nanamin_777"
 
 [[streamer]]
 name = "FH_Molissa"
 channel_id = "UCq5LQH-bD0Q3ZRhlclBAmqg"
 channel_name = "魔哩煞"
 twitter = "FHMolissa"
+twitch = "fh_molissa"
 
 [[streamer]]
 name = "Tsukimachi Nyamo"
 channel_id = "UCeFvaOWKmS0T-rSQEcfZNog"
 channel_name = "月待にゃも"
 twitter = "TukimachiNyamo"
+twitch = "tsukimachinyamo"
 
 [[streamer]]
 name = "Suwako Nao"
@@ -882,12 +930,14 @@ name = "Marie☆FD"
 channel_id = "UCaIcWouDRr_y5MJxiaNMGAA"
 channel_name = "Marie☆FD"
 twitter = "MariieFD"
+twitch = "mariefd"
 
 [[streamer]]
 name = "Tomoe Umari"
 channel_id = "UCDoH-Xv1K-9U3frP6uzuXAA"
 channel_name = "Tomoe Umari Ch."
 twitter = "UmariTomoe"
+twitch = "tomoeumari"
 
 [[streamer]]
 name = "Inuzuka Ichigo"
@@ -918,12 +968,14 @@ name = "Hiiragi Yuka"
 channel_id = "UCdvq5i3RyRsoTqITD1xSxNw"
 channel_name = "柊 優花"
 twitter = "hiiragi_yuka530"
+twitch = "hiiragiyukaofficial"
 
 [[streamer]]
 name = "Yofukashi Ridel"
 channel_id = "UCpwEuBTZQ8VFHuZa4ZcSsyg"
 channel_name = "Ridel.🐰🎤Vsinger"
 twitter = "Ridel2022"
+twitch = "ridel0609"
 
 [[streamer]]
 name = "Kanbutsu Himono"
@@ -966,6 +1018,7 @@ name = "RiiKami"
 channel_id = "UCk2q8NckMStR4uIK5hrDC4g"
 channel_name = "Riikami Ch."
 twitter = "RiiKami"
+twitch = "riikamivt"
 
 [[streamer]]
 name = "Kasukabe Tsukushi"
@@ -990,6 +1043,7 @@ name = "Tabasuko"
 channel_id = "UCXe8hqIk_Yap31y7EOCMdzg"
 channel_name = "Tabasuko Ch. 塔芭絲可"
 twitter = "mirotabasco"
+twitch = "mirolivetabasuko88"
 
 [[streamer]]
 name = "Hanaka Kotone"
@@ -1020,6 +1074,7 @@ name = "Shitagai Nora"
 channel_id = "UCQYy35PowPpc6ImRH1TQgcw"
 channel_name = "Nora Ch. 従井ノラ"
 twitter = "norashitagai"
+twitch = "norashitagai"
 
 [[streamer]]
 name = "Momokawa Nijimasu"
@@ -1032,6 +1087,7 @@ name = "Kurune Kokuri"
 channel_id = "UC2rIXE0D3Vb8kS48DQrW-Jg"
 channel_name = "Kokuri's ASMR ch.来音こくり"
 twitter = "kokuri_kurune"
+twitch = "kurunekokuri"
 
 [[streamer]]
 name = "MaiR"
@@ -1086,6 +1142,7 @@ name = "Hinokuma Ran"
 channel_id = "UCRvpMpzAXBRKJQuk-8-Sdvg"
 channel_name = "Ran Channel / 日ノ隈らん"
 twitter = "Ran_Hinokuma"
+twitch = "ran_hinokuma"
 
 [[streamer]]
 name = "Usatama Amyu"
@@ -1104,6 +1161,7 @@ name = "Hakuno Imasaka"
 channel_id = "UCuJpyIPTENcIMpdqGYCU6WA"
 channel_name = "Hakuno Imasaka"
 twitter = "hakuno_imasaka"
+twitch = "hakuno_imasaka"
 
 [[streamer]]
 name = "Minaton."
@@ -1128,6 +1186,7 @@ name = "Virtual Gorilla Games"
 channel_id = "UCjtEttSHpJacfd7a6fc4VXQ"
 channel_name = "バーチャルゴリラGAMES"
 twitter = "Gorilla_Virtual"
+twitch = "virtualgorilla55"
 
 [[streamer]]
 name = "mei garden"
@@ -1164,12 +1223,14 @@ name = "Aoi Hinamori"
 channel_id = "UCJSBNjYCB1pu_t0FajsY17g"
 channel_name = "Aoi Hinamori Ch."
 twitter = "AoiHinamori"
+twitch = "aoihinamori"
 
 [[streamer]]
 name = "Kuramochi Kyoko"
 channel_id = "UCfeznQrLe9URem6xJmWQVlw"
 channel_name = "Kyoko Ch. 倉持京子【あみゅどる】"
 twitter = "kuramochikyoko"
+twitch = "kyouko_kuramochi"
 
 [[streamer]]
 name = "Kohaku Nene"
@@ -1296,6 +1357,7 @@ name = "Morino Merun"
 channel_id = "UCDjutWNYx0gRgrnTLHYWgtA"
 channel_name = "Merun Ch. 森野めるん"
 twitter = "MerunMorino"
+twitch = "merunmorino"
 
 [[streamer]]
 name = "Deidey"
@@ -1314,6 +1376,7 @@ name = "Kuromu"
 channel_id = "UC2ZWggon1NOT2TGaVUMzY7A"
 channel_name = "庫洛姆•Kuromu"
 twitter = "KuromuOno"
+twitch = "kuromu_oxo"
 
 [[streamer]]
 name = "Cosmo Kamizuru"
@@ -1326,6 +1389,7 @@ name = "Tsukimi Tsuki"
 channel_id = "UC-Jg7D3KSMxGDaIrV-PiWHQ"
 channel_name = "月深ツキ -Tsukimi Tsuki-"
 twitter = "tsukimi_tsuki_"
+twitch = "tsukimi_tsuki"
 
 [[streamer]]
 name = "Hitsujimusume Meme"
@@ -1338,6 +1402,7 @@ name = "Bonnie Barkswell"
 channel_id = "UCqw3pdPEKKVOI7SFXomyKLA"
 channel_name = "Bonnie Barkswell"
 twitter = "BonnieBarkswell"
+twitch = "bonniebarkswell"
 
 [[streamer]]
 name = "Weatheroid Airi"
@@ -1374,18 +1439,21 @@ name = "Aruka"
 channel_id = "UCTUYzaLYcTnKCsw1lHX2YzQ"
 channel_name = "Aruka Ch. あるか"
 twitter = "ark03_"
+twitch = "arukach"
 
 [[streamer]]
 name = "Yukinoshita Peo"
 channel_id = "UChTI-WraqcTbKuSiG6zVQcw"
 channel_name = "Peo Ch. 雪乃下ぴお"
 twitter = "yukinoshitapeo"
+twitch = "yukinoshita_peo"
 
 [[streamer]]
 name = "Eileennoir"
 channel_id = "UCw64ItsCX0Cb4lCjb68oTpw"
 channel_name = "Eileennoir Ch."
 twitter = "Eileennoir"
+twitch = "eileennoir"
 
 [[streamer]]
 name = "Fuzuki Miki"
@@ -1398,6 +1466,7 @@ name = "Ashton Marten"
 channel_id = "UCx83BsemwWrkkbar8JNbnrQ"
 channel_name = "Ashton Marten Ch."
 twitter = "furraridriver"
+twitch = "ashtonmarten"
 
 
 # Atelier Live
@@ -1407,6 +1476,7 @@ name = "Artemis of the Blue"
 channel_id = "UCWImOidHDmm0KK20bkF-rSQ"
 channel_name = "Artemis of the Blue Ch."
 twitter = "artemisvtuber"
+twitch = "artemisoftheblue"
 aliases = ["Artemis"]
 
 [[streamer]]
@@ -1414,6 +1484,7 @@ name = "Chaikitsu"
 channel_id = "UCeZsdcN25H3YmjXAKARorQA"
 channel_name = "yueko"
 twitter = "yueko__"
+twitch = "yueko"
 aliases = ["yueko"]
 
 [[streamer]]
@@ -1421,6 +1492,7 @@ name = "Europa Yuu"
 channel_id = "UC5Ejf_RIWMVDAjA4B-GV5Zg"
 channel_name = "Europa Yuu"
 twitter = "EuropaYuu"
+twitch = "europayuu"
 aliases = ["Europa", "Yuu"]
 
 [[streamer]]
@@ -1441,6 +1513,7 @@ name = "Rosuuri"
 channel_id = "UC-Z8ZmHmvv_5tinNQSDw0xg"
 channel_name = "Rosuuri"
 twitter = "Ganbarosuu"
+twitch = "rosuuri"
 
 [[streamer]]
 name = "Yamane Chiika"
@@ -1535,6 +1608,7 @@ name = "Non Anon"
 channel_id = "UCx_A6fns9qKjybu-6k0ur1g"
 channel_name = "Non Anon / 亜音ノン [PRISM Project]"
 twitter = "non_a_non"
+twitch = "notnonanon"
 aliases = ["Anon", "Non"]
 
 
@@ -1564,6 +1638,7 @@ name = "Vienna"
 channel_id = "UCN-UumTCLD7zVey1czA-75g"
 channel_name = "C9 Vienna"
 twitter = "viennavtuber"
+twitch = "vienna"
 aliases = ["C9 Vienna"]
 
 
@@ -1590,6 +1665,7 @@ aliases = ["Nyanners", "Nyan", "Nyatasha"]
 name = "Silvervale"
 channel_id = "UCm8Dj7dQ0oRHXNUXF31kjEw"
 twitter = "_Silvervale_"
+twitch = "silvervale"
 
 
 # REJECT
@@ -1599,6 +1675,7 @@ name = "dtto"
 channel_id = "UCWNVjAzZmYUni8YBXYiy01w"
 channel_name = "dtto."
 twitter = "_dtto_"
+twitch = "dttodot"
 aliases = ["dttodot", "ditto"]
 
 
@@ -1609,6 +1686,7 @@ name = "Shiki Miyoshino"
 channel_id = "UCswvd6_YWmd6riRk-8oT-sA"
 channel_name = "Shiki Miyoshino / 美吉野しき [PRISM Project]"
 twitter = "ShikiMiyoshino"
+twitch = "shikimiyoshino"
 aliases = ["Miyoshino", "Shiki"]
 
 [[streamer]]
@@ -1616,6 +1694,7 @@ name = "Nia Suzune"
 channel_id = "UCw1KNjVqfrJSfcFd6zlcSzA"
 channel_name = "Nia Suzune / 鈴音にあ [PRISM Project]"
 twitter = "NiaSuzune"
+twitch = "niasuzune"
 aliases = ["Suzune", "Nia"]
 
 [[streamer]]
@@ -1630,6 +1709,7 @@ name = "Pina Pengin"
 channel_id = "UCpeRj9-GaLGNUoKdI5I7vZA"
 channel_name = "Pina Pengin / 辺銀ピナ [PRISM Project]"
 twitter = "PinaPengin"
+twitch = "pinapengin"
 aliases = ["Pengin", "Pina"]
 
 
@@ -1639,6 +1719,7 @@ aliases = ["Pengin", "Pina"]
 name = "Zentreya"
 channel_id = "UCVLsPBwDtv7n7FZLiOsvhSQ"
 twitter = "zentreya"
+twitch = "zentreya"
 
 
 # The Wildcard Club
@@ -1647,11 +1728,13 @@ twitter = "zentreya"
 name = "ironmouse"
 channel_id = "UChgPVLjqugDQpRLWvC7zzig"
 twitter = "ironmouse"
+twitch = "ironmouse"
 
 [[streamer]]
 name = "Dokibird"
 channel_id = "UComInW10MkHJs-_vi4rHQCQ"
 twitter = "Dokibird"
+twitch = "dokibird"
 aliases = ["jkterjter"]
 
 [[streamer]]
@@ -1669,12 +1752,14 @@ name = "Projekt Melody"
 channel_id = "UC1yoRdFoFJaCY-AGfD9W0wQ"
 channel_name = "CDawgVA"
 twitter = "ProjektMelody"
+twitch = "projektmelody"
 aliases = ["Melody"]
 
 [[streamer]]
 name = "Haruka Karibu"
 channel_id = "UCsk_mKQyv_xdhahUBqoVhcg"
 twitter = "haruka_karibu"
+twitch = "harukakaribu"
 aliases = ["Haruka", "How To Car"]
 
 [[streamer]]
@@ -1682,12 +1767,14 @@ name = "Froot"
 channel_id = "UCtNeQ8cUwvAAhBbVbwfGWpg"
 channel_name = "Apricot the Lich"
 twitter = "LichVtuber"
+twitch = "apricot"
 aliases = ["Apricot the Lich"]
 
 [[streamer]]
 name = "GEEGA"
 channel_id = "UCUERxnZSjCq-G7OfYL7Nukg"
 twitter = "GeneralGEEGA"
+twitch = "geega"
 aliases = ["General GEEGA"]
 
 [[streamer]]
@@ -1726,6 +1813,7 @@ name = "Bao"
 channel_id = "UCZQ7nZ8Lc7pslBN0gN1Jg0w"
 channel_name = "Bao The Whale"
 twitter = "baovtuber"
+twitch = "bao"
 aliases = ["Bao The Whale"]
 
 [[streamer]]

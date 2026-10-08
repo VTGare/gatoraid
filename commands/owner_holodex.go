@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cmp"
 	"fmt"
 	"strings"
 
@@ -98,20 +99,24 @@ func ownerStreamerSync(b *bot.Bot) *gumi.Command {
 				return gumi.Errorf("Holodex has no channels in %q. Org names are case-sensitive, like Hololive or Independents.", org)
 			}
 
-			var inactive []*store.Streamer
-			var missing []*store.Streamer
+			var inactive, missing []*store.Streamer
+			var twitchDiffs []string
 			for _, ch := range channels {
 				st, known := b.Streamers.Streamer(ch.ID)
 				switch {
 				case known && ch.Inactive:
 					inactive = append(inactive, st)
+				case known && holodexTwitch(&ch) != "" && holodexTwitch(&ch) != st.Twitch:
+					twitchDiffs = append(twitchDiffs, fmt.Sprintf("- %s: %s on Holodex, %s here",
+						st.Name, inlineCode(holodexTwitch(&ch)), inlineCode(cmp.Or(st.Twitch, "none"))))
 				case !known && !ch.Inactive:
 					name := ch.EnglishName
 					if name == "" {
 						name = ch.Name
 					}
 					missing = append(missing, &store.Streamer{
-						ChannelID: ch.ID, Name: name, ChannelName: ch.Name, Twitter: ch.Twitter, GroupID: groupID,
+						ChannelID: ch.ID, Name: name, ChannelName: ch.Name, Twitter: ch.Twitter, Twitch: holodexTwitch(&ch),
+						GroupID: groupID,
 					})
 				}
 			}
@@ -125,6 +130,11 @@ func ownerStreamerSync(b *bot.Bot) *gumi.Command {
 				for _, st := range inactive {
 					fmt.Fprintf(&report, "- %s (`%s`)\n", st.Name, st.ChannelID)
 				}
+			}
+
+			if len(twitchDiffs) > 0 {
+				report.WriteString("\nTwitch usernames that differ from Holodex:\n")
+				report.WriteString(strings.Join(twitchDiffs, "\n") + "\n")
 			}
 
 			resp := &gumi.Response{Content: report.String()}

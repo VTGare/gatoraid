@@ -52,6 +52,34 @@ var _ = Describe("Streamers", func() {
 		Expect(st.Curated()).To(BeTrue())
 	})
 
+	It("saves Twitch usernames and syncs changes to them", func() {
+		withTwitch := ame
+		withTwitch.Twitch = "watsonamelia"
+		_, err := db.SyncSeed(ctx, groups, []store.Streamer{withTwitch})
+		Expect(err).NotTo(HaveOccurred())
+
+		st, err := db.Streamer(ctx, "UCame")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.Twitch).To(Equal("watsonamelia"))
+
+		withTwitch.Twitch = "amelia"
+		res, err := db.SyncSeed(ctx, groups, []store.Streamer{withTwitch})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res).To(Equal(store.SeedResult{Updated: 1}))
+
+		edited := withTwitch
+		edited.Twitch = ""
+		edited.Source = store.SourceOwner
+		Expect(db.SaveStreamer(ctx, edited)).To(Succeed())
+		res, err = db.SyncSeed(ctx, groups, []store.Streamer{withTwitch})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res).To(Equal(store.SeedResult{Kept: 1}))
+
+		st, err = db.Streamer(ctx, "UCame")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(st.Twitch).To(BeEmpty())
+	})
+
 	It("only counts real changes as updates on later syncs", func() {
 		_, err := db.SyncSeed(ctx, groups, []store.Streamer{ame, kiara})
 		Expect(err).NotTo(HaveOccurred())

@@ -1,18 +1,21 @@
 # GatorAid
 
-A Discord bot for VTuber fans. It relays YouTube live chat into Discord channels (translations,
-the streamer's own messages, other VTubers and moderators) and announces streams and community
-posts.
+A Discord bot for VTuber fans. It relays YouTube and Twitch live chat into Discord channels
+(translations, the streamer's own messages, other VTubers and moderators) and announces streams and
+community posts.
 
 - **Relays** follow a streamer, a whole group like Hololive EN, or everyone. Relaying starts when
-  the waiting room opens and posts a notice that can ping a role.
+  the waiting room opens and posts a notice that can ping a role. Streamers with a Twitch channel
+  in the list are relayed from Twitch too, unless a server turns that off in `/settings`. When
+  they stream on both at once, their own lines are only posted once. Well-known Twitch chat bots
+  like StreamElements and Nightbot are moderators in most channels, so their lines are skipped.
 - **Cameos** post what a VTuber says in other streamers' chats. **Gossip** posts lines elsewhere
   that mention them.
 - **Translation**: streamer and VTuber lines get a DeepL translation into the server's language.
 - **Logs**: when a stream ends, its relayed lines are posted as a text file. `/log` fetches one
   later.
-- **Notifications** for streams going live and for new community posts.
-- **Moderation**: a blacklist of YouTube channels and filters for banned words and translation
+- **Notifications** for streams going live on YouTube or Twitch and for new community posts.
+- **Moderation**: a blacklist of chatters and filters for banned words and translation
   prefixes.
 
 Any YouTube channel that [Holodex](https://holodex.net) tracks can be relayed, not just the
@@ -23,8 +26,8 @@ curated streamer list. See [Channels outside the streamer list](#channels-outsid
 | Command | Who | What |
 |---|---|---|
 | `/relay`, `/cameos`, `/gossip` | Managers | `add`, `remove`, `clear`, `list` |
-| `/notify youtube`, `/notify posts` | Managers | Live and community post notifications, same subcommands |
-| `/settings` | Anyone can look, Managers change | Relay options, translation language, log channel, members-only and free chat handling, bot roles |
+| `/notify youtube`, `/notify twitch`, `/notify posts` | Managers | YouTube and Twitch live notifications, and community post notifications, same subcommands |
+| `/settings` | Anyone can look, Managers change | Relay options, translation language, log channel, members-only, free chat and Twitch handling, bot roles |
 | `/blacklist`, "Blacklist author" (message menu) | Blacklisters | Stop relaying someone in this server |
 | `/filter` | Blacklisters | Banned words and wanted translation prefixes |
 | `/log <video>` | Everyone | A stream's relayed lines as a file |
@@ -37,7 +40,7 @@ role or a Manager role. Both roles are set in `/settings`. Administrators can al
 
 ### Channels outside the streamer list
 
-`/relay add`, `/notify youtube add` and `/notify posts add` also take a YouTube channel link, an
+`/relay add`, `/notify youtube add`, `/notify twitch add` and `/notify posts add` also take a YouTube channel link, an
 `@handle` or a `UC…` channel ID as the target:
 
 ```
@@ -45,7 +48,7 @@ role or a Manager role. Both roles are set in `/settings`. Administrators can al
 ```
 
 The bot looks the channel up and adds it to the streamer list for everyone, marked as added by a
-server. It has to be a channel Holodex tracks, since that's how the bot learns about streams, and
+server, with the Twitch channel Holodex has for it. It has to be a channel Holodex tracks, since that's how the bot learns about streams, and
 Holodex mustn't list it as inactive. The channel's owner can ask Holodex to add it at
 <https://holodex.net/addChannel>.
 
@@ -75,6 +78,10 @@ task run
   off. `/log`, community posts and the commands still work.
 - **A DeepL API key** (`GATORAID_DEEPL_API_KEY`) for translation. Optional. Free keys end in `:fx`
   and allow 500,000 characters a month.
+- **A Twitch application** (`GATORAID_TWITCH_CLIENT_ID` and `GATORAID_TWITCH_CLIENT_SECRET`) for
+  Twitch streams. Optional, and it needs the Holodex key too. Register one at
+  <https://dev.twitch.tv/console> as a confidential client; any OAuth redirect URL will do, since
+  the bot only signs in as the app. Twitch chat itself is read anonymously.
 
 Invite GatorAid to a server with this link:
 
@@ -113,6 +120,8 @@ option.
 | `GATORAID_HOLODEX_TLDEX` | `holodex.tldex` | `false` |
 | `GATORAID_DEEPL_API_KEY` | `deepl.api_key` | |
 | `GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET` | `deepl.monthly_character_budget` | `500000` |
+| `GATORAID_TWITCH_CLIENT_ID` | `twitch.client_id` | |
+| `GATORAID_TWITCH_CLIENT_SECRET` | `twitch.client_secret` | |
 | `GATORAID_LIMITS_USER_CHANNELS` | `limits.user_channels` | `25` |
 | `GATORAID_RELAY_PRECHAT_HOURS` | `relay.prechat_hours` | `24` |
 | `GATORAID_LOG_LEVEL` | `log.level` | `info` |
@@ -120,7 +129,8 @@ option.
 | `GATORAID_EMOJIS` | `emojis` | |
 
 `holodex.tldex` also reads Holodex's TLdex feed, which adds translations posted with MChad and
-the exact stream start times. `limits.user_channels` is how many channels from outside the
+the exact stream start times. `twitch` is checked every 30 seconds for which listed streamers are
+live on Twitch. `limits.user_channels` is how many channels from outside the
 streamer list each server can follow. Rooms further off than `relay.prechat_hours` are relayed quietly: their chat is read every 15 seconds, and the
 "relaying the waiting room" notice waits until the stream is that close. It must be at least `1`.
 
@@ -147,7 +157,7 @@ invited back.
 task            # list tasks
 task test       # tests, 60 s timeout
 task test:race  # with the race detector (slower first build)
-task test:live  # against Holodex, YouTube and DeepL; uses the keys in .env and skips what's missing
+task test:live  # against Holodex, YouTube, Twitch and DeepL; uses the keys in .env and skips what's missing
 task lint       # golangci-lint, pinned version
 task check      # format check, vet, lint, race tests
 task build      # static binary in out/bin/
@@ -165,7 +175,7 @@ go run ./cmd/chatwatch [-tldex] VIDEO_ID...
 cmd/gatoraid/         entry point
 cmd/chatwatch/        prints live chat as the bot reads it
 bot/                  Discord client, router wiring, guild lifecycle
-chat/                 one reader per stream, YouTube chat merged with TLdex
+chat/                 one reader per stream: YouTube chat merged with TLdex, or Twitch chat
 commands/             slash commands and the /settings panel
 relay/                which chats to read and where their lines go: rules, formatting, engine
 sender/               Discord send queue per channel
@@ -177,11 +187,13 @@ holodex/tldex/        Holodex's TLdex translation feed
 moderation/           in-memory blacklists and filters
 notify/               live stream and community post notifications
 perms/                who may manage the bot: Discord permissions or bot roles
-stream/               stream tracker: Holodex polls into live/prechat/ended events
+stream/               stream tracker: Holodex and Twitch polls into live/prechat/ended events
 internal/config/      env-first configuration
 internal/logging/     slog setup
 store/                persistence interfaces and models
 store/sqlite/         SQLite implementation and its migrations
+twitch/helix/         Twitch API client, for which channels are live
+twitch/irc/           anonymous Twitch chat reader
 streamers/            streamer registry; seed/ holds the curated list
 youtube/channel/      finds YouTube channels from links, @handles and IDs
 youtube/livechat/     YouTube live chat reader

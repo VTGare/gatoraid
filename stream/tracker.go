@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"maps"
 	"slices"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/VTGare/gatoraid/holodex"
+	"github.com/VTGare/gatoraid/twitch/helix"
 )
 
 const (
@@ -17,6 +21,13 @@ const (
 	// Upcoming rooms more than 6 hours past their scheduled start are
 	// usually abandoned, so they aren't relayed.
 	PrechatGrace = 6 * time.Hour
+
+	// Twitch sometimes leaves a live stream out of one response, so a
+	// stream only ends after this many polls in a row without it.
+	twitchMisses = 2
+
+	twitchThumbWidth  = 1280
+	twitchThumbHeight = 720
 )
 
 type EventKind int
@@ -42,12 +53,22 @@ type Source interface {
 	Video(ctx context.Context, id string) (*holodex.Video, error)
 }
 
+type TwitchSource interface {
+	Streams(ctx context.Context, usernames []string) ([]helix.Stream, error)
+}
+
 type Config struct {
 	Source Source
 	// Called before every poll, so newly added channels get picked up.
-	Channels   func() []string
-	Classifier Classifier
-	Interval   time.Duration
+	Channels func() []string
+	// Optional. Holodex lists Twitch streams minutes late, so they come
+	// from Twitch.
+	Twitch TwitchSource
+	// Twitch usernames to the YouTube channel IDs of their streamers. Called
+	// before every poll.
+	TwitchChannels func() map[string]string
+	Classifier     Classifier
+	Interval       time.Duration
 	// Upcoming streams further off than this are distant.
 	PrechatLead time.Duration
 	Log         *slog.Logger
@@ -59,6 +80,8 @@ type tracked struct {
 	Stream
 	prechatSent bool
 	nearSent    bool
+	// Twitch polls in a row the stream was missing from.
+	missed int
 }
 
 // On startup the tracker reports everything that's already live or
@@ -120,6 +143,9 @@ func (t *Tracker) Run(ctx context.Context) error {
 	for {
 		if err := t.Poll(ctx); err != nil && ctx.Err() == nil {
 			t.cfg.Log.Warn("stream poll failed", slog.Any("error", err))
+		}
+		if err := t.PollTwitch(ctx); err != nil && ctx.Err() == nil {
+			t.cfg.Log.Warn("Twitch stream poll failed", slog.Any("error", err))
 		}
 
 		select {
@@ -185,7 +211,7 @@ func (t *Tracker) Poll(ctx context.Context) error {
 
 	var gone []*tracked
 	for id, tr := range t.state {
-		if !seen[id] {
+		if !seen[id] && !tr.Twitch() {
 			gone = append(gone, tr)
 		}
 	}
@@ -213,6 +239,76 @@ func (t *Tracker) Poll(ctx context.Context) error {
 		t.cfg.OnAvatars(ctx, avatars)
 	}
 
+	return t.send(ctx, events)
+}
+
+// PollTwitch does nothing without a Twitch source. A failed poll leaves
+// the tracked streams as they were.
+func (t *Tracker) PollTwitch(ctx context.Context) error {
+	if t.cfg.Twitch == nil {
+		return nil
+	}
+
+	channels := t.cfg.TwitchChannels()
+	usernames := slices.Sorted(maps.Keys(channels))
+	streams, err := t.cfg.Twitch.Streams(ctx, usernames)
+	if err != nil {
+		return err
+	}
+
+	seen := map[string]bool{}
+	var events []Event
+
+	t.mu.Lock()
+	for _, ts := range streams {
+		username := strings.ToLower(ts.Username)
+		channelID, ok := channels[username]
+		if ts.Type != "live" || !ok {
+			continue
+		}
+
+		s := Stream{
+			VideoID:        "twitch:" + ts.ID,
+			Platform:       Twitch,
+			ChannelID:      channelID,
+			ChannelName:    ts.DisplayName,
+			Title:          ts.Title,
+			Status:         Live,
+			ScheduledAt:    ts.StartedAt,
+			StartedAt:      ts.StartedAt,
+			TwitchUsername: username,
+			Thumbnail:      helix.Thumbnail(ts.ThumbnailURL, twitchThumbWidth, twitchThumbHeight),
+		}
+		// Discord caches embed images by URL, and Twitch keeps one preview
+		// URL per channel.
+		if s.Thumbnail != "" {
+			s.Thumbnail += "?s=" + strconv.FormatInt(ts.StartedAt.Unix(), 10)
+		}
+		seen[s.VideoID] = true
+
+		if _, ok := t.state[s.VideoID]; !ok {
+			events = append(events, Event{Kind: EventLive, Stream: s})
+		}
+		t.state[s.VideoID] = &tracked{Stream: s}
+	}
+
+	for id, tr := range t.state {
+		if !tr.Twitch() || seen[id] {
+			continue
+		}
+		tr.missed++
+		if _, followed := channels[tr.TwitchUsername]; followed && tr.missed < twitchMisses {
+			continue
+		}
+		delete(t.state, id)
+		events = append(events, Event{Kind: EventEnded, Stream: tr.Stream, WasLive: true})
+	}
+	t.mu.Unlock()
+
+	return t.send(ctx, events)
+}
+
+func (t *Tracker) send(ctx context.Context, events []Event) error {
 	// Ended streams go first, since they free chats up.
 	slices.SortStableFunc(events, func(a, b Event) int {
 		if (a.Kind == EventEnded) != (b.Kind == EventEnded) {

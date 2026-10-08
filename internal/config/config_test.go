@@ -31,6 +31,8 @@ var _ = Describe("Config", func() {
 			"GATORAID_HOLODEX_TLDEX=true",
 			"GATORAID_DEEPL_API_KEY=d:fx",
 			"GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET=1000",
+			"GATORAID_TWITCH_CLIENT_ID=tid",
+			"GATORAID_TWITCH_CLIENT_SECRET=tsecret",
 			"GATORAID_LIMITS_USER_CHANNELS=5",
 			"GATORAID_RELAY_PRECHAT_HOURS=48",
 			"GATORAID_LOG_LEVEL=debug",
@@ -50,6 +52,8 @@ var _ = Describe("Config", func() {
 		Expect(cfg.Database.Path).To(Equal("data/bot.db"))
 		Expect(cfg.Holodex).To(Equal(config.Holodex{APIKey: "h", TLdex: true}))
 		Expect(cfg.DeepL).To(Equal(config.DeepL{APIKey: "d:fx", MonthlyCharacterBudget: 1000}))
+		Expect(cfg.Twitch).To(Equal(config.Twitch{ClientID: "tid", ClientSecret: "tsecret"}))
+		Expect(cfg.Twitch.Enabled()).To(BeTrue())
 		Expect(cfg.Limits.UserChannels).To(Equal(5))
 		Expect(cfg.Relay.PrechatHours).To(Equal(48))
 		Expect(cfg.Log).To(Equal(config.Log{Level: "debug", Format: "text"}))
@@ -129,6 +133,7 @@ var _ = Describe("Config", func() {
 		Entry("negative budget", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_DEEPL_MONTHLY_CHARACTER_BUDGET=-1"}, "cannot be negative"),
 		Entry("negative prechat hours", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_RELAY_PRECHAT_HOURS=-1"}, "prechat hours cannot be negative"),
 		Entry("negative user channel limit", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_LIMITS_USER_CHANNELS=-1"}, "user channel limit cannot be negative"),
+		Entry("Twitch ID without a secret", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_TWITCH_CLIENT_ID=id"}, "both a client ID and a client secret"),
 		Entry("bad owner ID", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_DISCORD_OWNER_IDS=1,vt"}, `discord.owner_ids[1] "vt" is not a Discord ID`),
 		Entry("bad log channel", "", []string{"GATORAID_DISCORD_TOKEN=t", "GATORAID_DISCORD_LOG_CHANNEL_ID=#logs"}, `discord.log_channel_id "#logs" is not a Discord ID`),
 	)

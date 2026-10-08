@@ -18,6 +18,7 @@ name = "Mono Monet"
 channel_id = "UCdubotSy4pPOsiaW4MrYn3Q"
 channel_name = "Mono Monet Ch.【V4Mirai】"
 twitter = "mono_monet"
+twitch = "monomonet"
 aliases = ["Mono"]
 
 [[streamer]]
@@ -58,6 +59,7 @@ name = "Rara Rocora"
 channel_id = "UCJmMPjJSRDOSfQKHHUs1efQ"
 channel_name = "Rara Rocora Ch.【V4Mirai】"
 twitter = "RaraRocora"
+twitch = "rararocora"
 
 [[streamer]]
 name = "Poma Pon"

@@ -162,7 +162,7 @@ var _ = Describe("Manager", func() {
 			{msgs: []livechat.Message{msg("c", "UC1", "again")}},
 		}
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		Expect(comments(3)).To(Equal([]string{"a", "b", "c"}))
 		Expect(manager.Running()).To(Equal([]string{"v"}))
@@ -179,11 +179,11 @@ var _ = Describe("Manager", func() {
 		}
 		manager = NewManager(cfg)
 
-		manager.Start(ctx, "distant")
+		manager.Start(ctx, Target{VideoID: "distant"})
 		Consistently(manager.Events(), 100*time.Millisecond).ShouldNot(Receive())
 
 		manager.Stop("distant")
-		manager.Start(ctx, "near")
+		manager.Start(ctx, Target{VideoID: "near"})
 		Expect(comments(1)).To(Equal([]string{"a"}))
 	})
 
@@ -208,7 +208,7 @@ var _ = Describe("Manager", func() {
 		manager = NewManager(cfg)
 
 		for _, id := range []string{"a", "b", "c", "d"} {
-			manager.Start(ctx, id)
+			manager.Start(ctx, Target{VideoID: id})
 		}
 		count := func() int { mu.Lock(); defer mu.Unlock(); return opening }
 		Eventually(count).Should(Equal(2))
@@ -220,8 +220,8 @@ var _ = Describe("Manager", func() {
 	})
 
 	It("runs one session per stream", func() {
-		manager.Start(ctx, "v")
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		opens := func() int { mu.Lock(); defer mu.Unlock(); return opened }
 		Eventually(opens).Should(Equal(1))
@@ -229,7 +229,7 @@ var _ = Describe("Manager", func() {
 	})
 
 	It("stops quietly when asked", func() {
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 		Eventually(manager.Running).Should(HaveLen(1))
 
 		manager.Stop("v")
@@ -241,7 +241,7 @@ var _ = Describe("Manager", func() {
 	It("gives up at once on chats that can't be read", func() {
 		opens = []error{livechat.ErrUnavailable}
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		e := nextEvent()
 		Expect(e.Kind).To(Equal(EventStopped))
@@ -253,7 +253,7 @@ var _ = Describe("Manager", func() {
 		opens = []error{errors.New("timeout"), errors.New("timeout"), nil}
 		reader.polls = []step{{msgs: []livechat.Message{msg("a", "UC1", "hi")}}}
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		Expect(comments(1)).To(Equal([]string{"a"}))
 		Expect(opened).To(Equal(3))
@@ -263,7 +263,7 @@ var _ = Describe("Manager", func() {
 		reader.polls = []step{{err: errors.New("connection reset")}}
 		reader.reopens = []step{{msgs: []livechat.Message{msg("missed", "UC1", "hi")}}}
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		Expect(comments(1)).To(Equal([]string{"missed"}))
 	})
@@ -271,7 +271,7 @@ var _ = Describe("Manager", func() {
 	It("reports the end of the chat", func() {
 		reader.polls = []step{{msgs: []livechat.Message{msg("a", "UC1", "bye")}}, {err: livechat.ErrEnded}}
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		Expect(comments(1)).To(Equal([]string{"a"}))
 		e := nextEvent()
@@ -288,7 +288,7 @@ var _ = Describe("Manager", func() {
 		}
 		reader.polls, reader.reopens = failures, failures
 
-		manager.Start(ctx, "v")
+		manager.Start(ctx, Target{VideoID: "v"})
 
 		e := nextEvent()
 		Expect(e.Kind).To(Equal(EventStopped))
@@ -300,7 +300,7 @@ var _ = Describe("Manager", func() {
 
 		It("reports the start time", func() {
 			started := time.Date(2026, 10, 2, 1, 0, 0, 0, time.UTC)
-			manager.Start(ctx, "v")
+			manager.Start(ctx, Target{VideoID: "v"})
 			Eventually(func() int { tl.mu.Lock(); defer tl.mu.Unlock(); return len(tl.subs) }).Should(Equal(1))
 
 			tl.send("v", tldex.Update{StartedAt: started})
@@ -311,7 +311,7 @@ var _ = Describe("Manager", func() {
 		})
 
 		It("drops the second copy of a line from either source", func() {
-			manager.Start(ctx, "v")
+			manager.Start(ctx, Target{VideoID: "v"})
 			Eventually(func() int { tl.mu.Lock(); defer tl.mu.Unlock(); return len(tl.subs) }).Should(Equal(1))
 
 			tl.send("v", tldex.Update{Message: &tldex.Message{VideoID: "v", ChannelID: "UCtl", Name: "tl", Text: "[EN] Hello :_wave: world!", TL: true}})
@@ -326,7 +326,7 @@ var _ = Describe("Manager", func() {
 		})
 
 		It("passes MChad lines through", func() {
-			manager.Start(ctx, "v")
+			manager.Start(ctx, Target{VideoID: "v"})
 			Eventually(func() int { tl.mu.Lock(); defer tl.mu.Unlock(); return len(tl.subs) }).Should(Equal(1))
 
 			tl.send("v", tldex.Update{Message: &tldex.Message{VideoID: "v", Name: "mchad user", Text: "TL line", Source: "MChad", TL: true}})
@@ -339,7 +339,7 @@ var _ = Describe("Manager", func() {
 		})
 
 		It("unsubscribes when the session stops", func() {
-			manager.Start(ctx, "v")
+			manager.Start(ctx, Target{VideoID: "v"})
 			Eventually(func() int { tl.mu.Lock(); defer tl.mu.Unlock(); return len(tl.subs) }).Should(Equal(1))
 
 			manager.Stop("v")

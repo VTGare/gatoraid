@@ -26,8 +26,10 @@ type toggle struct {
 }
 
 var toggles = []toggle{
-	{"mods", "relay", "Mod messages", "Relay what chat moderators say",
-		func(s *store.Settings) *bool { return &s.ModMessages }},
+	{"mods", "relay", "YouTube mod messages", "Relay what YouTube chat moderators say",
+		func(s *store.Settings) *bool { return &s.YouTubeModMessages }},
+	{"twitchmods", "relay", "Twitch mod messages", "Relay what Twitch chat moderators say",
+		func(s *store.Settings) *bool { return &s.TwitchModMessages }},
 	{"prechat", "relay", "Waiting rooms", "Relay the waiting room before the stream starts",
 		func(s *store.Settings) *bool { return &s.Prechat }},
 	{"chatlink", "relay", "Chat link", "Link the chat when a line could come from more than one",
@@ -38,6 +40,8 @@ var toggles = []toggle{
 		func(s *store.Settings) *bool { return &s.NotifyMembersOnly }},
 	{"relayfreechat", "streams", "Relay free chat rooms", "Relay the chat of rooms titled free chat",
 		func(s *store.Settings) *bool { return &s.RelayFreeChat }},
+	{"relaytwitch", "streams", "Relay Twitch chats", "Relays of a streamer include their Twitch streams",
+		func(s *store.Settings) *bool { return &s.RelayTwitch }},
 }
 
 type section struct {
@@ -48,7 +52,7 @@ var sections = []section{
 	{"relay", "Relay", "Mod messages, waiting rooms, chat link, auto-translate"},
 	{"translation", "Translation", "Which language VTuber lines are translated into"},
 	{"logs", "Logs", "Where stream logs go"},
-	{"streams", "Streams", "Members-only streams and free chat rooms"},
+	{"streams", "Streams", "Members-only streams, free chat rooms and Twitch"},
 	{"permissions", "Permissions", "Roles that can manage the bot"},
 }
 
@@ -207,7 +211,9 @@ func (p *settingsPanel) view(ctx context.Context, guild snowflake.ID, owner stri
 		cmd: p.cmd, owner: owner, settings: g.Settings, counts: map[store.Feature]int{},
 		translation: p.b.Translator != nil,
 	}
-	for _, f := range []store.Feature{store.FeatureRelay, store.FeatureCameos, store.FeatureGossip, store.FeatureYouTube, store.FeaturePosts} {
+	for _, f := range []store.Feature{
+		store.FeatureRelay, store.FeatureCameos, store.FeatureGossip, store.FeatureYouTube, store.FeatureTwitch, store.FeaturePosts,
+	} {
 		subs, err := p.b.Subs.Guild(ctx, guildID, f)
 		if err != nil {
 			return nil, err
@@ -328,19 +334,21 @@ func (v *panelView) renderHome(e *discord.Embed) {
 	c := v.counts
 
 	e.Title = "Settings"
-	e.Description = fmt.Sprintf("**%d** relays · **%d** cameos · **%d** gossip · **%d** live and **%d** post notifications\n"+
+	e.Description = fmt.Sprintf("**%d** relays · **%d** cameos · **%d** gossip · **%d** YouTube and **%d** Twitch live notifications · **%d** post notifications\n"+
 		"**%d** channels from outside the streamer list · **%d** blacklisted · **%d** filters\n"+
 		"-# Change those with `/relay`, `/cameos`, `/gossip`, `/notify`, `/blacklist` and `/filter`",
-		c[store.FeatureRelay], c[store.FeatureCameos], c[store.FeatureGossip], c[store.FeatureYouTube], c[store.FeaturePosts],
+		c[store.FeatureRelay], c[store.FeatureCameos], c[store.FeatureGossip], c[store.FeatureYouTube], c[store.FeatureTwitch],
+		c[store.FeaturePosts],
 		v.outside, v.blacklisted, v.filters)
 
 	e.Fields = []discord.EmbedField{
-		{Name: "Relay", Value: fmt.Sprintf("Mod messages **%s** · Waiting rooms **%s** · Chat link **%s** · Auto-translate **%s**",
-			onOff(s.ModMessages), onOff(s.Prechat), onOff(s.ShowChat), onOff(s.AutoTranslate))},
+		{Name: "Relay", Value: fmt.Sprintf("YouTube mod messages **%s** · Twitch mod messages **%s** · Waiting rooms **%s** · "+
+			"Chat link **%s** · Auto-translate **%s**",
+			onOff(s.YouTubeModMessages), onOff(s.TwitchModMessages), onOff(s.Prechat), onOff(s.ShowChat), onOff(s.AutoTranslate))},
 		{Name: "Translation", Value: "Into **" + translate.Name(s.TargetLanguage) + "**"},
 		{Name: "Logs", Value: v.logChannel()},
-		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s**",
-			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat))},
+		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s** · Relay Twitch **%s**",
+			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat), onOff(s.RelayTwitch))},
 		{Name: "Permissions", Value: "Managers " + roleList(v.managers) + " · Blacklisters " + roleList(v.blacklisters)},
 	}
 	e.Footer = &discord.EmbedFooter{Text: "Changing settings needs Manage Server or a Manager role"}

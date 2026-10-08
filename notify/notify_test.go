@@ -144,9 +144,9 @@ var _ = Describe("Live", func() {
 		streams <- live("kiara", kiaraID, time.Minute)
 
 		Eventually(w.snd.contents).Should(ConsistOf(
-			"c1: <@&42> | Mori Calliope: Karaoke_time (Live now)",
-			"c1: <@&42> | Takanashi Kiara: Karaoke_time (Live now)",
-			"c2:  | Takanashi Kiara: Karaoke_time (Live now)",
+			"c1: <@&42> | Mori Calliope: Karaoke_time (Live now on YouTube)",
+			"c1: <@&42> | Takanashi Kiara: Karaoke_time (Live now on YouTube)",
+			"c2:  | Takanashi Kiara: Karaoke_time (Live now on YouTube)",
 		))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(3))
 		Expect(w.snd.messages()[0].Send.AllowedMentions.Roles).To(Equal([]snowflake.ID{42}))
@@ -176,6 +176,24 @@ var _ = Describe("Live", func() {
 
 		Eventually(w.snd.contents).Should(ConsistOf("c2:  | Mori Calliope: Karaoke_time (Members-only stream)"))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(1))
+	})
+
+	It("announces Twitch streams to Twitch subscriptions only", func() {
+		w.subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c1", "")
+		w.subscribe("g2", store.FeatureTwitch, store.TargetGroup, "holo-en", "c2", "")
+		run()
+
+		tw := live("twitch:1", calliID, time.Minute)
+		tw.Stream.Platform = stream.Twitch
+		tw.Stream.TwitchUsername = "moricalliope"
+		streams <- tw
+		streams <- live("yt", calliID, time.Minute)
+
+		Eventually(w.snd.contents).Should(ConsistOf(
+			"c2:  | Mori Calliope: Karaoke_time (Live now on Twitch)",
+			"c1:  | Mori Calliope: Karaoke_time (Live now on YouTube)",
+		))
+		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(2))
 	})
 })
 
@@ -292,6 +310,19 @@ var _ = Describe("LiveMessage", func() {
 		Expect(e.Image.URL).To(Equal("https://i.ytimg.com/vi/vid/hqdefault.jpg"))
 		Expect(e.Timestamp.UTC().Format(time.RFC3339)).To(Equal("2026-10-02T12:00:00Z"))
 		Expect(e.Color).To(Equal(7))
+	})
+
+	It("links Twitch streams to Twitch", func() {
+		msg := notify.LiveMessage(stream.Stream{
+			VideoID: "twitch:1", Platform: stream.Twitch, ChannelID: calliID, TwitchUsername: "moricalliope",
+			Title: "Karaoke", Thumbnail: "https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1",
+		}, nil, "", 7)
+
+		e := msg.Embeds[0]
+		Expect(e.Description).To(Equal("Live now on Twitch"))
+		Expect(e.URL).To(Equal("https://www.twitch.tv/moricalliope"))
+		Expect(e.Author.URL).To(Equal("https://www.twitch.tv/moricalliope"))
+		Expect(e.Image.URL).To(Equal("https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1"))
 	})
 })
 

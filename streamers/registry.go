@@ -43,12 +43,17 @@ type snapshot struct {
 	// Active streamers only. Hidden ones are just in all.
 	streamers []*store.Streamer
 	byChannel map[string]*store.Streamer
+	byTwitch  map[string]*store.Streamer
 	all       map[string]*store.Streamer
 }
 
 func New(st store.StreamerStore) *Registry {
 	r := &Registry{store: st}
-	r.snap.Store(&snapshot{groupByID: map[string]*store.Group{}, byChannel: map[string]*store.Streamer{}})
+	r.snap.Store(&snapshot{
+		groupByID: map[string]*store.Group{},
+		byChannel: map[string]*store.Streamer{},
+		byTwitch:  map[string]*store.Streamer{},
+	})
 	return r
 }
 
@@ -77,6 +82,7 @@ func (r *Registry) Reload(ctx context.Context) error {
 		groupByID: make(map[string]*store.Group, len(groups)),
 		children:  make(map[string][]*store.Group),
 		byChannel: make(map[string]*store.Streamer, len(streamers)),
+		byTwitch:  make(map[string]*store.Streamer),
 		all:       make(map[string]*store.Streamer, len(streamers)),
 	}
 
@@ -100,6 +106,9 @@ func (r *Registry) Reload(ctx context.Context) error {
 		}
 		s.streamers = append(s.streamers, st)
 		s.byChannel[st.ChannelID] = st
+		if st.Twitch != "" {
+			s.byTwitch[st.Twitch] = st
+		}
 	}
 
 	r.snap.Store(s)
@@ -109,6 +118,21 @@ func (r *Registry) Reload(ctx context.Context) error {
 func (r *Registry) Streamer(channelID string) (*store.Streamer, bool) {
 	st, ok := r.snap.Load().byChannel[channelID]
 	return st, ok
+}
+
+func (r *Registry) TwitchStreamer(username string) (*store.Streamer, bool) {
+	st, ok := r.snap.Load().byTwitch[strings.ToLower(username)]
+	return st, ok
+}
+
+// TwitchChannels maps the Twitch usernames of active streamers to their
+// channel IDs.
+func (r *Registry) TwitchChannels() map[string]string {
+	out := map[string]string{}
+	for username, st := range r.snap.Load().byTwitch {
+		out[username] = st.ChannelID
+	}
+	return out
 }
 
 // Lookup also finds hidden streamers, for showing what a subscription

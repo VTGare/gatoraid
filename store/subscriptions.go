@@ -16,6 +16,7 @@ const (
 	FeatureGossip Feature = "gossip"
 	// Live notifications and community posts.
 	FeatureYouTube Feature = "youtube"
+	FeatureTwitch  Feature = "twitch"
 	FeaturePosts   Feature = "posts"
 )
 
@@ -29,7 +30,8 @@ const (
 
 type Target struct {
 	Kind TargetKind
-	// A YouTube channel ID or a group ID. Empty for TargetAll.
+	// A YouTube channel ID or a group ID. Empty for TargetAll. Twitch
+	// subscriptions use the streamer's YouTube channel ID too.
 	ID string
 }
 

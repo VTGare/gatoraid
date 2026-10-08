@@ -48,6 +48,7 @@ name = "Millie Parfait"
 channel_id = "UC47rNmkDcNgbOcM-2BwzJTQ"
 channel_name = "Millie Parfait【NIJISANJI EN】"
 twitter = "MillieParfait"
+twitch = "millieparfait"
 aliases = ["Millie", "Parfait"]
 
 [[streamer]]
@@ -65,6 +66,7 @@ name = "Luca Kaneshiro"
 channel_id = "UC7Gb7Uawe20QyFibhLl1lzA"
 channel_name = "Luca Kaneshiro【NIJISANJI EN】"
 twitter = "luca_kaneshiro"
+twitch = "lucakaneshiro"
 aliases = ["Pog-Man", "Lucy", "Luca"]
 
 [[streamer]]
@@ -102,6 +104,7 @@ name = "Uki Violeta"
 channel_id = "UChJ5FTsHOu72_5OVx0rvsvQ"
 channel_name = "Uki Violeta 【NIJISANJI EN"
 twitter = "uki_violeta"
+twitch = "ukivioleta"
 aliases = ["Uki", "Violeta"]
 
 [[streamer]]
@@ -150,6 +153,7 @@ name = "Doppio Dropscythe"
 channel_id = "UCy91xBlY_Brh3bnHxKtjrrg"
 channel_name = "Doppio Dropscythe【NIJISANJI EN】"
 twitter = "D_Dropscythe"
+twitch = "doppiodropscythe"
 aliases = ["Dropscythe", "Doppio"]
 
 [[streamer]]
@@ -157,6 +161,7 @@ name = "Meloco Kyoran"
 channel_id = "UChKXd7oqD18qiIYBoRIHTlw"
 channel_name = "Meloco Kyoran【NIJISANJI EN】"
 twitter = "MelocoKyoran"
+twitch = "melocokyoran"
 aliases = ["Meloco", "Kyoran"]
 
 [[streamer]]
@@ -181,6 +186,7 @@ name = "Vantacrow Bringer"
 channel_id = "UCpYf6C9QsP_BRf97vLuXlIA"
 channel_name = "Vantacrow Bringer 【NIJISANJI EN】"
 twitter = "Tyrant_Vanta"
+twitch = "vantacrow_bringer"
 aliases = ["Vantacrow", "Bringer"]
 
 [[streamer]]
@@ -188,6 +194,7 @@ name = "Vezalius Bandage"
 channel_id = "UCK9l6rTwU3hiSZijIMq51Gw"
 channel_name = "Vezalius Bandage【NIJISANJI EN】"
 twitter = "VezaliusBandage"
+twitch = "vezalius_bandage"
 aliases = ["Vezalius", "Bandage"]
 
 

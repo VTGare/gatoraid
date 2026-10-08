@@ -44,9 +44,9 @@ func main() {
 		go func() { _ = tl.Run(ctx) }()
 	}
 
-	chats := bot.NewChatManager(tl, nil, log)
+	chats := bot.NewChatManager(tl, nil, nil, log)
 	for _, id := range flag.Args() {
-		chats.Start(ctx, id)
+		chats.Start(ctx, chat.Target{VideoID: id})
 	}
 
 	running := flag.NArg()

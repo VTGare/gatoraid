@@ -168,14 +168,20 @@ var _ = Describe("Subscription commands", func() {
 		}
 
 		Expect(notify("youtube", "add", dt.String("target", "calli"), dt.Role("role", 123))).
-			To(Equal("Now posting live notifications for **Mori Calliope** in <#3000>.\nNotifications ping <@&123>."))
+			To(Equal("Now posting YouTube live notifications for **Mori Calliope** in <#3000>.\nNotifications ping <@&123>."))
 		Expect(notify("posts", "add", dt.String("target", "group:hololive-en"))).
 			To(Equal("Now posting new posts by everyone in **Hololive EN** in <#3000>."))
 		Expect(notify("posts", "list")).To(Equal("<#3000>\n- everyone in **Hololive EN**"))
-		Expect(notify("youtube", "clear")).To(Equal("Removed 1 live notification subscription from <#3000>."))
+		Expect(notify("youtube", "clear")).To(Equal("Removed 1 YouTube live notification subscription from <#3000>."))
 		Expect(notify("youtube", "list")).To(Equal("Nothing yet. Add one with `/notify youtube add`."))
 
 		Expect(h.b.Subs.Match(store.FeaturePosts, calliID)).To(HaveLen(1))
+		Expect(h.b.Subs.Match(store.FeatureYouTube, calliID)).To(BeEmpty())
+
+		Expect(notify("twitch", "add", dt.String("target", "calli"))).
+			To(Equal("Now posting Twitch live notifications for **Mori Calliope** in <#3000>."))
+		Expect(notify("twitch", "list")).To(Equal("<#3000>\n- **Mori Calliope**"))
+		Expect(h.b.Subs.Match(store.FeatureTwitch, calliID)).To(HaveLen(1))
 		Expect(h.b.Subs.Match(store.FeatureYouTube, calliID)).To(BeEmpty())
 	})
 })

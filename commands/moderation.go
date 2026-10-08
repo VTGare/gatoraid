@@ -10,6 +10,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/bot"
+	"github.com/VTGare/gatoraid/chat"
 	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
@@ -36,7 +37,7 @@ func blacklistCommand(b *bot.Bot) *gumi.Command {
 		Subcommands: []*gumi.Command{
 			{
 				Name:        "add",
-				Description: "Blacklist a YouTube channel",
+				Description: "Blacklist a YouTube channel, or a Twitch chatter from the suggestions",
 				Ephemeral:   true,
 				Defer:       true,
 				Options: []*gumi.Option{
@@ -98,7 +99,31 @@ func blacklistAuthorCommand(b *bot.Bot) *gumi.Command {
 }
 
 func blacklistAdd(b *bot.Bot, ctx *gumi.Context) error {
-	input := ctx.Options.String("channel")
+	input := strings.TrimSpace(ctx.Options.String("channel"))
+
+	// Twitch and MChad authors have no YouTube channel to look up. They're
+	// picked from the suggestions, which come from relayed lines.
+	if strings.HasPrefix(input, chat.TwitchAuthorPrefix) || strings.HasPrefix(input, chat.MChadAuthorPrefix) {
+		line, err := b.Store.AuthorLine(ctx.Context(), ctx.GuildID().String(), input)
+		switch {
+		case errors.Is(err, store.ErrLineNotFound):
+			return gumi.NewUserError("I haven't relayed anything by them in this server lately. Pick someone from the suggestions.")
+		case err != nil:
+			return err
+		}
+
+		msg, err := addToBlacklist(b, ctx, store.BlacklistEntry{
+			GuildID:   ctx.GuildID().String(),
+			ChannelID: input,
+			Name:      line.AuthorName,
+			Reason:    strings.TrimSpace(ctx.Options.String("reason")),
+			AddedBy:   ctx.AuthorID().String(),
+		})
+		if err != nil {
+			return err
+		}
+		return success(ctx, msg)
+	}
 
 	ch, err := b.Channels.Resolve(ctx.Context(), input)
 	switch {

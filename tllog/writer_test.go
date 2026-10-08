@@ -130,6 +130,20 @@ var _ = Describe("Writer", func() {
 		Expect(snd.all()[0].body).To(HaveSuffix("[0:00:01] @tl: [EN] one\n[0:00:02] @tl: [EN] two\n"))
 	})
 
+	It("links Twitch streams and names their file without a colon", func() {
+		l := at(time.Second, "tl", store.LineTL, "[EN] one")
+		l.VideoID, l.GuildID, l.ChannelID = "twitch:42", "g", "c1"
+		Expect(db.SaveLines(ctx, []store.Line{l})).To(Succeed())
+
+		w := newWriter()
+		w.StreamEnded(stream.Stream{
+			VideoID: "twitch:42", Platform: stream.Twitch, TwitchUsername: "moricalliope", Title: "Title", StartedAt: start,
+		})
+
+		Eventually(snd.all).Should(ConsistOf(posted{"c1", "Title | Stream log · 1 h 30 min · 1 line", "twitch-42.txt",
+			"Title\nhttps://www.twitch.tv/moricalliope\nStarted 2026-10-02 12:00 UTC\n\n[0:00:01] @tl: [EN] one\n"}))
+	})
+
 	It("skips guilds the bot left", func() {
 		save("g", "c1", time.Second, "[EN] one")
 		Expect(db.LeaveGuild(ctx, "g", time.Now())).To(Succeed())

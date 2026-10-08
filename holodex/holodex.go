@@ -92,7 +92,9 @@ type Channel struct {
 	Suborg      string `json:"suborg"`
 	Photo       string `json:"photo"`
 	Twitter     string `json:"twitter"`
-	Inactive    bool   `json:"inactive"`
+	// The Twitch username as the channel's owner typed it, often with capitals.
+	Twitch   string `json:"twitch"`
+	Inactive bool   `json:"inactive"`
 }
 
 // Holodex also returns streams on other channels that mention these ones,

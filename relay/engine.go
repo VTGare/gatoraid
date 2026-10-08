@@ -29,10 +29,13 @@ const (
 	storeTimeout  = 10 * time.Second
 	// Past this the line goes out without its translation.
 	translateTimeout = 5 * time.Second
+	// A streamer live on YouTube and Twitch at once often says the same
+	// thing in both chats within this long.
+	streamerRepeatWindow = time.Minute
 )
 
 type Chats interface {
-	Start(ctx context.Context, videoID string)
+	Start(ctx context.Context, t chat.Target)
 	Stop(videoID string)
 	Events() <-chan chat.Event
 }
@@ -83,12 +86,24 @@ type Engine struct {
 	running map[string]bool
 	// Chats that stopped on their own, with the stream's status then. They
 	// aren't restarted until the status changes.
-	stopped  map[string]stream.Status
-	notified map[noticeKey]bool
+	stopped      map[string]stream.Status
+	notified     map[noticeKey]bool
+	streamerSaid map[streamerLine]said
 	// Guarded by settingsMu, since SettingsChanged runs on other goroutines.
 	settingsMu sync.Mutex
 	settings   map[string]*store.Settings
 	resync     chan struct{}
+}
+
+type streamerLine struct {
+	discordChannelID string
+	hostChannelID    string
+	text             string
+}
+
+type said struct {
+	videoID string
+	at      time.Time
 }
 
 type noticeKey struct {
@@ -110,16 +125,17 @@ func NewEngine(cfg Config) *Engine {
 	}
 
 	e := &Engine{
-		cfg:      cfg,
-		lines:    make(chan store.Line, lineBuffer),
-		quit:     make(chan struct{}),
-		saved:    make(chan struct{}),
-		streams:  map[string]*stream.Stream{},
-		running:  map[string]bool{},
-		stopped:  map[string]stream.Status{},
-		notified: map[noticeKey]bool{},
-		settings: map[string]*store.Settings{},
-		resync:   make(chan struct{}, 1),
+		cfg:          cfg,
+		lines:        make(chan store.Line, lineBuffer),
+		quit:         make(chan struct{}),
+		saved:        make(chan struct{}),
+		streams:      map[string]*stream.Stream{},
+		running:      map[string]bool{},
+		stopped:      map[string]stream.Status{},
+		notified:     map[noticeKey]bool{},
+		streamerSaid: map[streamerLine]said{},
+		settings:     map[string]*store.Settings{},
+		resync:       make(chan struct{}, 1),
 	}
 	go e.saveLines()
 
@@ -213,7 +229,7 @@ func (e *Engine) update(ctx context.Context, s *stream.Stream) {
 
 	switch {
 	case read && !e.running[s.VideoID]:
-		e.cfg.Chats.Start(ctx, s.VideoID)
+		e.cfg.Chats.Start(ctx, chat.Target{VideoID: s.VideoID, TwitchUsername: s.TwitchUsername})
 		e.running[s.VideoID] = true
 	case !read && e.running[s.VideoID]:
 		e.cfg.Chats.Stop(s.VideoID)
@@ -244,7 +260,8 @@ func relayable(s *stream.Stream, st *store.Settings) bool {
 	switch {
 	case s.MembersOnly,
 		s.FreeChat && !st.RelayFreeChat,
-		s.Status == stream.Upcoming && !st.Prechat:
+		s.Status == stream.Upcoming && !st.Prechat,
+		s.Twitch() && !st.RelayTwitch:
 		return false
 	}
 	return true
@@ -325,7 +342,11 @@ func (e *Engine) onChat(ev chat.Event) {
 func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	c := &Comment{Comment: *cc, Stream: s}
 	c.Host, _ = e.cfg.Registry.Streamer(s.ChannelID)
-	c.Author, _ = e.cfg.Registry.Streamer(cc.AuthorChannelID)
+	if cc.Source == chat.SourceTwitch {
+		c.Author, _ = e.cfg.Registry.TwitchStreamer(cc.AuthorUsername)
+	} else {
+		c.Author, _ = e.cfg.Registry.Streamer(cc.AuthorChannelID)
+	}
 
 	if kind, ok := Relay(c, &archiveSettings, nil); ok {
 		e.save(c, kind, "", "", nil)
@@ -349,7 +370,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 		}
 
 		kind, ok := Relay(c, st, e.cfg.Moderation(sub.GuildID))
-		if !ok {
+		if !ok || (kind == KindOwner && e.saidElsewhere(c, sub.ChannelID)) {
 			continue
 		}
 
@@ -364,7 +385,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	}
 
 	if c.Author != nil {
-		for _, sub := range e.cfg.Subs.Match(store.FeatureCameos, c.AuthorChannelID) {
+		for _, sub := range e.cfg.Subs.Match(store.FeatureCameos, c.Author.ChannelID) {
 			if !sent[sub.ChannelID] && Cameo(c, e.cfg.Moderation(sub.GuildID)) {
 				post(sub, KindCameo, e.cfg.Formatter.Cameo(c))
 			}
@@ -384,6 +405,25 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	for target, lines := range toTranslate {
 		e.translateAndPost(c, target, lines)
 	}
+}
+
+// saidElsewhere reports whether the streamer said the line in another of
+// their chats a moment ago, and the Discord channel already got it.
+func (e *Engine) saidElsewhere(c *Comment, discordChannelID string) bool {
+	now := time.Now()
+	for k, v := range e.streamerSaid {
+		if now.Sub(v.at) > streamerRepeatWindow {
+			delete(e.streamerSaid, k)
+		}
+	}
+
+	key := streamerLine{discordChannelID, c.Stream.ChannelID, chat.Normalize(c.translatable())}
+	if prev, ok := e.streamerSaid[key]; ok && prev.videoID != c.VideoID {
+		return true
+	}
+
+	e.streamerSaid[key] = said{c.VideoID, now}
+	return false
 }
 
 func (e *Engine) openChats(channelID string) int {
@@ -417,7 +457,7 @@ func (e *Engine) translates(c *Comment, kind Kind, st *store.Settings) bool {
 	case e.cfg.Translator == nil || !st.AutoTranslate,
 		kind != KindOwner && kind != KindVTuber,
 		c.Author != nil && e.cfg.Registry.SkipAutoTranslate(c.Author),
-		!hasWords(c.Text):
+		!hasWords(c.translatable()):
 		return false
 	}
 	return true
@@ -438,9 +478,10 @@ func (e *Engine) translateAndPost(c *Comment, target string, lines []waiting) {
 		defer cancel()
 
 		translation := ""
-		r, err := e.cfg.Translator.Translate(ctx, own.Text, target, chatBackground(&own))
+		text := own.translatable()
+		r, err := e.cfg.Translator.Translate(ctx, text, target, chatBackground(&own))
 		switch {
-		case err == nil && !translate.SameLanguage(r.DetectedSource, target) && !translate.Unchanged(own.Text, r.Text):
+		case err == nil && !translate.SameLanguage(r.DetectedSource, target) && !translate.Unchanged(text, r.Text):
 			translation = r.Text
 		case err != nil && !errors.Is(err, translate.ErrBudget):
 			e.cfg.Log.Warn("translation failed", slog.String("video_id", own.VideoID), slog.Any("error", err))
@@ -460,7 +501,9 @@ func chatBackground(c *Comment) string {
 	var sb strings.Builder
 	sb.WriteString("A message from the live chat of ")
 	sb.WriteString(hostName(c))
-	sb.WriteString("'s YouTube stream")
+	sb.WriteString("'s ")
+	sb.WriteString(c.Stream.PlatformName())
+	sb.WriteString(" stream")
 	if c.Stream.Title != "" {
 		sb.WriteString(" ")
 		sb.WriteString(strconv.Quote(c.Stream.Title))

@@ -11,9 +11,14 @@ import (
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/internal/config"
 	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/twitch"
 )
 
-var channelInURL = regexp.MustCompile(`UC[\w-]{22}`)
+var (
+	channelInURL = regexp.MustCompile(`UC[\w-]{22}`)
+	// Everything around the username in a pasted channel link.
+	twitchLink = regexp.MustCompile(`(?i)^(https?://)?(www\.|m\.)?twitch\.tv/|[/?#].*$`)
+)
 
 // Typing this into an optional text field clears it.
 const clearValue = "-"
@@ -58,6 +63,7 @@ func ownerStreamerAdd(b *bot.Bot) *gumi.Command {
 			gumi.String("name", "Display name").Require(),
 			groupOption(b, "group", "Group"),
 			gumi.String("twitter", "Twitter handle"),
+			gumi.String("twitch", "Twitch username or channel link"),
 			gumi.String("aliases", "Comma-separated nicknames"),
 			gumi.String("channel_name", "YouTube channel title, used to spot collabs"),
 			gumi.Boolean("free_chat", "They stream in rooms titled free chat"),
@@ -100,6 +106,7 @@ func ownerStreamerEdit(b *bot.Bot) *gumi.Command {
 			gumi.String("name", "Display name"),
 			groupOption(b, "group", `Group, or "-" for none`),
 			gumi.String("twitter", `Twitter handle, or "-" for none`),
+			gumi.String("twitch", `Twitch username or channel link, or "-" for none`),
 			gumi.String("aliases", `Comma-separated nicknames, replacing the old ones, or "-" for none`),
 			gumi.String("channel_name", `YouTube channel title, or "-" for none`),
 			gumi.Boolean("free_chat", "They stream in rooms titled free chat"),
@@ -224,6 +231,7 @@ func applyStreamerEdits(b *bot.Bot, ctx *gumi.Context, st *store.Streamer) error
 
 	text := map[string]*string{
 		"twitter":      &st.Twitter,
+		"twitch":       &st.Twitch,
 		"channel_name": &st.ChannelName,
 	}
 	for name, field := range text {
@@ -237,6 +245,16 @@ func applyStreamerEdits(b *bot.Bot, ctx *gumi.Context, st *store.Streamer) error
 		*field = v
 	}
 	st.Twitter = strings.TrimPrefix(st.Twitter, "@")
+
+	st.Twitch = strings.ToLower(twitchLink.ReplaceAllString(st.Twitch, ""))
+	switch {
+	case st.Twitch != "" && !twitch.ValidUsername(st.Twitch):
+		return gumi.Errorf("%s isn't a Twitch username.", inlineCode(st.Twitch))
+	case st.Twitch != "":
+		if other, ok := b.Streamers.TwitchStreamer(st.Twitch); ok && other.ChannelID != st.ChannelID {
+			return gumi.Errorf("%s already has that Twitch username.", other.Name)
+		}
+	}
 
 	if opts.Has("aliases") {
 		st.Aliases = nil

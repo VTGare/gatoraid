@@ -10,6 +10,7 @@ name = "Hololive VTuber Group"
 channel_id = "UCJFZiqLMntJufDCHc6bQixg"
 channel_name = "hololive ホロライブ - VTuber Group"
 twitter = "hololivetv"
+twitch = "hololive"
 
 [[streamer]]
 name = "ASOBI★MAWARI-TAI!"

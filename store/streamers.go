@@ -35,8 +35,10 @@ type Streamer struct {
 	ChannelName string
 	GroupID     string
 	Twitter     string
-	Aliases     []string
-	AvatarURL   string
+	// Twitch username, lowercase.
+	Twitch    string
+	Aliases   []string
+	AvatarURL string
 	// The channel streams in rooms titled "free chat", so those aren't
 	// skipped as placeholder chats.
 	FreeChatStreams bool

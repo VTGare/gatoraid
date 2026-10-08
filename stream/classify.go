@@ -8,6 +8,13 @@ import (
 	"github.com/VTGare/gatoraid/holodex"
 )
 
+type Platform string
+
+const (
+	YouTube Platform = "youtube"
+	Twitch  Platform = "twitch"
+)
+
 type Status int
 
 const (
@@ -16,7 +23,12 @@ const (
 )
 
 type Stream struct {
-	VideoID     string
+	// Twitch streams use "twitch:" and Twitch's stream ID, so the two never
+	// clash.
+	VideoID  string
+	Platform Platform
+	// The YouTube channel ID, which is how the registry knows streamers,
+	// for Twitch streams too.
 	ChannelID   string
 	ChannelName string
 	Title       string
@@ -32,9 +44,40 @@ type Stream struct {
 	Distant bool
 	// Channels Holodex detected in the stream, for collabs.
 	Mentions []string
+	// Only set for Twitch streams.
+	TwitchUsername string
+	Thumbnail      string
 }
 
-func (s *Stream) URL() string { return "https://youtu.be/" + s.VideoID }
+func (s *Stream) Twitch() bool { return s.Platform == Twitch }
+
+func (s *Stream) URL() string {
+	if s.Twitch() {
+		return "https://www.twitch.tv/" + s.TwitchUsername
+	}
+	return "https://youtu.be/" + s.VideoID
+}
+
+func (s *Stream) ChannelURL() string {
+	if s.Twitch() {
+		return "https://www.twitch.tv/" + s.TwitchUsername
+	}
+	return "https://www.youtube.com/channel/" + s.ChannelID
+}
+
+func (s *Stream) ThumbnailURL() string {
+	if s.Thumbnail != "" {
+		return s.Thumbnail
+	}
+	return "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"
+}
+
+func (s *Stream) PlatformName() string {
+	if s.Twitch() {
+		return "Twitch"
+	}
+	return "YouTube"
+}
 
 // Urgency puts live streams first, then near waiting rooms, then distant
 // ones, each by scheduled time. Chats open a few at a time, and after a
@@ -82,6 +125,7 @@ type Classifier struct {
 func (c Classifier) Classify(v holodex.Video) Stream {
 	s := Stream{
 		VideoID:     v.ID,
+		Platform:    YouTube,
 		ChannelID:   v.Channel.ID,
 		ChannelName: v.Channel.Name,
 		Title:       v.Title,

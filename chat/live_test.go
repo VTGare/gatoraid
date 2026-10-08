@@ -58,7 +58,7 @@ var _ = Describe("Live chat manager", func() {
 			},
 			TLdex: tl,
 		})
-		m.Start(ctx, video.ID)
+		m.Start(ctx, Target{VideoID: video.ID})
 
 		counts := map[Source]int{}
 		started := false

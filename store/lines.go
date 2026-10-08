@@ -50,6 +50,8 @@ type LineStore interface {
 	// Authors of the guild's lines whose name contains query, most recent
 	// first, one line each.
 	RecentAuthors(ctx context.Context, guildID, query string, limit int) ([]Line, error)
+	// The author's latest guild line. ErrLineNotFound if there's none.
+	AuthorLine(ctx context.Context, guildID, authorChannelID string) (*Line, error)
 	// The Discord channels each guild relayed the video's chat into. Cameo
 	// and gossip lines don't count.
 	VideoChannels(ctx context.Context, videoID string) ([]VideoChannel, error)

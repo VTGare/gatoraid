@@ -77,7 +77,12 @@ func (l *Live) announce(ctx context.Context, s stream.Stream) {
 
 	host, _ := l.cfg.Registry.Streamer(s.ChannelID)
 
-	for _, sub := range l.cfg.Subs.Match(store.FeatureYouTube, s.ChannelID) {
+	feature := store.FeatureYouTube
+	if s.Twitch() {
+		feature = store.FeatureTwitch
+	}
+
+	for _, sub := range l.cfg.Subs.Match(feature, s.ChannelID) {
 		if err := l.notify(ctx, s, host, sub); err != nil {
 			l.cfg.Log.Error("failed to announce a stream", slog.String("video_id", s.VideoID),
 				slog.String("guild_id", sub.GuildID), slog.Any("error", err))
@@ -112,7 +117,7 @@ func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer
 
 func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int) discord.MessageCreate {
 	e := relay.StreamEmbed(&s, host, color)
-	e.Description = "Live now"
+	e.Description = "Live now on " + s.PlatformName()
 	if s.MembersOnly {
 		e.Description = "Members-only stream"
 	}

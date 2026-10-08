@@ -7,7 +7,7 @@ Streamers edited with `/owner streamers` belong to the owner from then on, and t
 alone.
 
 Run `task test -- ./streamers/...` after editing. It loads these files and fails on typos, unknown
-fields, duplicate channel IDs and broken group references.
+fields, duplicate channel IDs or Twitch usernames, and broken group references.
 
 ## Layout
 
@@ -31,6 +31,7 @@ name = "Mori Calliope"
 channel_id = "UCL_qhgtOy0dy1Agp8vkySQg"
 channel_name = "Mori Calliope Ch. hololive-EN"
 twitter = "moricalliope"
+twitch = "moricalliope"
 aliases = ["calliope", "calli", "mori"]
 ```
 
@@ -40,6 +41,7 @@ aliases = ["calliope", "calli", "mori"]
 | `channel_id` | yes | The `UC…` ID from the channel URL. A handle like `@MoriCalliope` won't work. |
 | `channel_name` | | The YouTube channel title. Used to spot collabs for gossip. |
 | `twitter` | | Handle without the `@`. Also used to spot collabs. |
+| `twitch` | | Lowercase Twitch username, from their `twitch.tv/` link. Their Twitch streams get relayed and announced, and their lines in other Twitch chats count as a VTuber's. Holodex lists it as `twitch` on `/channels/<channel_id>`. |
 | `aliases` | | Nicknames people search and gossip by. Japanese ones match inside words too. |
 | `free_chat_streams` | | `true` if they stream in rooms titled "free chat", which are otherwise skipped. |
 

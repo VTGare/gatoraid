@@ -34,6 +34,7 @@ name = "Mori Calliope"
 channel_id = "UCL_qhgtOy0dy1Agp8vkySQg"
 channel_name = "Mori Calliope Ch. hololive-EN"
 twitter = "moricalliope"
+twitch = "moricalliope"
 aliases = ["calliope", "calli", "mori"]
 
 [[streamer]]
@@ -88,6 +89,7 @@ name = "Koseki Bijou"
 channel_id = "UC9p_lqQ0FEDz327Vgf5JwqA"
 channel_name = "Koseki Bijou Ch. hololive-EN"
 twitter = "kosekibijou"
+twitch = "kosekibijou"
 aliases = ["Bijou", "Koseki"]
 
 [[streamer]]
@@ -95,6 +97,7 @@ name = "Nerissa Ravencroft"
 channel_id = "UC_sFNM0z0MWm9A6WlKPuMMg"
 channel_name = "Nerissa Ravencroft Ch. hololive-EN"
 twitter = "nerissa_en"
+twitch = "nerissaravencroft"
 aliases = ["Nerissa", "Ravencroft"]
 
 

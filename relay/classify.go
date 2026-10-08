@@ -85,6 +85,22 @@ func (c *Comment) heartLine() bool {
 	return strings.Contains(text, "hearted") && strings.Contains(text, "super chat")
 }
 
+// translatable is the text without Twitch emotes, whose names look like
+// words.
+func (c *Comment) translatable() string {
+	if len(c.Emotes) == 0 {
+		return c.Text
+	}
+
+	var kept []string
+	for _, w := range strings.Fields(c.Text) {
+		if !slices.Contains(c.Emotes, w) {
+			kept = append(kept, w)
+		}
+	}
+	return strings.Join(kept, " ")
+}
+
 // Moderation is a guild's blacklist and filters.
 type Moderation struct {
 	// YouTube channel IDs.
@@ -143,7 +159,7 @@ func Relay(c *Comment, settings *store.Settings, m *Moderation) (Kind, bool) {
 		return KindTL, true
 	case c.fromVTuber():
 		return KindVTuber, true
-	case c.Moderator && settings.ModMessages:
+	case c.Moderator && settings.ModMessages(c.Stream.Twitch()):
 		return KindMod, true
 	}
 
@@ -163,6 +179,7 @@ func Cameo(c *Comment, m *Moderation) bool {
 func Gossip(c *Comment, subject *store.Streamer, m *Moderation) bool {
 	switch {
 	case c.AuthorChannelID == subject.ChannelID,
+		c.Author != nil && c.Author.ChannelID == subject.ChannelID,
 		c.Stream.ChannelID == subject.ChannelID,
 		slices.Contains(c.Stream.Mentions, subject.ChannelID),
 		!c.fromVTuber() && !m.isTL(c),

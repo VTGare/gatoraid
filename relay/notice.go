@@ -21,7 +21,7 @@ func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.
 			e.Description += fmt.Sprintf(" The stream starts <t:%d:R>.", s.ScheduledAt.Unix())
 		}
 	default:
-		e.Description = "Relaying the live chat here."
+		e.Description = "Relaying the " + s.PlatformName() + " live chat here."
 	}
 
 	return RoleMessage(e, roleID)
@@ -34,10 +34,10 @@ func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) discord.Embe
 		Title: s.Title,
 		URL:   s.URL(),
 		Color: color,
-		Image: &discord.EmbedResource{URL: "https://i.ytimg.com/vi/" + s.VideoID + "/hqdefault.jpg"},
+		Image: &discord.EmbedResource{URL: s.ThumbnailURL()},
 		Author: &discord.EmbedAuthor{
 			Name: s.ChannelName,
-			URL:  "https://www.youtube.com/channel/" + s.ChannelID,
+			URL:  s.ChannelURL(),
 		},
 	}
 

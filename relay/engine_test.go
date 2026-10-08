@@ -31,14 +31,16 @@ type fakeChats struct {
 	mu      sync.Mutex
 	running map[string]bool
 	starts  []string
+	targets []chat.Target
 	events  chan chat.Event
 }
 
-func (f *fakeChats) Start(_ context.Context, id string) {
+func (f *fakeChats) Start(_ context.Context, t chat.Target) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.running[id] = true
-	f.starts = append(f.starts, id)
+	f.running[t.VideoID] = true
+	f.starts = append(f.starts, t.VideoID)
+	f.targets = append(f.targets, t)
 }
 
 func (f *fakeChats) Stop(id string) {
@@ -180,8 +182,8 @@ var _ = Describe("Engine", func() {
 				{ID: "holo-id", Name: "Hololive ID", SkipAutoTranslate: true},
 			},
 			Streamers: []store.Streamer{
-				{ChannelID: calliID, Name: "Mori Calliope", GroupID: "holo-en", Aliases: []string{"calli"}},
-				{ChannelID: kiaraID, Name: "Takanashi Kiara", GroupID: "holo-en", Aliases: []string{"kiara"}},
+				{ChannelID: calliID, Name: "Mori Calliope", GroupID: "holo-en", Aliases: []string{"calli"}, Twitch: "moricalliope"},
+				{ChannelID: kiaraID, Name: "Takanashi Kiara", GroupID: "holo-en", Aliases: []string{"kiara"}, Twitch: "takanashikiara"},
 				{ChannelID: eliraID, Name: "Elira Pendora", GroupID: "niji", Aliases: []string{"elira"}},
 				{ChannelID: "UCrisu", Name: "Ayunda Risu", GroupID: "holo-id"},
 			},
@@ -264,7 +266,7 @@ var _ = Describe("Engine", func() {
 		streams <- live("calli-live", calliID)
 		streams <- live("kiara-live", kiaraID)
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
-		Eventually(snd.lines).Should(Equal([]string{"c1: notice <@&42> Relaying the live chat here."}))
+		Eventually(snd.lines).Should(Equal([]string{"c1: notice <@&42> Relaying the YouTube live chat here."}))
 
 		say("calli-live", "UCviewer", "@viewer", "lol")
 		say("calli-live", "UCviewer", "@viewer", "[EN] hello")
@@ -338,8 +340,8 @@ var _ = Describe("Engine", func() {
 
 		streams <- live("calli-live", calliID)
 		Eventually(snd.lines).Should(ContainElements(
-			"c1: notice  Relaying the live chat here.",
-			"c2: notice  Relaying the live chat here.",
+			"c1: notice  Relaying the YouTube live chat here.",
+			"c2: notice  Relaying the YouTube live chat here.",
 		))
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
@@ -597,5 +599,121 @@ var _ = Describe("Engine", func() {
 		Eventually(chats.Running).Should(HaveLen(1))
 		say("calli-live", calliID, "@calli", "hi")
 		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `hi`\n-# [Mori Calliope](<https://youtu.be/calli-live>) · stream"))
+	})
+
+	Describe("Twitch", func() {
+		twitchLive := func(videoID, channelID, username string) stream.Event {
+			return stream.Event{Kind: stream.EventLive, Stream: stream.Stream{
+				VideoID: videoID, Platform: stream.Twitch, ChannelID: channelID, ChannelName: username,
+				TwitchUsername: username, Status: stream.Live, Title: "twitch stream",
+			}}
+		}
+
+		sayTwitch := func(videoID, userID, username, text string, owner bool, emotes ...string) {
+			chats.events <- chat.Event{Kind: chat.EventComment, VideoID: videoID, Comment: &chat.Comment{
+				VideoID: videoID, ID: "twitch:" + text, AuthorChannelID: chat.TwitchAuthorPrefix + userID,
+				AuthorUsername: username, AuthorName: username, Text: text, Owner: owner, Emotes: emotes,
+				Source: chat.SourceTwitch, Time: time.Now(),
+			}}
+		}
+
+		setTwitch := func(guild string, on bool) {
+			GinkgoHelper()
+			g, err := db.Guild(ctx, guild)
+			Expect(err).NotTo(HaveOccurred())
+			g.Settings.RelayTwitch = on
+			Expect(db.UpdateGuildSettings(ctx, guild, g.Settings)).To(Succeed())
+		}
+
+		It("reads the Twitch chat by username and links it", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			start()
+
+			streams <- twitchLive("twitch:1", calliID, "moricalliope")
+			Eventually(chats.Running).Should(Equal([]string{"twitch:1"}))
+			Expect(chats.targets).To(Equal([]chat.Target{{VideoID: "twitch:1", TwitchUsername: "moricalliope"}}))
+			Eventually(snd.lines).Should(Equal([]string{"c1: notice  Relaying the Twitch live chat here."}))
+
+			sayTwitch("twitch:1", "7", "moricalliope", "hi chat", true)
+			Eventually(snd.lines).Should(HaveLen(2))
+			Expect(snd.lines()[1]).To(Equal("c1: 🎙️ **moricalliope:** `hi chat`"))
+			Expect(snd.sent[0].msg.Embeds[0].URL).To(Equal("https://www.twitch.tv/moricalliope"))
+		})
+
+		It("leaves out guilds that turned Twitch off", func() {
+			setTwitch("g2", false)
+			subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
+			start()
+
+			streams <- twitchLive("twitch:1", calliID, "moricalliope")
+			streams <- live("calli-live", calliID)
+			Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
+
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			Eventually(chats.Running).Should(Equal([]string{"calli-live", "twitch:1"}))
+
+			sayTwitch("twitch:1", "7", "moricalliope", "only on twitch", true)
+			Eventually(snd.lines).Should(ContainElement(ContainSubstring("only on twitch")))
+			Consistently(snd.lines, 50*time.Millisecond).ShouldNot(ContainElement(HavePrefix("c2: 🎙️")))
+		})
+
+		It("knows VTubers in Twitch chats by username", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			subscribe("g1", store.FeatureCameos, store.TargetChannel, kiaraID, "c3", "")
+			start()
+
+			streams <- twitchLive("twitch:1", calliID, "moricalliope")
+			Eventually(chats.Running).Should(Equal([]string{"twitch:1"}))
+
+			sayTwitch("twitch:1", "99", "TakanashiKiara", "KIKKERIKI", false)
+			Eventually(snd.lines).Should(ContainElements(
+				"c1: 🎙️ **TakanashiKiara:** `KIKKERIKI`",
+				ContainSubstring("c3: 👀 **Takanashi Kiara** in [**Mori Calliope**'s chat](<https://www.twitch.tv/moricalliope>)"),
+			))
+		})
+
+		It("sends the streamer's line once when they say it in both chats", func() {
+			setTwitch("g2", false)
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
+			start()
+
+			streams <- live("calli-live", calliID)
+			streams <- twitchLive("twitch:1", calliID, "moricalliope")
+			Eventually(chats.Running).Should(Equal([]string{"calli-live", "twitch:1"}))
+
+			sayTwitch("twitch:1", "7", "moricalliope", "Hello everyone!", true)
+			say("calli-live", calliID, "@calli", "hello everyone")
+			sayTwitch("twitch:1", "7", "moricalliope", "something else", true)
+
+			Eventually(snd.lines).Should(ContainElement(ContainSubstring("something else")))
+			var relayed []string
+			for _, l := range snd.lines() {
+				if strings.Contains(l, "🎙️") {
+					relayed = append(relayed, l)
+				}
+			}
+			// g2 doesn't relay Twitch, so it gets the YouTube copy.
+			Expect(relayed).To(ConsistOf(
+				And(HavePrefix("c1: "), ContainSubstring("`Hello everyone!`")),
+				And(HavePrefix("c2: "), ContainSubstring("`hello everyone`")),
+				And(HavePrefix("c1: "), ContainSubstring("`something else`")),
+			))
+		})
+
+		It("keeps Twitch emotes out of translations", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			start()
+
+			streams <- twitchLive("twitch:1", calliID, "moricalliope")
+			Eventually(chats.Running).Should(Equal([]string{"twitch:1"}))
+
+			sayTwitch("twitch:1", "7", "moricalliope", "Kappa", true, "Kappa")
+			sayTwitch("twitch:1", "7", "moricalliope", "みんなこんにちは Kappa", true, "Kappa")
+
+			Eventually(tl.callList).Should(Equal([]string{"EN-US:みんなこんにちは"}))
+			Expect(tl.backgroundList()[0]).To(ContainSubstring("Mori Calliope's Twitch stream"))
+			Eventually(snd.lines).Should(ContainElement(ContainSubstring("`<みんなこんにちは in EN-US>`")))
+		})
 	})
 })

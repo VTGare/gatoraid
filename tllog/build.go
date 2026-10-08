@@ -15,7 +15,9 @@ import (
 
 type Meta struct {
 	VideoID string
-	Title   string
+	// The stream's page. Empty means the YouTube video.
+	Link  string
+	Title string
 	// Zero means times count from the first line.
 	Start time.Time
 	// The streamer, for the message. Optional.
@@ -24,7 +26,12 @@ type Meta struct {
 	Duration time.Duration
 }
 
-func (m Meta) URL() string { return "https://youtu.be/" + m.VideoID }
+func (m Meta) URL() string {
+	if m.Link != "" {
+		return m.Link
+	}
+	return "https://youtu.be/" + m.VideoID
+}
 
 // Build writes the log and returns how many lines made it in. The
 // blacklist and filters are applied as they are now, so authors blacklisted

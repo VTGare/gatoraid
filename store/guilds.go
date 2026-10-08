@@ -18,10 +18,12 @@ func (g *Guild) Active() bool { return g.LeftAt == nil }
 // JSON document and decoded on top of DefaultSettings, so adding a field
 // doesn't need a migration.
 type Settings struct {
-	ModMessages   bool `json:"mod_messages"`
-	Prechat       bool `json:"prechat"`
-	ShowChat      bool `json:"show_chat"`
-	AutoTranslate bool `json:"auto_translate"`
+	// Saved settings use this key, so it can't take the field's name.
+	YouTubeModMessages bool `json:"mod_messages"`
+	TwitchModMessages  bool `json:"twitch_mod_messages"`
+	Prechat            bool `json:"prechat"`
+	ShowChat           bool `json:"show_chat"`
+	AutoTranslate      bool `json:"auto_translate"`
 
 	// DeepL language code, e.g. EN-US.
 	TargetLanguage string `json:"target_language"`
@@ -31,15 +33,28 @@ type Settings struct {
 
 	NotifyMembersOnly bool `json:"notify_members_only"`
 	RelayFreeChat     bool `json:"relay_free_chat"`
+
+	// Relays of a streamer include their Twitch chat.
+	RelayTwitch bool `json:"relay_twitch"`
+}
+
+func (s *Settings) ModMessages(twitch bool) bool {
+	if twitch {
+		return s.TwitchModMessages
+	}
+
+	return s.YouTubeModMessages
 }
 
 func DefaultSettings() Settings {
 	return Settings{
-		ModMessages:    true,
-		Prechat:        true,
-		ShowChat:       true,
-		AutoTranslate:  true,
-		TargetLanguage: "EN-US",
+		YouTubeModMessages: true,
+		TwitchModMessages:  true,
+		Prechat:            true,
+		ShowChat:           true,
+		AutoTranslate:      true,
+		TargetLanguage:     "EN-US",
+		RelayTwitch:        true,
 	}
 }
 

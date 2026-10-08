@@ -113,7 +113,7 @@ var _ = Describe("Notice", func() {
 		Expect(e.URL).To(Equal("https://youtu.be/vid"))
 		Expect(e.Author.Name).To(Equal("Mori Calliope"))
 		Expect(e.Author.IconURL).To(Equal("calli.png"))
-		Expect(e.Description).To(Equal("Relaying the live chat here."))
+		Expect(e.Description).To(Equal("Relaying the YouTube live chat here."))
 		Expect(e.Image.URL).To(Equal("https://i.ytimg.com/vi/vid/hqdefault.jpg"))
 		Expect(e.Thumbnail).To(BeNil())
 	})

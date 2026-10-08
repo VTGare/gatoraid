@@ -36,6 +36,7 @@ type Config struct {
 	Database Database `json:"database" envPrefix:"DATABASE_"`
 	Holodex  Holodex  `json:"holodex" envPrefix:"HOLODEX_"`
 	DeepL    DeepL    `json:"deepl" envPrefix:"DEEPL_"`
+	Twitch   Twitch   `json:"twitch" envPrefix:"TWITCH_"`
 	Limits   Limits   `json:"limits" envPrefix:"LIMITS_"`
 	Relay    Relay    `json:"relay" envPrefix:"RELAY_"`
 	Log      Log      `json:"log" envPrefix:"LOG_"`
@@ -74,6 +75,14 @@ type DeepL struct {
 	APIKey                 string `json:"api_key" env:"API_KEY"`
 	MonthlyCharacterBudget int    `json:"monthly_character_budget" env:"MONTHLY_CHARACTER_BUDGET"`
 }
+
+// An app from the Twitch developer console. Both empty turns Twitch off.
+type Twitch struct {
+	ClientID     string `json:"client_id" env:"CLIENT_ID"`
+	ClientSecret string `json:"client_secret" env:"CLIENT_SECRET"`
+}
+
+func (t Twitch) Enabled() bool { return t.ClientID != "" && t.ClientSecret != "" }
 
 type Limits struct {
 	// YouTube channels outside the streamer registry one guild can add.
@@ -179,6 +188,10 @@ func (c *Config) Validate() error {
 
 	if c.DeepL.MonthlyCharacterBudget < 0 {
 		errs = append(errs, errors.New("config: the DeepL monthly character budget cannot be negative"))
+	}
+
+	if (c.Twitch.ClientID == "") != (c.Twitch.ClientSecret == "") {
+		errs = append(errs, errors.New("config: Twitch needs both a client ID and a client secret"))
 	}
 
 	if c.Limits.UserChannels < 0 {

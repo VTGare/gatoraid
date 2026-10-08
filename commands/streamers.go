@@ -227,6 +227,12 @@ func streamerEmbed(reg *streamers.Registry, st *store.Streamer) discord.Embed {
 		})
 	}
 
+	if st.Twitch != "" {
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name: "Twitch", Value: fmt.Sprintf("[%s](https://www.twitch.tv/%s)", st.Twitch, st.Twitch), Inline: new(true),
+		})
+	}
+
 	if len(st.Aliases) > 0 {
 		e.Fields = append(e.Fields, discord.EmbedField{Name: "Aliases", Value: strings.Join(st.Aliases, ", ")})
 	}

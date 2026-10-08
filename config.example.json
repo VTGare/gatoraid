@@ -17,6 +17,10 @@
     "api_key": "",
     "monthly_character_budget": 500000
   },
+  "twitch": {
+    "client_id": "",
+    "client_secret": ""
+  },
   "limits": {
     "user_channels": 25
   },

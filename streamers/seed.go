@@ -14,6 +14,7 @@ import (
 	"github.com/BurntSushi/toml"
 
 	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/twitch"
 )
 
 //go:embed seed
@@ -44,6 +45,7 @@ type seedFile struct {
 		ChannelID       string   `toml:"channel_id"`
 		ChannelName     string   `toml:"channel_name"`
 		Twitter         string   `toml:"twitter"`
+		Twitch          string   `toml:"twitch"`
 		Aliases         []string `toml:"aliases"`
 		FreeChatStreams bool     `toml:"free_chat_streams"`
 	} `toml:"streamer"`
@@ -70,6 +72,7 @@ func ParseSeed(fsys fs.FS) (*Seed, error) {
 		groups    = map[string]*seedGroup{}
 		streamers []store.Streamer
 		channels  = map[string]string{}
+		usernames = map[string]string{}
 	)
 
 	err := fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
@@ -122,8 +125,17 @@ func ParseSeed(fsys fs.FS) (*Seed, error) {
 			case channels[s.ChannelID] != "":
 				errs = append(errs, fmt.Errorf("%s: %s: channel %s is already used by %s", p, s.Name, s.ChannelID, channels[s.ChannelID]))
 				continue
+			case s.Twitch != "" && !twitch.ValidUsername(s.Twitch):
+				errs = append(errs, fmt.Errorf("%s: %s: %q isn't a lowercase Twitch username", p, s.Name, s.Twitch))
+				continue
+			case s.Twitch != "" && usernames[s.Twitch] != "":
+				errs = append(errs, fmt.Errorf("%s: %s: Twitch username %s is already used by %s", p, s.Name, s.Twitch, usernames[s.Twitch]))
+				continue
 			}
 			channels[s.ChannelID] = s.Name
+			if s.Twitch != "" {
+				usernames[s.Twitch] = s.Name
+			}
 
 			streamers = append(streamers, store.Streamer{
 				ChannelID:       s.ChannelID,
@@ -131,6 +143,7 @@ func ParseSeed(fsys fs.FS) (*Seed, error) {
 				ChannelName:     s.ChannelName,
 				GroupID:         g.ID,
 				Twitter:         s.Twitter,
+				Twitch:          s.Twitch,
 				Aliases:         s.Aliases,
 				FreeChatStreams: s.FreeChatStreams,
 				Source:          store.SourceSeed,

@@ -135,6 +135,21 @@ var _ = Describe("Moderation commands", func() {
 		Expect(h.b.Moderation.Blacklisted(testGuild, "")).To(BeFalse())
 	})
 
+	It("blacklists Twitch chatters picked from the suggestions", func() {
+		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
+			VideoID: "twitch:1", GuildID: testGuild, AuthorChannelID: "twitch:42", AuthorName: "Troll_TV", Body: "[EN] lies",
+			Kind: store.LineTL, SaidAt: time.Now(),
+		}})).To(Succeed())
+
+		suggested := choices(h.run(asMod(dt.Autocomplete(user, "blacklist", dt.Sub("add", dt.Focused(dt.String("channel", "troll")))))))
+		Expect(suggested).To(Equal([]string{"Troll_TV · twitch:42"}))
+
+		Expect(runDeferred("blacklist", "add", dt.String("channel", "twitch:42"))).To(HavePrefix(`Blacklisted **Troll\_TV**.`))
+		Expect(h.b.Moderation.Blacklisted(testGuild, "twitch:42")).To(BeTrue())
+
+		Expect(runDeferred("blacklist", "add", dt.String("channel", "twitch:999"))).To(ContainSubstring("haven't relayed anything by them"))
+	})
+
 	It("mentions that streamers' own lines are still relayed", func() {
 		Expect(h.b.Store.SaveLines(ctx, []store.Line{{
 			VideoID: "v", GuildID: testGuild, MessageID: "4001", AuthorChannelID: "UCstreamer", AuthorName: "@streamer",

@@ -91,6 +91,26 @@ var _ = Describe("/settings", func() {
 		Expect(data["content"]).To(ContainSubstring("someone else's"))
 	})
 
+	It("toggles YouTube and Twitch mod messages separately", func() {
+		data := click(asManager(dt.Button(user, id("toggle", "twitchmods"))))
+
+		Expect(embed(data)["title"]).To(Equal("Relay"))
+		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Twitch mod messages: Off"))
+		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("YouTube mod messages: On"))
+		Expect(settings().TwitchModMessages).To(BeFalse())
+		Expect(settings().YouTubeModMessages).To(BeTrue())
+	})
+
+	It("turns Twitch relays off and on", func() {
+		Expect(settings().RelayTwitch).To(BeTrue())
+
+		data := click(asManager(dt.Button(user, id("toggle", "relaytwitch"))))
+
+		Expect(embed(data)["title"]).To(Equal("Streams"))
+		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Relay Twitch chats: Off"))
+		Expect(settings().RelayTwitch).To(BeFalse())
+	})
+
 	It("lets Manager roles change settings", func() {
 		Expect(h.b.Store.SetGuildRoles(ctx, testGuild, store.RoleManager, []string{"11"})).To(Succeed())
 

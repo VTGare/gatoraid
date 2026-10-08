@@ -76,7 +76,7 @@ func (w *Writer) StreamEnded(s stream.Stream) {
 		return
 	}
 
-	meta := Meta{VideoID: s.VideoID, Title: s.Title, Start: s.StartedAt, Author: s.ChannelName}
+	meta := Meta{VideoID: s.VideoID, Link: s.URL(), Title: s.Title, Start: s.StartedAt, Author: s.ChannelName}
 	if !s.StartedAt.IsZero() {
 		meta.Duration = w.cfg.Now().Sub(s.StartedAt)
 	}
@@ -209,7 +209,7 @@ func Message(meta Meta, text string, lines int, color int) discord.MessageCreate
 
 	return discord.MessageCreate{
 		Embeds:          []discord.Embed{e},
-		Files:           []*discord.File{discord.NewFile(meta.VideoID+".txt", "", strings.NewReader(text))},
+		Files:           []*discord.File{discord.NewFile(fileName(meta.VideoID), "", strings.NewReader(text))},
 		AllowedMentions: &discord.AllowedMentions{},
 	}
 }
@@ -222,4 +222,8 @@ func length(d time.Duration) string {
 		return fmt.Sprintf("%d min", m)
 	}
 	return fmt.Sprintf("%d h %d min", h, m)
+}
+
+func fileName(videoID string) string {
+	return strings.ReplaceAll(videoID, ":", "-") + ".txt"
 }

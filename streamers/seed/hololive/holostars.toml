@@ -26,6 +26,7 @@ name = "Kanade Izuru"
 channel_id = "UCZgOv3YDEs-ZnZWDYVwJdmA"
 channel_name = "Izuru Ch. 奏手イヅル"
 twitter = "kanadeizuru"
+twitch = "kanadeizuru_holostars"
 aliases = ["izuru"]
 free_chat_streams = true
 
@@ -71,6 +72,7 @@ name = "Utsugi Uyu"
 channel_id = "UCgRqGV1gBf2Esxh0Tz1vxzw"
 channel_name = "Uyu Ch. 羽継烏有 - UPROAR!! -"
 twitter = "utsugiuyu"
+twitch = "utsugiuyu_uproar"
 aliases = ["uyu"]
 
 
@@ -88,6 +90,7 @@ name = "Axel Syrios"
 channel_id = "UC2hx0xVkMoHGWijwr_lA01w"
 channel_name = "Axel Syrios Ch. HOLOSTARS-EN"
 twitter = "axelsyrios"
+twitch = "axelsyrios"
 aliases = ["Axel"]
 
 
@@ -105,6 +108,7 @@ name = "Banzoin Hakka"
 channel_id = "UC7gxU6NXjKF1LrgOddPzgTw"
 channel_name = "Banzoin Hakka Ch. HOLOSTARS-EN"
 twitter = "banzoinhakka"
+twitch = "banzoinhakka"
 aliases = ["Banzoin"]
 
 [[streamer]]
@@ -112,6 +116,7 @@ name = "Machina X Flayon"
 channel_id = "UC060r4zABV18vcahAWR1n7w"
 channel_name = "Machina X Flayon Ch. HOLOSTARS-EN"
 twitter = "machinaxflayon"
+twitch = "machinaxflayon"
 aliases = ["Machina", "Flayon", "Flay"]
 
 [[streamer]]
@@ -119,6 +124,7 @@ name = "Gavis Bettel"
 channel_id = "UCHP4f7G2dWD4qib7BMatGAw"
 channel_name = "Gavis Bettel Ch. HOLOSTARS-EN"
 twitter = "gavisbettel"
+twitch = "gavisbettel"
 aliases = ["Gavis"]
 
 
@@ -148,4 +154,5 @@ name = "Crimzon Ruze"
 channel_id = "UCajbFh6e_R8QZdHAMbbi4rQ"
 channel_name = "Crimzon Ruze Ch. HOLOSTARS-EN"
 twitter = "crimzonruze"
+twitch = "crimzonruze"
 aliases = ["Crimzon", "Ruze"]

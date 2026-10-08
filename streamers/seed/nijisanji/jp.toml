@@ -99,6 +99,7 @@ name = "Ushimi Ichigo"
 channel_id = "UCmUjjW5zF1MMOhYUwwwQv9Q"
 channel_name = "宇志海いちご"
 twitter = "ushimi_ichigo"
+twitch = "ushimi_ichigo3"
 aliases = ["Ushimi", "Ichigo", "宇志海いちご"]
 
 [[streamer]]
@@ -122,6 +123,7 @@ name = "Kanae"
 channel_id = "UCspv01oxUFf_MTSipURRhkA"
 channel_name = "Kanae Channel"
 twitter = "Kanae_2434"
+twitch = "kanae_2434"
 aliases = ["叶＠にじさんじ"]
 
 [[streamer]]
@@ -129,6 +131,7 @@ name = "Akabane Youko"
 channel_id = "UCBi8YaVyZpiKWN3_Z0dCTfQ"
 channel_name = "赤羽葉子ちゃんねる"
 twitter = "Youko_Akabane"
+twitch = "akabane45"
 aliases = ["Akabane", "Youko", "赤羽葉子"]
 
 [[streamer]]
@@ -215,6 +218,7 @@ name = "Uzuki Kou"
 channel_id = "UC3lNFeJiTq6L3UWoz4g1e-A"
 channel_name = "卯月コウ"
 twitter = "udukikohh"
+twitch = "udukikohh"
 aliases = ["Uzuki", "Kou", "卯月コウ"]
 
 [[streamer]]
@@ -634,6 +638,7 @@ name = "Ibrahim"
 channel_id = "UCmZ1Rbthn-6Jm_qOGjYsh5A"
 channel_name = "フイブラヒム【にじさんじ】"
 twitter = "honmono_ibrahim"
+twitch = "ibrahimtv_2434"
 aliases = ["イブラヒム"]
 
 
@@ -714,6 +719,7 @@ name = "Lauren Iroas"
 channel_id = "UCgmFrRcyH7d1zR9sIVQhFow"
 channel_name = "ローレン・イロアス / Lauren Iroas【にじさんじ】"
 twitter = "Lauren_iroas"
+twitch = "lauren_iroas2434"
 aliases = ["Lauren", "Iroas", "ローレン・イロアス"]
 
 [[streamer]]
@@ -779,6 +785,7 @@ name = "Fura Kanato"
 channel_id = "UCC7rRD6P7RQcx0hKv9RQP4w"
 channel_name = "風楽奏斗 / Fura Kanato"
 twitter = "KNTFR2434"
+twitch = "kntfr_2434"
 aliases = ["Fura", "Kanato", "風楽奏斗"]
 
 [[streamer]]
@@ -786,6 +793,7 @@ name = "Watarai Hibari"
 channel_id = "UC4l9gz3q65lTBFfFtW5LLeA"
 channel_name = "渡会雲雀 / Watarai Hibari"
 twitter = "watarai_hibari"
+twitch = "hibari2434"
 aliases = ["Watarai", "Hibari", "渡会雲雀"]
 
 [[streamer]]
@@ -871,6 +879,7 @@ name = "Usami Rito"
 channel_id = "UCambvP8yxNDot4FzQc9cgiw"
 channel_name = "宇佐美リト / Usami Rito【にじさんじ】"
 twitter = "usamirito_power"
+twitch = "usamirito"
 
 [[streamer]]
 name = "Hibachi Mana"
@@ -910,6 +919,7 @@ name = "Murakumo Kagetsu"
 channel_id = "UChdY64fJb14Nfnbs8EGdQig"
 channel_name = "叢雲カゲツ / Murakumo Kagetsu【にじさんじ】"
 twitter = "Kagetsu_2434"
+twitch = "kagetsu_2434"
 
 [[streamer]]
 name = "Inami Rai"
@@ -1170,6 +1180,7 @@ name = "Kokonami Iruka"
 channel_id = "UCGGIGlgxXoVu1ZzbQ2XBxqQ"
 channel_name = "小々波いるか / Kokonami Iruka【にじさんじ】"
 twitter = "Kokonami_Iruka"
+twitch = "kokonami_iruka"
 
 [[streamer]]
 name = "Rayon"
@@ -1188,6 +1199,7 @@ name = "Kuri Eita"
 channel_id = "UCzcuYIyP-1YcXC96t9J5yWQ"
 channel_name = "九里詠太 / Kuri Eita【にじさんじ】"
 twitter = "Eita_2434"
+twitch = "eita_2434"
 
 
 # Poppun Parlor

@@ -5,11 +5,14 @@ import (
 	"errors"
 	"log/slog"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/VTGare/gatoraid/holodex/tldex"
+	"github.com/VTGare/gatoraid/twitch"
+	"github.com/VTGare/gatoraid/twitch/irc"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 )
 
@@ -29,6 +32,10 @@ type Comment struct {
 	TL     bool
 	VTuber bool
 	Source Source
+	// Only set on Twitch, where the registry knows streamers by username.
+	AuthorUsername string
+	// Twitch emotes in Text, by name.
+	Emotes []string
 }
 
 type Source string
@@ -37,12 +44,17 @@ const (
 	SourceYouTube Source = "youtube"
 	SourceTLdex   Source = "tldex"
 	// Lines posted on Holodex with MChad. They never appear in YouTube chat.
-	SourceMChad Source = "mchad"
+	SourceMChad  Source = "mchad"
+	SourceTwitch Source = "twitch"
 )
 
 // MChad authors have no YouTube channel, so their author ID is this prefix
 // and their name. The blacklist and logs key authors by that ID.
 const MChadAuthorPrefix = "mchad:"
+
+// Twitch authors are keyed by this prefix and their Twitch user ID, which
+// unlike their username never changes.
+const TwitchAuthorPrefix = "twitch:"
 
 type EventKind int
 
@@ -71,6 +83,15 @@ type Reader interface {
 
 type Opener func(ctx context.Context, videoID string) (Reader, error)
 
+type Target struct {
+	VideoID        string
+	TwitchUsername string
+}
+
+type TwitchChat interface {
+	Subscribe(username string) (<-chan *irc.Message, func())
+}
+
 type TLdex interface {
 	Subscribe(videoID string) <-chan tldex.Update
 	Unsubscribe(videoID string)
@@ -80,7 +101,9 @@ type Config struct {
 	Open Opener
 	// Optional.
 	TLdex TLdex
-	Log   *slog.Logger
+	// Optional. Twitch chats stop right away without it.
+	Twitch TwitchChat
+	Log    *slog.Logger
 	// The first retry after an error. It doubles up to MaxBackoff.
 	Backoff    time.Duration
 	MaxBackoff time.Duration
@@ -137,7 +160,8 @@ func (m *Manager) Events() <-chan Event { return m.events }
 
 // Start reads a stream's chat until it ends, Stop is called or ctx is done.
 // Starting a stream that's already running does nothing.
-func (m *Manager) Start(ctx context.Context, videoID string) {
+func (m *Manager) Start(ctx context.Context, t Target) {
+	videoID := t.VideoID
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -149,7 +173,12 @@ func (m *Manager) Start(ctx context.Context, videoID string) {
 	m.sessions[videoID] = cancel
 
 	m.wg.Go(func() {
-		err := m.run(ctx, videoID)
+		var err error
+		if t.TwitchUsername != "" {
+			err = m.runTwitch(ctx, videoID, t.TwitchUsername)
+		} else {
+			err = m.run(ctx, videoID)
+		}
 
 		m.mu.Lock()
 		delete(m.sessions, videoID)
@@ -283,6 +312,35 @@ func (m *Manager) limitOpening(ctx context.Context, open func() error) error {
 	return open()
 }
 
+var errNoTwitch = errors.New("chat: Twitch chat is off")
+
+// Twitch chat doesn't end with the stream, so it runs until Stop.
+func (m *Manager) runTwitch(ctx context.Context, videoID, username string) error {
+	if m.cfg.Twitch == nil {
+		return errNoTwitch
+	}
+
+	lines, stop := m.cfg.Twitch.Subscribe(username)
+	defer stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case msg, ok := <-lines:
+			if !ok {
+				return errors.New("chat: Twitch chat closed")
+			}
+
+			if twitch.KnownBot(msg.Username) {
+				continue
+			}
+
+			m.send(ctx, Event{Kind: EventComment, VideoID: videoID, Comment: fromTwitch(videoID, msg)})
+		}
+	}
+}
+
 func (m *Manager) relayTLdex(ctx context.Context, videoID string, updates <-chan tldex.Update, dedup *deduper) {
 	for {
 		select {
@@ -333,6 +391,30 @@ func fromYouTube(videoID string, m livechat.Message) *Comment {
 		SuperChat:       m.SuperChat,
 		Source:          SourceYouTube,
 	}
+}
+
+func fromTwitch(videoID string, m *irc.Message) *Comment {
+	c := &Comment{
+		VideoID:         videoID,
+		ID:              "twitch:" + m.ID,
+		AuthorChannelID: TwitchAuthorPrefix + m.UserID,
+		AuthorUsername:  m.Username,
+		AuthorName:      m.DisplayName,
+		Text:            m.Text,
+		Time:            m.Time,
+		Owner:           m.Broadcaster,
+		Moderator:       m.Moderator,
+		Verified:        m.Partner,
+		Member:          m.Subscriber,
+		Emotes:          m.Emotes,
+		Source:          SourceTwitch,
+	}
+
+	if m.Bits > 0 {
+		c.SuperChat = strconv.Itoa(m.Bits) + " bits"
+	}
+
+	return c
 }
 
 func fromTLdex(m *tldex.Message) *Comment {

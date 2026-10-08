@@ -61,6 +61,18 @@ func (s *Store) RecentAuthors(ctx context.Context, guildID, query string, limit 
 		LIMIT ?`, guildID, "%"+likeEscaper.Replace(query)+"%", limit)
 }
 
+func (s *Store) AuthorLine(ctx context.Context, guildID, authorChannelID string) (*store.Line, error) {
+	lines, err := s.queryLines(ctx, `SELECT `+lineColumns+` FROM relayed_lines
+		WHERE guild_id = ? AND author_channel_id = ? ORDER BY id DESC LIMIT 1`, guildID, authorChannelID)
+	if err != nil {
+		return nil, err
+	}
+	if len(lines) == 0 {
+		return nil, store.ErrLineNotFound
+	}
+	return &lines[0], nil
+}
+
 var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 
 func (s *Store) queryLines(ctx context.Context, query string, args ...any) ([]store.Line, error) {

@@ -18,6 +18,7 @@ import (
 	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
+	"github.com/VTGare/gatoraid/twitch"
 	"github.com/VTGare/gatoraid/youtube/channel"
 )
 
@@ -86,11 +87,23 @@ var (
 	youtubeFeature = feature{
 		Feature:     store.FeatureYouTube,
 		command:     "notify youtube",
-		description: "Notifications when streamers go live",
-		add:         "Notify when a streamer, a group or anyone goes live",
-		doing:       "posting live notifications for %s",
-		noun:        "live notification",
-		title:       "Live notifications",
+		description: "Notifications when streamers go live on YouTube",
+		add:         "Notify when a streamer, a group or anyone goes live on YouTube",
+		doing:       "posting YouTube live notifications for %s",
+		noun:        "YouTube live notification",
+		title:       "YouTube live notifications",
+		pings:       "Notifications",
+		anyChannel:  true,
+		roleHelp:    "Role to ping",
+	}
+	twitchFeature = feature{
+		Feature:     store.FeatureTwitch,
+		command:     "notify twitch",
+		description: "Notifications when streamers go live on Twitch",
+		add:         "Notify when a streamer, a group or anyone goes live on Twitch",
+		doing:       "posting Twitch live notifications for %s",
+		noun:        "Twitch live notification",
+		title:       "Twitch live notifications",
 		pings:       "Notifications",
 		anyChannel:  true,
 		roleHelp:    "Role to ping",
@@ -129,6 +142,7 @@ func notifyCommand(b *bot.Bot) *gumi.Command {
 	cmd.Category = CategoryNotifications
 	cmd.Subcommands = []*gumi.Command{
 		{Name: "youtube", Description: youtubeFeature.description, Subcommands: subscriptionSubcommands(b, youtubeFeature)},
+		{Name: "twitch", Description: twitchFeature.description, Subcommands: subscriptionSubcommands(b, twitchFeature)},
 		{Name: "posts", Description: postsFeature.description, Subcommands: subscriptionSubcommands(b, postsFeature)},
 	}
 	return cmd
@@ -412,6 +426,7 @@ func addUserChannel(b *bot.Bot, ctx *gumi.Context, query string) (store.Target, 
 		Name:         name,
 		ChannelName:  ch.Name,
 		Twitter:      hc.Twitter,
+		Twitch:       holodexTwitch(hc),
 		AvatarURL:    cmp.Or(ch.AvatarURL, hc.Photo),
 		Source:       store.SourceUser,
 		AddedByGuild: ctx.GuildID().String(),
@@ -423,7 +438,7 @@ func addUserChannel(b *bot.Bot, ctx *gumi.Context, query string) (store.Target, 
 // subscribes to in any way.
 func userChannels(ctx context.Context, b *bot.Bot, guildID string) (map[string]bool, error) {
 	out := map[string]bool{}
-	for _, f := range []store.Feature{store.FeatureRelay, store.FeatureYouTube, store.FeaturePosts} {
+	for _, f := range []store.Feature{store.FeatureRelay, store.FeatureYouTube, store.FeatureTwitch, store.FeaturePosts} {
 		subs, err := b.Subs.Guild(ctx, guildID, f)
 		if err != nil {
 			return nil, err
@@ -583,4 +598,15 @@ func subscribedOption(b *bot.Bot, f feature, name, description string) *gumi.Opt
 func capitalize(s string) string {
 	r, size := utf8.DecodeRuneInString(s)
 	return string(unicode.ToUpper(r)) + s[size:]
+}
+
+// Holodex keeps Twitch usernames as their owners typed them, often with
+// capitals. Ones that still aren't valid are left out.
+func holodexTwitch(ch *holodex.Channel) string {
+	username := strings.ToLower(strings.TrimSpace(ch.Twitch))
+	if !twitch.ValidUsername(username) {
+		return ""
+	}
+
+	return username
 }

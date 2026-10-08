@@ -12,6 +12,7 @@ name = "Suha 민수하"
 channel_id = "UCUtKkGKef8BYMs3h-3zQm9A"
 channel_name = "민수하 /Suhaスハ【NIJISANJI】"
 twitter = "SuhaMin2434"
+twitch = "suha2434"
 aliases = ["Suha", "민수하", "スハ"]
 
 [[streamer]]
@@ -55,6 +56,7 @@ name = "Yang Nari"
 channel_id = "UCCHH0nWYXFZmtDS_4tvMxHQ"
 channel_name = "ヤン・ナリ / Yang Nari 【にじさんじ】"
 twitter = "NariYang2434"
+twitch = "nariyang2434"
 aliases = ["Yang", "Nari", "ヤン・ナリ", "ヤン"]
 
 [[streamer]]

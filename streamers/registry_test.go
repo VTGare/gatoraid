@@ -55,12 +55,13 @@ name = "G"
 [[streamer]]
 name = "A"
 channel_id = "UCaaaaaaaaaaaaaaaaaaaaaa"
+twitch = "a_live"
 aliases = ["x"]
 free_chat_streams = true
 `)}})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(seed.Streamers).To(Equal([]store.Streamer{{
-			ChannelID: "UCaaaaaaaaaaaaaaaaaaaaaa", Name: "A", GroupID: "g", Aliases: []string{"x"},
+			ChannelID: "UCaaaaaaaaaaaaaaaaaaaaaa", Name: "A", GroupID: "g", Twitch: "a_live", Aliases: []string{"x"},
 			FreeChatStreams: true, Source: store.SourceSeed,
 		}}))
 	})
@@ -86,6 +87,13 @@ free_chat_streams = true
 			"a.toml": "[group]\nid = \"a\"\nname = \"A\"\n[[streamer]]\nname = \"One\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"",
 			"b.toml": "[group]\nid = \"b\"\nname = \"B\"\n[[streamer]]\nname = \"Two\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"",
 		}, "channel UCaaaaaaaaaaaaaaaaaaaaaa is already used by One"),
+		Entry("uppercase Twitch username", map[string]string{
+			"g.toml": "[group]\nid = \"g\"\nname = \"G\"\n[[streamer]]\nname = \"A\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"\ntwitch = \"Alice\"",
+		}, `g.toml: A: "Alice" isn't a lowercase Twitch username`),
+		Entry("duplicate Twitch username", map[string]string{
+			"a.toml": "[group]\nid = \"a\"\nname = \"A\"\n[[streamer]]\nname = \"One\"\nchannel_id = \"UCaaaaaaaaaaaaaaaaaaaaaa\"\ntwitch = \"same\"",
+			"b.toml": "[group]\nid = \"b\"\nname = \"B\"\n[[streamer]]\nname = \"Two\"\nchannel_id = \"UCbbbbbbbbbbbbbbbbbbbbbb\"\ntwitch = \"same\"",
+		}, "Twitch username same is already used by One"),
 		Entry("duplicate group", map[string]string{
 			"a.toml": "[group]\nid = \"g\"\nname = \"A\"",
 			"b.toml": "[group]\nid = \"g\"\nname = \"B\"",
@@ -132,6 +140,27 @@ var _ = Describe("Registry", func() {
 		Expect(resolve("calli")).To(Equal("Mori Calliope"))
 		Expect(resolve("キアラ")).To(Equal("Takanashi Kiara"))
 		Expect(resolve("kanaeru")).To(Equal("Kobo Kanaeru"))
+	})
+
+	It("finds streamers by Twitch username", func() {
+		st, ok := reg.TwitchStreamer("MoriCalliope")
+		Expect(ok).To(BeTrue())
+		Expect(st.Name).To(Equal("Mori Calliope"))
+
+		_, ok = reg.TwitchStreamer("nobody_here")
+		Expect(ok).To(BeFalse())
+
+		channels := reg.TwitchChannels()
+		Expect(channels).To(HaveKeyWithValue("moricalliope", "UCL_qhgtOy0dy1Agp8vkySQg"))
+		Expect(len(channels)).To(BeNumerically(">", 150))
+	})
+
+	It("drops hidden streamers from the Twitch usernames", func() {
+		Expect(reg.Remove(ctx, "UCL_qhgtOy0dy1Agp8vkySQg")).To(Succeed())
+
+		_, ok := reg.TwitchStreamer("moricalliope")
+		Expect(ok).To(BeFalse())
+		Expect(reg.TwitchChannels()).NotTo(HaveKey("moricalliope"))
 	})
 
 	It("prefers an alias over name words", func() {

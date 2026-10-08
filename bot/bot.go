@@ -29,6 +29,8 @@ import (
 	"github.com/VTGare/gatoraid/subs"
 	"github.com/VTGare/gatoraid/tllog"
 	"github.com/VTGare/gatoraid/translate"
+	"github.com/VTGare/gatoraid/twitch/helix"
+	"github.com/VTGare/gatoraid/twitch/irc"
 	"github.com/VTGare/gatoraid/youtube/channel"
 	"github.com/VTGare/gatoraid/youtube/livechat"
 	"github.com/VTGare/gatoraid/youtube/posts"
@@ -53,25 +55,36 @@ type Bot struct {
 	Store     store.Store
 	Streamers *streamers.Registry
 	Subs      *subs.Service
+
 	// Blacklists and filters.
 	Moderation *moderation.Service
+
 	// Looks up YouTube channels from links and handles.
 	Channels *channel.Client
+
 	// Nil without a DeepL API key.
 	Translator *translate.Service
 	Client     *disgobot.Client
 	Router     *gumi.Router
+
 	// Nil without a Holodex API key.
 	Holodex *holodex.Client
 	Streams *stream.Tracker
 	Chats   *chat.Manager
+
 	// Nil unless holodex.tldex is on.
-	TLdex  *tldex.Client
-	Sender *sender.Sender
+	TLdex *tldex.Client
+
+	// Both nil without Twitch credentials.
+	Twitch     *helix.Client
+	TwitchChat *irc.Client
+	Sender     *sender.Sender
+
 	// Nil without a Holodex API key, since nothing would tell it about
 	// streams.
 	Relay *relay.Engine
 	Logs  *tllog.Writer
+
 	// Nil without a Holodex API key.
 	Live  *notify.Live
 	Posts *notify.Posts
@@ -139,9 +152,14 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		middleware.Timeout(commandTimeout),
 	)
 
+	if cfg.Twitch.Enabled() {
+		b.Twitch = helix.New(cfg.Twitch.ClientID, cfg.Twitch.ClientSecret)
+		b.TwitchChat = irc.New(irc.WithLogger(log.With("component", "twitch")))
+	}
+
 	if cfg.Holodex.APIKey != "" {
 		b.Holodex = holodex.New(cfg.Holodex.APIKey)
-		b.Streams = stream.NewTracker(stream.Config{
+		streamCfg := stream.Config{
 			Source:   b.Holodex,
 			Channels: b.Streamers.ChannelIDs,
 			Classifier: stream.Classifier{FreeChatStreams: func(id string) bool {
@@ -155,7 +173,14 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 					log.Warn("failed to update avatars", slog.Any("error", err))
 				}
 			},
-		})
+		}
+
+		if b.Twitch != nil {
+			streamCfg.Twitch = b.Twitch
+			streamCfg.TwitchChannels = b.Streamers.TwitchChannels
+		}
+
+		b.Streams = stream.NewTracker(streamCfg)
 	}
 
 	if cfg.Holodex.TLdex {
@@ -172,7 +197,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		}
 	}
 
-	b.Chats = NewChatManager(b.TLdex, minWait, log.With("component", "chat"))
+	b.Chats = NewChatManager(b.TLdex, b.TwitchChat, minWait, log.With("component", "chat"))
 
 	b.Sender = sender.New(sender.Config{Poster: c.Rest, Log: log.With("component", "sender")})
 
@@ -235,9 +260,9 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	return b, nil
 }
 
-// NewChatManager reads YouTube chat, merged with TLdex when tl isn't nil.
-// minWait is optional.
-func NewChatManager(tl *tldex.Client, minWait func(videoID string) time.Duration, log *slog.Logger) *chat.Manager {
+// NewChatManager reads YouTube chat, merged with TLdex when tl isn't nil,
+// and Twitch chat when twitch isn't nil. minWait is optional.
+func NewChatManager(tl *tldex.Client, twitch *irc.Client, minWait func(videoID string) time.Duration, log *slog.Logger) *chat.Manager {
 	youtube := livechat.New()
 	cfg := chat.Config{
 		Open: func(ctx context.Context, videoID string) (chat.Reader, error) {
@@ -250,10 +275,16 @@ func NewChatManager(tl *tldex.Client, minWait func(videoID string) time.Duration
 		MinWait: minWait,
 		Log:     log,
 	}
-	// A nil *tldex.Client in the interface would look like TLdex is on.
+
+	// Nil clients in the interfaces would look like they're on.
 	if tl != nil {
 		cfg.TLdex = tl
 	}
+
+	if twitch != nil {
+		cfg.Twitch = twitch
+	}
+
 	return chat.NewManager(cfg)
 }
 
@@ -282,6 +313,10 @@ func (b *Bot) Start(ctx context.Context) error {
 
 	if b.TLdex != nil {
 		go func() { _ = b.TLdex.Run(ctx) }()
+	}
+
+	if b.TwitchChat != nil {
+		go func() { _ = b.TwitchChat.Run(ctx) }()
 	}
 
 	go func() { _ = b.Posts.Run(ctx) }()
@@ -425,9 +460,11 @@ func (b *Bot) purge(ctx context.Context) {
 	if _, err := b.Store.PruneNotices(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
 		b.Log.Error("failed to prune stream notices", slog.Any("error", err))
 	}
+
 	if _, err := b.Store.PruneLogs(ctx, time.Now().Add(-store.NoticeRetention)); err != nil {
 		b.Log.Error("failed to prune posted logs", slog.Any("error", err))
 	}
+
 	if _, err := b.Store.PruneSeen(ctx, time.Now().Add(-store.DedupeRetention)); err != nil {
 		b.Log.Error("failed to prune seen posts", slog.Any("error", err))
 	}

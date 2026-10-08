@@ -36,6 +36,7 @@ name = "Moona Hoshinova"
 channel_id = "UCP0BspO_AMEe3aQqqpo89Dg"
 channel_name = "Moona Hoshinova hololive-ID"
 twitter = "moonahoshinova"
+twitch = "moonahoshinova"
 aliases = ["moona", "ムーナ"]
 
 
@@ -69,6 +70,7 @@ name = "Vestia Zeta"
 channel_id = "UCTvHWSfBZgtxE4sILOaurIQ"
 channel_name = "Vestia Zeta Ch. hololive-ID"
 twitter = "vestiazeta"
+twitch = "vestiazeta"
 aliases = ["Zeta"]
 
 [[streamer]]

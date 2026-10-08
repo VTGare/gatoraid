@@ -101,13 +101,27 @@ var _ = Describe("Relay", func() {
 		Entry("an empty line", fromCalli(comment("  ")), nil, relay.Kind("")),
 	)
 
-	It("leaves out mods when the guild doesn't want them", func() {
-		c := comment("no spam")
-		c.Moderator = true
-		off := settings
-		off.ModMessages = false
+	It("leaves out mods of each platform when the guild doesn't want them", func() {
+		yt := comment("no spam")
+		yt.Moderator = true
+		tw := comment("no spam")
+		tw.Moderator = true
+		twitchStream := *tw.Stream
+		twitchStream.Platform = stream.Twitch
+		tw.Stream = &twitchStream
 
-		_, ok := relay.Relay(c, &off, nil)
+		noYouTube := settings
+		noYouTube.YouTubeModMessages = false
+		_, ok := relay.Relay(yt, &noYouTube, nil)
+		Expect(ok).To(BeFalse())
+		_, ok = relay.Relay(tw, &noYouTube, nil)
+		Expect(ok).To(BeTrue())
+
+		noTwitch := settings
+		noTwitch.TwitchModMessages = false
+		_, ok = relay.Relay(yt, &noTwitch, nil)
+		Expect(ok).To(BeTrue())
+		_, ok = relay.Relay(tw, &noTwitch, nil)
 		Expect(ok).To(BeFalse())
 	})
 

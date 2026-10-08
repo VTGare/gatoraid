@@ -77,7 +77,7 @@ var _ = Describe("SQLite store", func() {
 			g, _, err := db.JoinGuild(ctx, "g")
 			Expect(err).NotTo(HaveOccurred())
 
-			g.Settings.ModMessages = false
+			g.Settings.YouTubeModMessages = false
 			g.Settings.LogChannelID = "123"
 			Expect(db.UpdateGuildSettings(ctx, "g", g.Settings)).To(Succeed())
 
@@ -93,7 +93,7 @@ var _ = Describe("SQLite store", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(kind).To(Equal(store.JoinRestored))
 			Expect(back.Active()).To(BeTrue())
-			Expect(back.Settings.ModMessages).To(BeFalse())
+			Expect(back.Settings.YouTubeModMessages).To(BeFalse())
 			Expect(back.Settings.LogChannelID).To(Equal("123"))
 		})
 
@@ -185,7 +185,7 @@ var _ = Describe("Settings", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		want := store.DefaultSettings()
-		want.ModMessages = false
+		want.YouTubeModMessages = false
 		Expect(s).To(Equal(want))
 	})
 

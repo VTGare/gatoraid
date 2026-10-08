@@ -14,6 +14,7 @@ type exportEntry struct {
 	ChannelID       string   `toml:"channel_id"`
 	ChannelName     string   `toml:"channel_name,omitempty"`
 	Twitter         string   `toml:"twitter,omitempty"`
+	Twitch          string   `toml:"twitch,omitempty"`
 	Aliases         []string `toml:"aliases,omitempty"`
 	FreeChatStreams bool     `toml:"free_chat_streams,omitempty"`
 }
@@ -61,6 +62,7 @@ func (r *Registry) Export(sts []*store.Streamer) (string, error) {
 				ChannelID:       st.ChannelID,
 				ChannelName:     st.ChannelName,
 				Twitter:         st.Twitter,
+				Twitch:          st.Twitch,
 				Aliases:         st.Aliases,
 				FreeChatStreams: st.FreeChatStreams,
 			})

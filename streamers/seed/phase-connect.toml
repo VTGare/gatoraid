@@ -24,6 +24,7 @@ name = "Ashelia Rinkou"
 channel_id = "UCg7sW-h1PUowdiR5K4HlBew"
 channel_name = "Lia Ch.【Phase Connect】"
 twitter = "RinkouAshelia"
+twitch = "asheliarinkou"
 aliases = ["Ashelia", "Lia"]
 
 [[streamer]]
@@ -31,6 +32,7 @@ name = "Utatane Nasa"
 channel_id = "UCB7sSUNwh_dXE7ZL3DsGDpw"
 channel_name = "Nasa Ch. 転寝ナサ 【Phase Connect】"
 twitter = "UtataneNasa"
+twitch = "utatanenasa"
 aliases = ["Nasa", "Utatane"]
 
 [[streamer]]
@@ -38,6 +40,7 @@ name = "Pipkin Pippa"
 channel_id = "UCJ46YTYBQVXsfsp8-HryoUA"
 channel_name = "Pipkin Pippa Ch.【Phase Connect】"
 twitter = "pipkinpippa"
+twitch = "pippa"
 aliases = ["Pipkin", "Pippa"]
 
 [[streamer]]
@@ -45,6 +48,7 @@ name = "Tenma Maemi"
 channel_id = "UC3K7pmiHsNSx1y0tdx2bbCw"
 channel_name = "Tenma Ch. マエミ 天満 【Phase Connect】"
 twitter = "tenmamaemi"
+twitch = "tenma"
 aliases = ["Tenma", "Maemi"]
 
 [[streamer]]
@@ -52,6 +56,7 @@ name = "Hakushika Iori"
 channel_id = "UCN5bD1YYapThOeadG7YkBOA"
 channel_name = "Iori Ch. 白鹿いおり【Phase Connect】"
 twitter = "hakushikaiori"
+twitch = "iorihakushika"
 aliases = ["Iori", "Hakushika"]
 
 [[streamer]]
@@ -59,6 +64,7 @@ name = "Fujikura Uruka"
 channel_id = "UCjXJYPsKxoJyc-1RPB6dSyw"
 channel_name = "Uruka Ch. 藤倉ウルカ 【Phase Connect】"
 twitter = "fujikurauruka"
+twitch = "fujikurauruka"
 aliases = ["Uruka", "Fujikura"]
 
 [[streamer]]
@@ -66,6 +72,7 @@ name = "Shisui Michiru"
 channel_id = "UC1cExET9xoWSO9iSnRsW_1Q"
 channel_name = "Michiru Ch. 紫翠みちる【Phase Connect】"
 twitter = "shisuimichiru"
+twitch = "michiru_shisui"
 aliases = ["Michiru", "Shisui"]
 
 [[streamer]]
@@ -81,6 +88,7 @@ name = "Kaneko Lumi"
 channel_id = "UCx_zwZuGIS4jxO07kFk8G6Q"
 channel_name = "Lumi Ch.【Phase Connect】"
 twitter = "Kaneko_Lumi"
+twitch = "kanekolumi"
 aliases = ["Lumi", "Kaneko"]
 
 [[streamer]]
@@ -88,6 +96,7 @@ name = "Ember Amane"
 channel_id = "UC0w_dvkIwnXzMak6gfeioRQ"
 channel_name = "Ember Amane Ch. 【Phase Connect】"
 twitter = "EmberAmane"
+twitch = "emberamane"
 aliases = ["Ember", "Amane"]
 
 [[streamer]]
@@ -95,6 +104,7 @@ name = "Dizzy Dokuro"
 channel_id = "UC98iRMvRqUxRD6GP4NtRskw"
 channel_name = "Dizzy Dokuro Ch. 【Phase Connect】"
 twitter = "dizzydokuro"
+twitch = "dizzydokuro"
 aliases = ["Dizzy", "Dokuro"]
 
 [[streamer]]
@@ -102,6 +112,7 @@ name = "Hoshiumi Jelly"
 channel_id = "UCkb-r702uhx4-6Lrmetp-Ow"
 channel_name = "Jelly Hoshiumi Ch. 【Phase Connect】"
 twitter = "jellyhoshiumi"
+twitch = "jellyhoshiumi"
 aliases = ["Jelly", "Hoshiumi"]
 
 
@@ -112,18 +123,21 @@ name = "Eepy Sleepy"
 channel_id = "UC3aEtHpGzCFvoSn_wRWzgZQ"
 channel_name = "Eepy Sleepy Ch. 【Phase Connect】"
 twitter = "EepySleepyCh"
+twitch = "eepysleepy"
 
 [[streamer]]
 name = "Mari Mari"
 channel_id = "UCG5vZgELi3on_pksaLrIoxw"
 channel_name = "Mari Mari Ch. [Phase Connect]"
 twitter = "MARIMARI_EN"
+twitch = "marimari_en"
 
 [[streamer]]
 name = "Clio Aite"
 channel_id = "UCrGTSXWMiAWoPlowSuMVZ4Q"
 channel_name = "Clio Ch. クリオ・アイテ [Phase Connect]"
 twitter = "ClioAite"
+twitch = "clioaite"
 
 
 # Phase 02 - ALiAS
@@ -133,6 +147,7 @@ name = "Remilia Nephys"
 channel_id = "UC-hMwvRuMsQrfgu0DPKLV2A"
 channel_name = "Remilia Ch. レミリア・ネフィス 【Phase Connect】"
 twitter = "Remilia_Nephys"
+twitch = "remilianephys"
 aliases = ["Remilia", "Nephys"]
 
 [[streamer]]
@@ -140,6 +155,7 @@ name = "Chisaka Airi"
 channel_id = "UC5qlAhrec6-0J-K3zmhNPPQ"
 channel_name = "Airi Ch. 千坂 アイリ【Phase Connect】"
 twitter = "ChisakaAiri"
+twitch = "chisakaairi"
 aliases = ["Airi", "Chisaka"]
 
 [[streamer]]
@@ -147,6 +163,7 @@ name = "Amanogawa Shiina"
 channel_id = "UCnJNNk45O1QYS2oMRYFKSyw"
 channel_name = "Shiina Ch. 天ノ川 しいな 【Phase Connect】"
 twitter = "AmanogawaShiina"
+twitch = "amanogawashiina"
 aliases = ["Shiina", "Amanogawa"]
 
 [[streamer]]
@@ -154,6 +171,7 @@ name = "Himemiya Rie"
 channel_id = "UCJ4O6PWA47f6XbCgrLQNqEQ"
 channel_name = "Rie Ch. 姫宮りえ【Phase Connect】"
 twitter = "HimemiyaRie"
+twitch = "himemiyarie"
 aliases = ["Rie", "Himemiya"]
 
 [[streamer]]
@@ -161,6 +179,7 @@ name = "Erina Makina"
 channel_id = "UCupmjRr7kPgzXKh-cPxxGbg"
 channel_name = "Erina Ch. エリナ・マキナ 【Phase Connect】"
 twitter = "ErinaMakina"
+twitch = "erinamakina"
 aliases = ["Erina", "Makina"]
 
 [[streamer]]
@@ -168,6 +187,7 @@ name = "Komachi Panko"
 channel_id = "UCVo_KgPNsDKxHwzib7uarCw"
 channel_name = "Panko Ch. 小町ぱんこ 【Phase Connect】"
 twitter = "komachipanko"
+twitch = "komachipanko"
 aliases = ["Panko", "Komachi"]
 
 [[streamer]]
@@ -183,18 +203,21 @@ name = "Muu Muyu"
 channel_id = "UCejbicoRnQjCOdAPAv5JPwg"
 channel_name = "Muyu Ch. むうむゆ【Phase Connect】"
 twitter = "Muu_Muyu"
+twitch = "muumuyu"
 
 [[streamer]]
 name = "Runie Ruse"
 channel_id = "UCoAQsc-DQ0MjfTp059otQAw"
 channel_name = "Runie Ch. ルニ・ルーズ【Phase Connect】"
 twitter = "RunieRuse"
+twitch = "runieruse"
 
 [[streamer]]
 name = "Eimi Isami"
 channel_id = "UC-tBLCGTheczDn5mYNoNWTQ"
 channel_name = "Eimi Ch. 勇エイミ【Phase Connect】"
 twitter = "eimiisami"
+twitch = "eimiisami"
 
 
 # Phase 04 - SAGA
@@ -204,30 +227,35 @@ name = "Malice Evermore"
 channel_id = "UC0mEc9OzI-B9HRi1v-GCVBw"
 channel_name = "Malice Ch. マリス・エヴァーモア【Phase Connect】"
 twitter = "MaliceEvermore"
+twitch = "maliceevermore"
 
 [[streamer]]
 name = "Nitya Nil"
 channel_id = "UCBXLH5mn0nxgFH3udMtw4ig"
 channel_name = "Nitya Ch. 【Phase Connect】"
 twitter = "Nitya_Nil"
+twitch = "nitya_nil"
 
 [[streamer]]
 name = "Sinon Sinfonia"
 channel_id = "UCjqlgGE9PA7xEbE6XW5Tl9g"
 channel_name = "Sinon Ch.【Phase Connect】"
 twitter = "SinonSinfonia"
+twitch = "sinonsinfonia"
 
 [[streamer]]
 name = "Bibi Biscuit"
 channel_id = "UCmbokzv5VTe9LeuzAFcDu9A"
 channel_name = "Bibi Biscuit Ch.【Phase Connect】"
 twitter = "BibiBiscuitCh"
+twitch = "bibibiscuitch"
 
 [[streamer]]
 name = "Wilhelmina Frost"
 channel_id = "UCzA7j_ixOvBz39saDYlbRiA"
 channel_name = "Wilhelmina Ch.  ウィルヘルミナ・フロスト【Phase Connect】"
 twitter = "wilhelminafr0st"
+twitch = "wilhelminafrost"
 
 
 # Phase JP - Kaleido
@@ -237,12 +265,14 @@ name = "Ayase Yuu"
 channel_id = "UCnNLZWjl4GvVF4s8zBT9_kA"
 channel_name = "Yuu Ch. 絢世ユウ 【Phase Connect】"
 twitter = "ayaseyuuu"
+twitch = "ayaseyuu_"
 
 [[streamer]]
 name = "Gram Pico"
 channel_id = "UCtWH0tVAcUcSm4v96H5cAqQ"
 channel_name = "Pico Ch. 倉夢ぴこ 【Phase Connect】"
 twitter = "grampico_"
+twitch = "grampico"
 
 [[streamer]]
 name = "Kannagi Loki"

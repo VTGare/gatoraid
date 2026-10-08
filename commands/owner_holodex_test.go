@@ -67,9 +67,10 @@ var _ = Describe("Owner Holodex tools", func() {
 			Expect(r.URL.Query().Get("org")).To(Equal("Hololive"))
 			_ = json.NewEncoder(w).Encode([]holodex.Channel{
 				{ID: "UCjLEmnpCNeisMxy134KPwWw", Name: "Kobo Kanaeru Ch. hololive-ID", Inactive: true},
-				{ID: "UCnewnewnewnewnewnewnewn", Name: "New Ch. hololive-EN", EnglishName: "New Talent", Twitter: "newtalent"},
+				{ID: "UCnewnewnewnewnewnewnewn", Name: "New Ch. hololive-EN", EnglishName: "New Talent", Twitter: "newtalent", Twitch: "NewTalent"},
 				{ID: "UCgonegonegonegonegonego", Name: "Old Ch.", Inactive: true},
-				{ID: "UCHsx4Hqa-1ORjQTh9TYDhww", Name: "Takanashi Kiara Ch. hololive-EN"},
+				{ID: "UCHsx4Hqa-1ORjQTh9TYDhww", Name: "Takanashi Kiara Ch. hololive-EN", Twitch: "TakanashiKiara"},
+				{ID: "UCL_qhgtOy0dy1Agp8vkySQg", Name: "Mori Calliope Ch. hololive-EN", Twitch: "MoriCalliope"},
 			})
 		}))
 		DeferCleanup(srv.Close)
@@ -80,10 +81,14 @@ var _ = Describe("Owner Holodex tools", func() {
 
 		edits := h.rec.Edits()
 		Expect(edits).To(HaveLen(1))
-		Expect(edits[0].Body["content"]).To(ContainSubstring("**Hololive**: 4 channels on Holodex. 1 in the registry are inactive there, 1 active ones aren't in the registry."))
+		Expect(edits[0].Body["content"]).To(ContainSubstring("**Hololive**: 5 channels on Holodex. 1 in the registry are inactive there, 1 active ones aren't in the registry."))
 		Expect(edits[0].Body["content"]).To(ContainSubstring("- Kobo Kanaeru (`UCjLEmnpCNeisMxy134KPwWw`)"))
 		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring("# streamers/seed/hololive/en.toml"))
 		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring(`name = "New Talent"`))
 		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring(`twitter = "newtalent"`))
+		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring(`twitch = "newtalent"`))
+		Expect(edits[0].Body["content"]).To(ContainSubstring(
+			"Twitch usernames that differ from Holodex:\n- Takanashi Kiara: `takanashikiara` on Holodex, `none` here\n"))
+		Expect(edits[0].Body["content"]).NotTo(ContainSubstring("Mori Calliope"))
 	})
 })
