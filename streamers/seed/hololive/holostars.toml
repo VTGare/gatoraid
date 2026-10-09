@@ -38,6 +38,7 @@ name = "Yukoku Roberu"
 channel_id = "UCANDOlYTJT7N5jlRC3zfzVA"
 channel_name = "Roberu Ch. 夕刻ロベル"
 twitter = "yukokuroberu"
+twitch = "yukokuroberu_holostars"
 aliases = ["winning son", "roberu", "ロベル"]
 
 [[streamer]]
@@ -55,6 +56,7 @@ name = "Aragami Oga"
 channel_id = "UCwL7dgTxKo8Y4RFIKWaf8gA"
 channel_name = "Oga Ch.荒咬オウガ"
 twitter = "aragamioga"
+twitch = "aragamioga_holostars"
 aliases = ["oga"]
 
 
@@ -83,6 +85,7 @@ name = "Regis Altare"
 channel_id = "UCyxtGMdWlURZ30WSnEjDOQw"
 channel_name = "Regis Altare Ch. HOLOSTARS-EN"
 twitter = "regisaltare"
+twitch = "regisaltare_holostars_en"
 aliases = ["Regis"]
 
 [[streamer]]
@@ -101,6 +104,7 @@ name = "Josuiji Shinri"
 channel_id = "UCMqGG8BRAiI1lJfKOpETM_w"
 channel_name = "Josuiji Shinri Ch. HOLOSTARS-EN"
 twitter = "josuijishinri"
+twitch = "josuijishinri"
 aliases = ["Josuiji"]
 
 [[streamer]]
@@ -148,6 +152,7 @@ name = "Octavio"
 channel_id = "UCLk1hcmxg8rJ3Nm1_GvxTRA"
 channel_name = "Octavio Ch. HOLOSTARS-EN"
 twitter = "octavio_holo"
+twitch = "octavioholo"
 
 [[streamer]]
 name = "Crimzon Ruze"

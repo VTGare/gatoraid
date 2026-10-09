@@ -54,6 +54,7 @@ name = "Kureiji Ollie"
 channel_id = "UCYz_5n-uDuChHtLo7My1HnQ"
 channel_name = "Kureiji Ollie Ch. hololive-ID"
 twitter = "kureijiollie"
+twitch = "kureijiollie"
 
 [[streamer]]
 name = "Pavolia Reine"

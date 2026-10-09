@@ -26,6 +26,7 @@ name = "Yae Yugiri"
 channel_id = "UCbDHIS0NpXROhYjsaXQX4pA"
 channel_name = "Yae Yugiri Ch.【V4Mirai】"
 twitter = "YaeYugiri"
+twitch = "yaeyugiri"
 aliases = ["Yae"]
 
 
@@ -36,6 +37,7 @@ name = "Dr Novae"
 channel_id = "UC2Ne6dDcFxnM2hCBLii3IUg"
 channel_name = "Dr.NOVA(e) Ch.【V4Mirai】"
 twitter = "Dr_NOVAe"
+twitch = "drnovae"
 aliases = ["Novae", "Nova"]
 
 [[streamer]]
@@ -43,6 +45,7 @@ name = "REM Kanashibari"
 channel_id = "UCbZZlqASU668-wyW1K2kYBw"
 channel_name = "REM Kanashibari Ch.【V4Mirai】"
 twitter = "REMKanashibari"
+twitch = "remkanashibari"
 aliases = ["REM"]
 
 
@@ -53,6 +56,7 @@ name = "Lyko Lianna"
 channel_id = "UC1nhjH-Jrh7GH9y0Fma-dGw"
 channel_name = "Lyko Lianna Ch.【V4Mirai】"
 twitter = "LykoLianna"
+twitch = "lykolianna"
 
 [[streamer]]
 name = "Rara Rocora"
@@ -66,6 +70,7 @@ name = "Poma Pon"
 channel_id = "UCWChGhf3iYh9C_zAUNe9nag"
 channel_name = "Poma Pon Ch.【V4Mirai】"
 twitter = "pomapon_"
+twitch = "pomapon_"
 
 
 # 5th Gen AuraRain
@@ -75,9 +80,11 @@ name = "Paige Terner"
 channel_id = "UCPet_g252gdu3R_jg4VP_ZQ"
 channel_name = "Paige Terner Ch. 【V4Mirai】"
 twitter = "paigeterner_"
+twitch = "paigeterner_v4m"
 
 [[streamer]]
 name = "Ao WuWu"
 channel_id = "UCXxakVxNmVfFEu1zuU9JmMQ"
 channel_name = "Ao WuWu Ch.【V4Mirai】"
 twitter = "_aowuwu"
+twitch = "aowuwu_v4m"

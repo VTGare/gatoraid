@@ -88,7 +88,7 @@ var _ = Describe("Owner Holodex tools", func() {
 		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring(`twitter = "newtalent"`))
 		Expect(edits[0].Files["missing.toml"]).To(ContainSubstring(`twitch = "newtalent"`))
 		Expect(edits[0].Body["content"]).To(ContainSubstring(
-			"Twitch usernames that differ from Holodex:\n- Takanashi Kiara: `takanashikiara` on Holodex, `none` here\n"))
+			"Twitch usernames that differ from Holodex:\n- Takanashi Kiara: `takanashikiara` on Holodex, `kiara` here\n"))
 		Expect(edits[0].Body["content"]).NotTo(ContainSubstring("Mori Calliope"))
 	})
 })

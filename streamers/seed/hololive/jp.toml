@@ -34,6 +34,7 @@ name = "Roboco-san"
 channel_id = "UCDqI2jOz0weumE8s7paEk6g"
 channel_name = "Roboco Ch. - ロボ子"
 twitter = "robocosan"
+twitch = "robocosan_hololive"
 aliases = ["roboco", "ロボ子"]
 
 [[streamer]]
@@ -59,6 +60,7 @@ name = "Akai Haato"
 channel_id = "UC1CfXB_kRs3C-zaeTG3oGyg"
 channel_name = "HAACHAMA Ch 赤井はあと"
 twitter = "akaihaato"
+twitch = "akaihaato_hololive"
 aliases = ["haato", "haachama", "はあちゃま", "はあと"]
 
 [[streamer]]
@@ -72,6 +74,7 @@ name = "Shirakami Fubuki"
 channel_id = "UCdn5BQ06XqgXoAxIhbqw5Rg"
 channel_name = "フブキCh。白上フブキ"
 twitter = "shirakamifubuki"
+twitch = "shirakamifubuki_holo"
 aliases = ["fubuki", "fbk", "フブキ"]
 
 [[streamer]]
@@ -87,6 +90,7 @@ name = "Natsuiro Matsuri"
 channel_id = "UCQ0UDLQCjY0rmuxCDE38FGg"
 channel_name = "Matsuri Channel 夏色まつり"
 twitter = "natsuiromatsuri"
+twitch = "natsuiromatsuri_hololive"
 aliases = ["matsuri", "まつり"]
 
 [[streamer]]
@@ -109,6 +113,7 @@ name = "Nakiri Ayame"
 channel_id = "UC7fk0CB07ly8oSl0aqKkqFg"
 channel_name = "Nakiri Ayame Ch. 百鬼あやめ"
 twitter = "nakiriayame"
+twitch = "nakiriayame_hololive"
 aliases = ["ayame", "nakiri", "あやめ"]
 
 [[streamer]]
@@ -170,6 +175,7 @@ name = "Shirogane Noel"
 channel_id = "UCdyqAaZDKHXg4Ahi7VENThQ"
 channel_name = "Noel Ch. 白銀ノエル"
 twitter = "shiroganenoel"
+twitch = "shiroganenoel_hololive"
 aliases = ["noel", "ノエル", "danchou", "団長"]
 
 [[streamer]]
@@ -177,6 +183,7 @@ name = "Shiranui Flare"
 channel_id = "UCvInZx9h3jC2JzsIzoOebWg"
 channel_name = "Flare Ch. 不知火フレア"
 twitter = "shiranuiflare"
+twitch = "shiranuiflare_hololive"
 aliases = ["flare", "フレア"]
 
 
@@ -187,6 +194,7 @@ name = "Tokoyami Towa"
 channel_id = "UC1uv2Oq6kNxgATlCiez59hw"
 channel_name = "Towa Ch. 常闇トワ"
 twitter = "tokoyamitowa"
+twitch = "tokoyamitowa_holo"
 aliases = ["towa", "トワ"]
 
 [[streamer]]
@@ -194,6 +202,7 @@ name = "Himemori Luna"
 channel_id = "UCa9Y57gfeY0Zro_noHRVrnw"
 channel_name = "Luna Ch. 姫森ルーナ"
 twitter = "himemoriluna"
+twitch = "himemoriluna_hololive"
 aliases = ["ルーナ", "luna"]
 free_chat_streams = true
 
@@ -202,6 +211,7 @@ name = "Tsunomaki Watame"
 channel_id = "UCqm3BQLlJfvkTsX_hvm0UmA"
 channel_name = "Watame Ch. 角巻わため"
 twitter = "tsunomakiwatame"
+twitch = "tsunomakiwatame_hololive"
 aliases = ["watame", "わため"]
 
 
@@ -221,6 +231,7 @@ name = "Yukihana Lamy"
 channel_id = "UCFKOVgVbGmX65RxO3EtH3iw"
 channel_name = "Lamy Ch. 雪花ラミィ"
 twitter = "yukihanalamy"
+twitch = "yukihanalamy_hololive"
 aliases = ["lamy", "らみ", "ラミィ"]
 
 [[streamer]]
@@ -236,6 +247,7 @@ name = "Shishiro Botan"
 channel_id = "UCUKD-uaobj9jiqB-VXt71mA"
 channel_name = "Botan Ch.獅白ぼたん"
 twitter = "shishirobotan"
+twitch = "shishirobotan_hololive"
 aliases = ["botan", "ぼたん", "shishiron", "bossan"]
 
 
@@ -246,6 +258,7 @@ name = "Laplus Darkness"
 channel_id = "UCENwRMx5Yh42zWpzURebzTw"
 channel_name = "Laplus ch. ラプラス・ダークネス - holoX -"
 twitter = "LaplusDarknesss"
+twitch = "laplusdarknesss_hololive"
 aliases = ["Laplus"]
 
 [[streamer]]
@@ -261,6 +274,7 @@ name = "Hakui Koyori"
 channel_id = "UC6eWCld0KwmyHFbAqK3V-Rw"
 channel_name = "Koyori ch. 博衣こより - holoX -"
 twitter = "hakuikoyori"
+twitch = "hakuikoyori_hololive"
 aliases = ["Koyori"]
 
 [[streamer]]
@@ -268,6 +282,7 @@ name = "Kazama Iroha"
 channel_id = "UC_vMYWcDjmfdpH6r4TTn1MQ"
 channel_name = "Iroha ch. 風真いろは - holoX -"
 twitter = "kazamairohach"
+twitch = "kazamairoha_holo"
 aliases = ["Iroha"]
 
 

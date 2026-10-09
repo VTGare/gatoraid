@@ -21,6 +21,7 @@ name = "Takanashi Kiara"
 channel_id = "UCHsx4Hqa-1ORjQTh9TYDhww"
 channel_name = "Takanashi Kiara Ch. hololive-EN"
 twitter = "takanashikiara"
+twitch = "kiara"
 aliases = ["kiara", "tenchou", "きあら", "キアラ", "店長"]
 
 [[streamer]]
@@ -75,6 +76,7 @@ name = "FUWAMOCO"
 channel_id = "UCt9H_RpQzhxzlyBxFqrdHqA"
 channel_name = "FUWAMOCO Ch. hololive-EN"
 twitter = "fuwamoco_en"
+twitch = "fuwamoco"
 aliases = ["Fuwa", "Fuwawa", "Moco", "Mococo"]
 
 [[streamer]]
@@ -82,6 +84,7 @@ name = "Shiori Novella"
 channel_id = "UCgnfPPb9JI3e9A4cXHnWbyg"
 channel_name = "Shiori Novella Ch. hololive-EN"
 twitter = "shiorinovella"
+twitch = "shiorinovella"
 aliases = ["Shiori", "Shio", "Novella"]
 
 [[streamer]]
@@ -108,6 +111,7 @@ name = "Cecilia Immergreen"
 channel_id = "UCvN5h1ShZtc7nly3pezRayg"
 channel_name = "Cecilia Immergreen Ch. hololive-EN"
 twitter = "ceciliaimmergreen"
+twitch = "cecilia"
 aliases = ["Cecilia", "Immergreen"]
 
 [[streamer]]
@@ -115,6 +119,7 @@ name = "Elizabeth Rose Bloodflame"
 channel_id = "UCW5uhrG1eCBYditmhL0Ykjw"
 channel_name = "Elizabeth Rose Bloodflame Ch. hololive-EN"
 twitter = "erbloodflame"
+twitch = "elizabethrosebloodflame"
 aliases = ["Elizabeth", "Rose", "Bloodflame"]
 
 [[streamer]]
@@ -122,6 +127,7 @@ name = "Gigi Murin"
 channel_id = "UCDHABijvPBnJm7F-KlNME3w"
 channel_name = "Gigi Murin Ch. hololive-EN"
 twitter = "gigimurin"
+twitch = "gigimurin"
 aliases = ["Gigi", "Murin"]
 
 [[streamer]]
@@ -129,4 +135,5 @@ name = "Raora Panthera"
 channel_id = "UCl69AEx4MdqMZH7Jtsm7Tig"
 channel_name = "Raora Panthera Ch. hololive-EN"
 twitter = "raorapanthera"
+twitch = "raora"
 aliases = ["Raora", "Panthera"]

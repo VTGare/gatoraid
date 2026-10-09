@@ -11,6 +11,7 @@ order = 2
 name = "NIJISANJI EN Official"
 channel_id = "UC-JSeFfovhNsEhftt1WHMvg"
 twitter = "NIJISANJI_World"
+twitch = "nijisanji_en"
 aliases = ["Nijisanji EN"]
 
 
@@ -21,6 +22,7 @@ name = "Elira Pendora"
 channel_id = "UCIeSUTOTkF9Hs7q3SGcO-Ow"
 channel_name = "Elira Pendora 【NIJISANJI EN】"
 twitter = "EliraPendora"
+twitch = "elirapendora"
 aliases = ["Elira", "Pendora", "Miss Pendora", "Ewiwa", "wiwi", "Ewiwi", "Eli"]
 
 [[streamer]]
@@ -28,6 +30,7 @@ name = "Finana Ryugu"
 channel_id = "UCu-J8uIXuLZh16gG-cT1naw"
 channel_name = "Finana Ryugu 【NIJISANJI EN】"
 twitter = "FinanaRyugu"
+twitch = "finanaryugu"
 aliases = ["Finana", "Finaurnaur", "Ryugu"]
 
 
@@ -38,6 +41,7 @@ name = "Petra Gurin"
 channel_id = "UCgA2jKRkqpY_8eysPUs8sjw"
 channel_name = "Petra Gurin【NIJISANJI EN】"
 twitter = "Petra_Gurin"
+twitch = "petragurin"
 aliases = ["Petra", "Gurin"]
 
 
@@ -56,6 +60,7 @@ name = "Enna Alouette"
 channel_id = "UCR6qhsLpn62WVxCBK1dkLow"
 channel_name = "Enna Alouette【NIJISANJI EN】"
 twitter = "EnnaAlouette"
+twitch = "ennaalouette"
 aliases = ["Enna", "Enner"]
 
 
@@ -74,6 +79,7 @@ name = "Shu Yamino"
 channel_id = "UCG0rzBZV_QMP4MtWg6IjhEA"
 channel_name = "Shu Yamino【NIJISANJI EN】"
 twitter = "shu_yamino"
+twitch = "shu_yamino"
 aliases = ["Shu", "Yamino"]
 
 [[streamer]]
@@ -112,6 +118,7 @@ name = "Alban Knox"
 channel_id = "UCQ1zGxHrfEmmW4CPpBx9-qw"
 channel_name = "Alban Knox 【NIJISANJI EN"
 twitter = "alban_knox"
+twitch = "albanknox"
 aliases = ["Alban", "Knox"]
 
 
@@ -122,6 +129,7 @@ name = "Maria Marionette"
 channel_id = "UCwaS8_S7kMiKA3izlTWHbQg"
 channel_name = "Maria Marionette 【NIJISANJI EN】"
 twitter = "MariaMari0nette"
+twitch = "mariamarionette"
 aliases = ["Maria", "Marionette"]
 
 [[streamer]]
@@ -129,6 +137,7 @@ name = "Aia Amare"
 channel_id = "UCN68LoM3khS4gdBMiWJO8WA"
 channel_name = "Aia Amare 【NIJISANJI EN】"
 twitter = "AiaAmare"
+twitch = "aiaamare"
 aliases = ["Aia", "Amare"]
 
 [[streamer]]
@@ -136,6 +145,7 @@ name = "Scarle Yonaguni"
 channel_id = "UCFgXWZOUZA2oYHNr6qDmsTQ"
 channel_name = "Scarle Yonaguni 【NIJISANJI EN】"
 twitter = "ScarleYonaguni"
+twitch = "scarleyonaguni"
 aliases = ["Scarle", "Yonaguni"]
 
 [[streamer]]
@@ -143,6 +153,7 @@ name = "Ren Zotto"
 channel_id = "UCKu59gTZ_rdEmerdx5rV4Yg"
 channel_name = "Ren Zotto 【NIJISANJI EN】"
 twitter = "RenZott0"
+twitch = "renzotto"
 aliases = ["Ren", "Zotto"]
 
 
@@ -169,6 +180,7 @@ name = "Ver Vermillion"
 channel_id = "UCO8WcDsF5znr-qsXlzZNpqg"
 channel_name = "Ver Vermillion【NIJISANJI EN】"
 twitter = "Ver_Vermillion"
+twitch = "ver_vermillion"
 aliases = ["Ver", "Vermillion"]
 
 
@@ -179,6 +191,7 @@ name = "Yu Q. Wilson"
 channel_id = "UCKpKC3M5fkcEvtOr06dmYlA"
 channel_name = "Yu Q. Wilson【NIJISANJI EN】"
 twitter = "YuQWilson"
+twitch = "yu_q_wilson"
 aliases = ["Yu", "Wilson"]
 
 [[streamer]]
@@ -205,6 +218,7 @@ name = "Claude Clawmark"
 channel_id = "UCdh-YF2gTzqDNu0VU9lwPPw"
 channel_name = "Claude Clawmark【NIJISANJI EN】"
 twitter = "ClaudeClawmark"
+twitch = "claude_clawmark"
 aliases = ["Claude", "Clawmark"]
 
 
@@ -215,6 +229,7 @@ name = "Ryoma Barrenwort"
 channel_id = "UCIzZDiilcPv0wim_MbuizFA"
 channel_name = "Ryoma Barrenwort【NIJISANJI EN】"
 twitter = "RyomaBarrenwort"
+twitch = "ryomabarrenwort"
 aliases = ["Ryoma"]
 
 [[streamer]]
@@ -222,6 +237,7 @@ name = "Klara Charmwood"
 channel_id = "UCQYwIUCLqFoin7lHKmePjJw"
 channel_name = "Klara Charmwood【NIJISANJI EN】"
 twitter = "KlaraCharmwood"
+twitch = "klara_charmwood"
 aliases = ["Klara"]
 
 
@@ -232,24 +248,28 @@ name = "Seible"
 channel_id = "UCCugV2RWXqJMjVVQl_Yh4TQ"
 channel_name = "Seible【NIJISANJI EN】"
 twitter = "Seible_2434"
+twitch = "seible_2434"
 
 [[streamer]]
 name = "Kaelix Debonair"
 channel_id = "UCEFOogmvTTcCaO8Qe0I8-tg"
 channel_name = "Kaelix Debonair【NIJISANJI EN】"
 twitter = "kaelixdebonair"
+twitch = "kaelixdebonair"
 
 [[streamer]]
 name = "Zeal Ginjoka"
 channel_id = "UClMYGvekJOb51eBOCK-d4Dw"
 channel_name = "Zeal Ginjoka【NIJISANJI EN】"
 twitter = "zealginjoka"
+twitch = "zealginjoka"
 
 [[streamer]]
 name = "Freodore"
 channel_id = "UCr40BzcLiGruKe7M5gXR9zQ"
 channel_name = "Freodore【NIJISANJI EN】"
 twitter = "Freo_2434"
+twitch = "freodore"
 
 [[streamer]]
 name = "BY THE BEAT"

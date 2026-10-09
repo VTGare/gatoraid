@@ -19,6 +19,7 @@ name = "Shibuya Hajime"
 channel_id = "UCeK9HFcRZoTrvqcUCtccMoQ"
 channel_name = "渋谷ハジメのはじめ支部"
 twitter = "sibuya_hajime"
+twitch = "hajime_shibuya2434"
 aliases = ["Shibuya", "Hajime", "渋谷ハジメ"]
 
 [[streamer]]
@@ -33,6 +34,7 @@ name = "Shizuka Rin"
 channel_id = "UC6oDys1BGgBsIC3WhG1BovQ"
 channel_name = "Shizuka Rin Official"
 twitter = "ShizuRin23"
+twitch = "shizurintv"
 aliases = ["Shizuka", "Rin", "静凛"]
 
 [[streamer]]
@@ -107,6 +109,7 @@ name = "Yuhi Riri"
 channel_id = "UC48jH1ul-6HOrcSSfoR02fQ"
 channel_name = "Yuhi Riri Official"
 twitter = "Yuuhi_Riri"
+twitch = "hello_miraijin"
 aliases = ["Yuhi", "Riri", "(夕陽リリ"]
 
 [[streamer]]
@@ -139,6 +142,7 @@ name = "Sasaki Saku"
 channel_id = "UCoztvTULBYd3WmStqYeoHcA"
 channel_name = "笹木咲 / Sasaki Saku"
 twitter = "saku_sasaki"
+twitch = "saku_sasaki84"
 aliases = ["Sasaki", "Saku", "笹木 咲"]
 
 [[streamer]]
@@ -146,6 +150,7 @@ name = "Honma Himawari"
 channel_id = "UC0g1AE0DOjBYnLhkgoRWN1w"
 channel_name = "本間ひまわり - Himawari Honma -"
 twitter = "honmahimawari"
+twitch = "honhima"
 aliases = ["Honma", "Himawari", "本間ひまわり"]
 
 [[streamer]]
@@ -153,6 +158,7 @@ name = "Makaino Ririmu"
 channel_id = "UC9EjSJ8pvxtvPdxLOElv73w"
 channel_name = "魔界ノりりむ"
 twitter = "makaino_ririmu"
+twitch = "makaino_ririmu"
 aliases = ["Makaino", "Ririmu", "魔界ノりりむ"]
 
 [[streamer]]
@@ -167,6 +173,7 @@ name = "Shiina Yuika"
 channel_id = "UC_4tXjqecqox5Uc05ncxpxg"
 channel_name = "椎名唯華 / Shiina Yuika"
 twitter = "yuika_siina"
+twitch = "yuika_shiina"
 aliases = ["Shiina", "Yuika", "椎名唯華"]
 
 
@@ -240,6 +247,7 @@ name = "Kanda Shoichi"
 channel_id = "UCWz0CSYCxf4MhRKPDm220AQ"
 channel_name = "神田笑一 / Kanda Shoichi【 にじさんじ 】"
 twitter = "Gaon2434"
+twitch = "shoichi_kanda"
 aliases = ["Kanda", "Shoichi", "神田笑一"]
 
 [[streamer]]
@@ -254,6 +262,7 @@ name = "Takamiya Rion"
 channel_id = "UCV5ZZlLjk5MKGg3L0n0vbzw"
 channel_name = "鷹宮リオン / Rion Takamiya"
 twitter = "TakamiyaRion"
+twitch = "takamiyarion"
 aliases = ["Takamiya", "Rion", "鷹宮リオン"]
 
 [[streamer]]
@@ -302,6 +311,7 @@ name = "Sakura Ritsuki"
 channel_id = "UCfQVs_KuXeNAlGa3fb8rlnQ"
 channel_name = "桜凛月"
 twitter = "SAKURA_RITSUKI"
+twitch = "ritsukintv"
 aliases = ["Sakura", "Ritsuki", "桜凛月"]
 
 [[streamer]]
@@ -394,6 +404,7 @@ name = "Saegusa Akina"
 channel_id = "UCNW1Ex0r6HsWRD4LCtPwvoQ"
 channel_name = "三枝明那 / Saegusa Akina"
 twitter = "333akina"
+twitch = "akkeyna2434"
 aliases = ["Saegusa", "Akina", "三枝明那"]
 
 [[streamer]]
@@ -411,6 +422,7 @@ name = "Yukishiro Mahiro"
 channel_id = "UCHX7YpFG8rVwhsHCx34xt7w"
 channel_name = "雪城眞尋/Yukishiro Mahiro【にじさんじ所属】"
 twitter = "MahiroYukishiro"
+twitch = "mahiro_yukishiro"
 aliases = ["Yukishiro", "Mahiro", "雪城眞尋"]
 
 [[streamer]]
@@ -427,6 +439,7 @@ name = "Ex Albio"
 channel_id = "UCIytNcoz4pWzXfLda0DoULQ"
 channel_name = "エクス・アルビオ -Ex Albio-"
 twitter = "Ex_Albio"
+twitch = "exalbio_2434"
 aliases = ["Albio", "エクス・アルビオ"]
 
 [[streamer]]
@@ -444,6 +457,7 @@ name = "Hayama Marin"
 channel_id = "UCfipDDn7wY-C-SoUChgxCQQ"
 channel_name = "葉山舞鈴 / Ohayama Ch."
 twitter = "Hayama_Marin"
+twitch = "nijisanji_hayama_marin"
 aliases = ["Hayama", "Marin", "葉山舞鈴"]
 
 [[streamer]]
@@ -485,6 +499,7 @@ name = "Ars Almal"
 channel_id = "UCdpUojq0KWZCN9bxXnZwz5w"
 channel_name = "アルス・アルマル -ars almal- 【にじさんじ】"
 twitter = "ars_almal"
+twitch = "arsalmal"
 aliases = ["Ars", "Almal", "アルス・アルマル"]
 
 
@@ -495,6 +510,7 @@ name = "Amamiya Kokoro"
 channel_id = "UCkIimWZ9gBJRamKF0rmPU8w"
 channel_name = "天宮 こころ / Amamya Ch."
 twitter = "amamiya_kokoro"
+twitch = "amamiyakokoro_"
 aliases = ["Kokoro", "Amamiya", "天宮 こころ", "Mya", "Amamya"]
 
 [[streamer]]
@@ -502,6 +518,7 @@ name = "Eli Conifer"
 channel_id = "UCpNH2Zk2gw3JBjWAKSyZcQQ"
 channel_name = "エリー・コニファー / Eli Conifer【にじさんじ】"
 twitter = "Eli_Conifer"
+twitch = "eli_conifer"
 aliases = ["Eli", "Conifer", "エリー・コニファー"]
 
 [[streamer]]
@@ -509,6 +526,7 @@ name = "Ratna Petit"
 channel_id = "UCIG9rDtgR45VCZmYnd-4DUw"
 channel_name = "ラトナ・プティ -Ratna Petit -にじさんじ所属"
 twitter = "ratna_petit"
+twitch = "petit2434"
 aliases = ["Ratna", "Petit", "ラトナ・プティ"]
 
 [[streamer]]
@@ -563,6 +581,7 @@ name = "Sara Hoshikawa"
 channel_id = "UC9V3Y3_uzU5e-usObb6IE1w"
 channel_name = "星川サラ / Sara Hoshikawa"
 twitter = "Sara_Hoshikawa"
+twitch = "sara_hoshikawa"
 aliases = ["Sara", "Hoshikawa", "星川サラ", "星川", "サラ"]
 
 
@@ -604,6 +623,7 @@ name = "Fuwa Minato"
 channel_id = "UC6wvdADTJ88OfIbJYIpAaDA"
 channel_name = "不破 湊 / Fuwa Minato【にじさんじ】"
 twitter = "Fuwa_Minato"
+twitch = "fuwaminato2434"
 aliases = ["Fuwa", "Minato", "不破 湊", "湊", "不破"]
 
 
@@ -649,6 +669,7 @@ name = "Genzuki Tojiro"
 channel_id = "UCGw7lrT-rVZCWHfdG9Frcgg"
 channel_name = "弦月 藤士郎 / Genzuki Tojiro【にじさんじ"
 twitter = "1O46V"
+twitch = "genzuki_tojiro"
 aliases = ["Genzuki", "Tojiro", "弦月藤士郎"]
 
 [[streamer]]
@@ -695,6 +716,7 @@ name = "Kitakoji Hisui"
 channel_id = "UCRqBKoKuX30ruKAq05pCeRQ"
 channel_name = "北小路ヒスイ / Kitakoji Hisui 【にじさんじ】"
 twitter = "Hisui_Kitakoji"
+twitch = "hisui_kitakoji"
 aliases = ["Kitakoji", "Hisui", "北小路ヒスイ"]
 
 [[streamer]]
@@ -709,6 +731,7 @@ name = "Nishizono Chigusa"
 channel_id = "UCkngxfPbmGyGl_RIq4FA3MQ"
 channel_name = "西園チグサ / Nishizono Chigusa"
 twitter = "Chigusa_24zono"
+twitch = "chigusa_nishizono"
 aliases = ["Chigusa", "Nishizono", "西園チグサ"]
 
 
@@ -734,6 +757,7 @@ name = "Oliver Evans"
 channel_id = "UCqjTqdVlvIipZXIKeCkHKUA"
 channel_name = "オリバー・エバンス / Oliver Evans 【にじさんじ】"
 twitter = "oliverD_23"
+twitch = "oliver_2434"
 aliases = ["Oliver", "Evans", "オリバー・エバンス"]
 
 [[streamer]]
@@ -741,6 +765,7 @@ name = "Lain Paterson"
 channel_id = "UCRm6lqtdxs_Qo6HeL-SRQ-w"
 channel_name = "レイン・パターソン／Lain Paterson【にじさんじ】"
 twitter = "Lain_Paterson"
+twitch = "lain_paterson"
 aliases = ["Lain", "Paterson", "レイン", "パターソン"]
 
 
@@ -841,18 +866,21 @@ name = "Ishigami Nozomi"
 channel_id = "UCtLfA_qUqCJtjXJM2ZR_keg"
 channel_name = "石神のぞみ / Ishigami Nozomi【にじさんじ】"
 twitter = "I_Nozomi_"
+twitch = "ishigami_nozomi"
 
 [[streamer]]
 name = "Koshimizu Toru"
 channel_id = "UCUP8TmlO7NNra88AMqGU_vQ"
 channel_name = "小清水 透 / Koshimizu Toru【にじさんじ】"
 twitter = "toru_2434"
+twitch = "toru_2434"
 
 [[streamer]]
 name = "Igarashi Rika"
 channel_id = "UCu-rV2gPtJ-CsGxe71z_BrQ"
 channel_name = "五十嵐梨花 / Igarashi Rika 【にじさんじ】"
 twitter = "1garashi_Rika"
+twitch = "igarashirika"
 
 [[streamer]]
 name = "Idios"
@@ -864,6 +892,7 @@ name = "Shishido Akari"
 channel_id = "UCWRPqA0ehhWV4Hnp27PJCkQ"
 channel_name = "獅子堂 あかり / Shishido Akari【にじさんじ】"
 twitter = "44do_akari"
+twitch = "shishidoakari"
 
 
 # Oriens
@@ -913,6 +942,7 @@ name = "Hoshirube Sho"
 channel_id = "UCgZ0pH7j6c9z-pkOG3PYw1Q"
 channel_name = "星導ショウ / Hoshirube Sho【にじさんじ】"
 twitter = "Show_SylveSTAR"
+twitch = "show_sylvestar"
 
 [[streamer]]
 name = "Murakumo Kagetsu"
@@ -1027,6 +1057,7 @@ name = "Sakayori Soma"
 channel_id = "UCkQ8i_cz0prqdo9jj__L93Q"
 channel_name = "酒寄颯馬 / Sakayori Soma【にじさんじ】"
 twitter = "sakayori_soma"
+twitch = "sakayorisoma"
 
 [[streamer]]
 name = "Nagisa Trout"
@@ -1066,6 +1097,7 @@ name = "Itsuki Sakyo"
 channel_id = "UCiBBDZ-ndtBgE4xKbswlgXQ"
 channel_name = "五木左京 / Itsuki Sakyo【にじさんじ】"
 twitter = "Itsuki_Sakyo"
+twitch = "itsuki_sakyo"
 
 
 # Yoiyume
@@ -1156,24 +1188,28 @@ name = "Reina"
 channel_id = "UC_4QF0dL-9XI9VajsNkMtmQ"
 channel_name = "Rei7【にじさんじ】"
 twitter = "Rei7_2434"
+twitch = "rei7_2434"
 
 [[streamer]]
 name = "Senri Ayumu"
 channel_id = "UC5Qv2tPOI38OcnqOdUKkn7Q"
 channel_name = "千凛あゆむ / Senri Ayumu【にじさんじ】"
 twitter = "Senri_Ayumu"
+twitch = "senriayumu_2434"
 
 [[streamer]]
 name = "Tsukahara Daichi"
 channel_id = "UC9HYkiQZ1_b3J_F8gc12eaA"
 channel_name = "塚原大地 / Tsukahara Daichi【にじさんじ】"
 twitter = "BIG_Tsukahara"
+twitch = "big_tsukahara"
 
 [[streamer]]
 name = "Onotora"
 channel_id = "UCFimqykDM5g9a5KxlW_e7ZQ"
 channel_name = "男虎 / Ono Tora【にじさんじ】"
 twitter = "OnoTora333"
+twitch = "onotora_2434"
 
 [[streamer]]
 name = "Kokonami Iruka"
@@ -1187,12 +1223,14 @@ name = "Rayon"
 channel_id = "UCsxs_R8xnsQN4t-F_3qQ8PQ"
 channel_name = "レヨン【にじさんじ】"
 twitter = "Rayon_2434"
+twitch = "rayon_2434"
 
 [[streamer]]
 name = "Mikogami Kotone"
 channel_id = "UCwjlRIySBvZ-kLV5bfjya4A"
 channel_name = "御子神琴音 / Mikogami Kotone【にじさんじ】"
 twitter = "Mikogami_Kotone"
+twitch = "mikogami_kotone"
 
 [[streamer]]
 name = "Kuri Eita"

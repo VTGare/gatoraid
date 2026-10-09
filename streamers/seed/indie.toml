@@ -1243,6 +1243,7 @@ name = "Immy Bisou"
 channel_id = "UCVIQsHu1ycP2lRGIbjFJjJw"
 channel_name = "Immy"
 twitter = "ImmyBisou"
+twitch = "immybisou"
 
 [[streamer]]
 name = "Kumonoue Yumemi"
@@ -1255,6 +1256,7 @@ name = "Nenemaru"
 channel_id = "UCx9yRTjbPuS1ZA1Hxdsxj4A"
 channel_name = "寧々丸"
 twitter = "nenemaru220"
+twitch = "nenemaru220"
 
 [[streamer]]
 name = "Sizma Rei"
@@ -1267,6 +1269,7 @@ name = "Pakael"
 channel_id = "UCNV41fU_c4IvhrwHhGKSWLA"
 channel_name = "パカエル / Pakael"
 twitter = "paka_el"
+twitch = "p4k4el"
 
 [[streamer]]
 name = "somunia"
@@ -1297,6 +1300,7 @@ name = "Shee Icho"
 channel_id = "UCYadZR9mRignx4RKvPow44g"
 channel_name = "Shee Icho Ch. 銀杏しい【 novamore 】"
 twitter = "shee_icho"
+twitch = "sheeicho"
 
 [[streamer]]
 name = "Planya"
@@ -1321,6 +1325,7 @@ name = "Kano"
 channel_id = "UCfuz6xYbYFGsWWBi3SpJI1w"
 channel_name = "鹿乃 / MKLNtic"
 twitter = "_kanotic"
+twitch = "kanotic_"
 
 [[streamer]]
 name = "Jinsei Tsumiko"
@@ -1333,6 +1338,7 @@ name = "Kanna Tamachi"
 channel_id = "UChEe0jSUdb2ox9wQFYkByEQ"
 channel_name = "Kanna Tamachi Ch."
 twitter = "kannatamachi"
+twitch = "kannatamachi"
 
 [[streamer]]
 name = "Ratio Yuires"
@@ -1460,6 +1466,7 @@ name = "Fuzuki Miki"
 channel_id = "UCRVYDlnhf6MCqbbf5-jjjsQ"
 channel_name = "Fuzuki Miki Ch. 文月みき"
 twitter = "fuzukimiki"
+twitch = "fuzukimiki"
 
 [[streamer]]
 name = "Ashton Marten"
@@ -1507,6 +1514,7 @@ name = "klaeia"
 channel_id = "UCguTLlIfEP-1KzkogRUcAKw"
 channel_name = "klaeia"
 twitter = "cloverkuri"
+twitch = "klaeia"
 
 [[streamer]]
 name = "Rosuuri"
@@ -1520,6 +1528,7 @@ name = "Yamane Chiika"
 channel_id = "UCfIZ5P7BcgIyLpfOj66DwtA"
 channel_name = "Chiika Ch. 山根ちいか"
 twitter = "chiikadayo"
+twitch = "chiika"
 aliases = ["Chiika", "Yamane"]
 
 
@@ -1574,6 +1583,7 @@ name = "Amatsuka Uto"
 channel_id = "UCdYR5Oyz8Q4g0ZmB4PkTD7g"
 channel_name = "天使うと"
 twitter = "amatsukauto"
+twitch = "utonyan_"
 aliases = ["Amatsuka", "Uto"]
 
 
@@ -1584,6 +1594,7 @@ name = "Nova Aokami"
 channel_id = "UCA4bOB1Jnw5-lbuoSCfxc-w"
 channel_name = "Nova Aokami Ch. [VReverie]"
 twitter = "novavreverie"
+twitch = "novaaokami"
 aliases = ["Nova", "Aokami"]
 
 
@@ -1618,6 +1629,7 @@ aliases = ["Anon", "Non"]
 name = "OniGiri"
 channel_id = "UC97JZwjhKFJ3HwrGkcJekSw"
 twitter = "OnigiriEn_"
+twitch = "onigiri"
 aliases = ["Giri", "OniGiriEN"]
 
 
@@ -1628,6 +1640,7 @@ name = "rpr"
 channel_id = "UCcMCZ0PPqw-L9rU9LWhOazA"
 channel_name = "rprxx"
 twitter = "rpr"
+twitch = "rprx"
 aliases = ["rprxx", "rprx"]
 
 
@@ -1659,6 +1672,7 @@ name = "Nyatasha Nyanners"
 channel_id = "UCO5Jvsc_sKuZi3MhnJxrlzQ"
 channel_name = "Nyanners"
 twitter = "NyanNyanners"
+twitch = "nyanners"
 aliases = ["Nyanners", "Nyan", "Nyatasha"]
 
 [[streamer]]
@@ -1742,6 +1756,7 @@ name = "Rin Penrose"
 channel_id = "UCpZIbzoEC_3rZglErpQkbDg"
 channel_name = "Rin Penrose Ch. idol-EN"
 twitter = "RinPenrose"
+twitch = "rinpenrose"
 aliases = ["Rin", "Penrose"]
 
 
@@ -1781,6 +1796,7 @@ aliases = ["General GEEGA"]
 name = "Matara Kan"
 channel_id = "UCxx2uRmAwkhb3QJMfLssgsw"
 twitter = "MataraKan"
+twitch = "matarakan"
 aliases = ["Matara"]
 
 [[streamer]]
@@ -1794,7 +1810,29 @@ name = "Gumi"
 channel_id = "UCidzkUQ_y3nvYjn7cSBK_kA"
 channel_name = "vGumiho"
 twitter = "vgumiho"
+twitch = "vgumiho"
 aliases = ["Gumiho", "vGumiho"]
+
+[[streamer]]
+name = "Neuro-sama"
+channel_id = "UCLHmLrj4pHHg3-iBJn_CqxA"
+twitter = "Vedal987"
+twitch = "vedal987"
+aliases = ["Neuro"]
+
+[[streamer]]
+name = "Limealicious"
+channel_id = "UC6CvZVuX2PP7IFxXI8bTIUA"
+twitter = "Laimulicious"
+twitch = "limealicious"
+aliases = ["Laimu", "Limes"]
+
+[[streamer]]
+name = "Nachoneko"
+channel_id = "UCvNn6mRroGDctnqU-FUsszg"
+twitter = "amsrntk3"
+twitch = "nacho_dayo"
+aliases = ["Nacho"]
 
 
 # Underscore Talent
@@ -1803,6 +1841,7 @@ aliases = ["Gumiho", "vGumiho"]
 name = "girl_dm_"
 channel_id = "UC_WC6plpIdL_buebR9vSVkg"
 twitter = "Girl_Dm_"
+twitch = "girl_dm_"
 aliases = ["girldm"]
 
 
@@ -1817,6 +1856,15 @@ twitch = "bao"
 aliases = ["Bao The Whale"]
 
 [[streamer]]
+name = "Henya"
+channel_id = "UCVhRMzNWYcg8XDTgB9NFRTw"
+channel_name = "Henya the Genius"
+twitter = "henyathegenius"
+twitch = "henyathegenius"
+aliases = ["Henya the Genius"]
+
+[[streamer]]
 name = "Shoto"
 channel_id = "UCgwJ4ReZqFOw_Y6eTEIunDQ"
 twitter = "shxtou"
+twitch = "shxtou"
