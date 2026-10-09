@@ -49,6 +49,24 @@ var _ = Describe("SQLite store", func() {
 			Expect(err).To(MatchError(store.ErrGuildNotFound))
 		})
 
+		It("lists every guild, including ones the bot left", func() {
+			for _, id := range []string{"b", "a"} {
+				_, _, err := db.JoinGuild(ctx, id)
+				Expect(err).NotTo(HaveOccurred())
+			}
+			Expect(db.LeaveGuild(ctx, "b", time.Now())).To(Succeed())
+
+			guilds, err := db.Guilds(ctx)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(guilds).To(HaveLen(2))
+			Expect(guilds[0].ID).To(Equal("a"))
+			Expect(guilds[0].Active()).To(BeTrue())
+			Expect(guilds[1].ID).To(Equal("b"))
+			Expect(guilds[1].Active()).To(BeFalse())
+			Expect(guilds[1].Settings).To(Equal(store.DefaultSettings()))
+		})
+
 		It("creates a guild with default settings on first join", func() {
 			before := time.Now().Add(-time.Second)
 

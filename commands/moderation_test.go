@@ -33,7 +33,7 @@ var _ = Describe("Moderation commands", func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
 
-		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
+		_, err := h.b.Guilds.Join(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 
 		yt := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

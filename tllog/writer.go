@@ -10,6 +10,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
@@ -22,7 +23,6 @@ const defaultDelay = time.Minute
 const storeTimeout = 30 * time.Second
 
 type Store interface {
-	Guild(ctx context.Context, guildID string) (*store.Guild, error)
 	VideoLines(ctx context.Context, videoID, guildID string) ([]store.Line, error)
 	VideoChannels(ctx context.Context, videoID string) ([]store.VideoChannel, error)
 	ClaimLog(ctx context.Context, guildID, videoID, channelID string) (bool, error)
@@ -30,6 +30,7 @@ type Store interface {
 
 type Config struct {
 	Store  Store
+	Guilds *guilds.State
 	Sender relay.Sender
 	// A guild's blacklist and filters. Optional.
 	Moderation func(guildID string) *relay.Moderation
@@ -132,9 +133,9 @@ func (w *Writer) post(ctx context.Context, meta Meta) error {
 }
 
 func (w *Writer) postGuild(ctx context.Context, meta Meta, guildID string, relayChannels []string) error {
-	g, err := w.cfg.Store.Guild(ctx, guildID)
-	if err != nil {
-		return err
+	g, ok := w.cfg.Guilds.Guild(guildID)
+	if !ok {
+		return store.ErrGuildNotFound
 	}
 	if !g.Active() {
 		return nil

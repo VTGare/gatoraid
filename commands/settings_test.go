@@ -27,7 +27,7 @@ var _ = Describe("/settings", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
-		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
+		_, err := h.b.Guilds.Join(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -52,8 +52,8 @@ var _ = Describe("/settings", func() {
 
 	settings := func() store.Settings {
 		GinkgoHelper()
-		g, err := h.b.Store.Guild(ctx, testGuild)
-		Expect(err).NotTo(HaveOccurred())
+		g, ok := h.b.Guilds.Guild(testGuild)
+		Expect(ok).To(BeTrue())
 		return g.Settings
 	}
 

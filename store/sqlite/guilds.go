@@ -14,6 +14,25 @@ func (s *Store) Guild(ctx context.Context, guildID string) (*store.Guild, error)
 		`SELECT id, settings, joined_at, left_at FROM guilds WHERE id = ?`, guildID))
 }
 
+func (s *Store) Guilds(ctx context.Context) ([]store.Guild, error) {
+	rows, err := s.read.QueryContext(ctx, `SELECT id, settings, joined_at, left_at FROM guilds ORDER BY id`)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	var out []store.Guild
+	for rows.Next() {
+		g, err := scanGuild(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, *g)
+	}
+
+	return out, rows.Err()
+}
+
 func (s *Store) JoinGuild(ctx context.Context, guildID string) (*store.Guild, store.JoinKind, error) {
 	var (
 		g    *store.Guild
@@ -138,7 +157,7 @@ func (s *Store) PurgeGuilds(ctx context.Context, leftBefore time.Time) (int, err
 	return int(n), err
 }
 
-func scanGuild(row *sql.Row) (*store.Guild, error) {
+func scanGuild(row interface{ Scan(dest ...any) error }) (*store.Guild, error) {
 	var (
 		g        store.Guild
 		settings []byte

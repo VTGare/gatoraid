@@ -50,6 +50,9 @@ type GuildStore interface {
 	// Includes guilds the bot has left.
 	Guild(ctx context.Context, guildID string) (*Guild, error)
 
+	// Every guild, including ones the bot has left.
+	Guilds(ctx context.Context) ([]Guild, error)
+
 	// Creates the guild with default settings, or restores it if the bot
 	// had left.
 	JoinGuild(ctx context.Context, guildID string) (*Guild, JoinKind, error)

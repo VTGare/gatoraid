@@ -12,7 +12,7 @@ type Guild struct {
 	LeftAt   *time.Time
 }
 
-func (g *Guild) Active() bool { return g.LeftAt == nil }
+func (g Guild) Active() bool { return g.LeftAt == nil }
 
 // Settings holds a guild's /settings values. They're stored as a single
 // JSON document and decoded on top of DefaultSettings, so adding a field

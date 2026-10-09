@@ -28,7 +28,7 @@ var _ = Describe("/log", func() {
 	BeforeEach(func() {
 		ctx = context.Background()
 		h = newHarness(&streamers.Seed{})
-		_, _, err := h.b.Store.JoinGuild(ctx, testGuild)
+		_, err := h.b.Guilds.Join(ctx, testGuild)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

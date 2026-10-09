@@ -10,6 +10,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
 
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/notify"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
@@ -69,6 +70,7 @@ type world struct {
 	db  *sqlite.Store
 	reg *streamers.Registry
 	svc *subs.Service
+	gs  *guilds.State
 	snd *fakeSender
 }
 
@@ -88,12 +90,13 @@ func newWorld() *world {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
+	gs := guilds.New(db)
 	for _, g := range []string{"g1", "g2"} {
-		_, _, err := db.JoinGuild(ctx, g)
+		_, err := gs.Join(ctx, g)
 		Expect(err).NotTo(HaveOccurred())
 	}
 
-	return &world{ctx: ctx, db: db, reg: reg, svc: subs.New(db, reg), snd: &fakeSender{}}
+	return &world{ctx: ctx, db: db, reg: reg, svc: subs.New(db, reg), gs: gs, snd: &fakeSender{}}
 }
 
 func (w *world) subscribe(guild string, feature store.Feature, kind store.TargetKind, target, channel, role string) {
@@ -119,7 +122,7 @@ var _ = Describe("Live", func() {
 
 	run := func() {
 		l := notify.NewLive(notify.LiveConfig{
-			Streams: streams, Registry: w.reg, Subs: w.svc, Store: w.db, Sender: w.snd,
+			Streams: streams, Registry: w.reg, Subs: w.svc, Guilds: w.gs, Store: w.db, Sender: w.snd,
 			Now: func() time.Time { return now },
 		})
 		ctx, cancel := context.WithCancel(w.ctx)
@@ -162,10 +165,7 @@ var _ = Describe("Live", func() {
 	})
 
 	It("announces members-only streams only when the guild wants them", func() {
-		g, err := w.db.Guild(w.ctx, "g2")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.NotifyMembersOnly = true
-		Expect(w.db.UpdateGuildSettings(w.ctx, "g2", g.Settings)).To(Succeed())
+		Expect(w.gs.Update(w.ctx, "g2", func(s *store.Settings) { s.NotifyMembersOnly = true })).To(Succeed())
 
 		w.subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c1", "")
 		w.subscribe("g2", store.FeatureYouTube, store.TargetChannel, calliID, "c2", "")

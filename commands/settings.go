@@ -146,25 +146,22 @@ func (p *settingsPanel) apply(ctx context.Context, cc *gumi.ComponentContext, ac
 		return "permissions", p.b.Store.SetGuildRoles(ctx, guildID, kind, cc.Values())
 	}
 
-	g, err := p.b.Store.Guild(ctx, guildID)
-	if err != nil {
-		return "", err
-	}
-	settings := g.Settings
-
+	var edit func(*store.Settings)
 	section := "home"
 	switch action {
 	case "toggle":
 		for _, t := range toggles {
 			if t.name == arg {
-				f := t.field(&settings)
-				*f = !*f
+				edit = func(s *store.Settings) {
+					f := t.field(s)
+					*f = !*f
+				}
 				section = t.section
 			}
 		}
 	case "lang":
 		if code := first(cc.Values()); code != "" {
-			settings.TargetLanguage = code
+			edit = func(s *store.Settings) { s.TargetLanguage = code }
 		}
 		section = "translation"
 	case "langcode":
@@ -173,21 +170,21 @@ func (p *settingsPanel) apply(ctx context.Context, cc *gumi.ComponentContext, ac
 			return "", gumi.Errorf("DeepL can't translate into %s. The codes are listed at "+
 				"<https://developers.deepl.com/docs/getting-started/supported-languages>.", inlineCode(code))
 		}
-		settings.TargetLanguage = code
+		edit = func(s *store.Settings) { s.TargetLanguage = code }
 		section = "translation"
 	case "logchannel":
-		settings.LogChannelID = first(cc.Values())
+		channelID := first(cc.Values())
+		edit = func(s *store.Settings) { s.LogChannelID = channelID }
 		section = "logs"
 	case "logclear":
-		settings.LogChannelID = ""
+		edit = func(s *store.Settings) { s.LogChannelID = "" }
 		section = "logs"
 	}
 
-	if err := p.b.Store.UpdateGuildSettings(ctx, guildID, settings); err != nil {
-		return "", err
+	if edit == nil {
+		return section, nil
 	}
-	p.b.SettingsChanged(guildID)
-	return section, nil
+	return section, p.b.Guilds.Update(ctx, guildID, edit)
 }
 
 // DeepL's own list when it can be reached, else the common ones.
@@ -202,9 +199,9 @@ func (p *settingsPanel) knownLanguage(ctx context.Context, code string) bool {
 
 func (p *settingsPanel) view(ctx context.Context, guild snowflake.ID, owner string) (*panelView, error) {
 	guildID := guild.String()
-	g, err := p.b.Store.Guild(ctx, guildID)
-	if err != nil {
-		return nil, err
+	g, ok := p.b.Guilds.Guild(guildID)
+	if !ok {
+		return nil, store.ErrGuildNotFound
 	}
 
 	v := &panelView{

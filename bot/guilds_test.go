@@ -47,9 +47,10 @@ var _ = Describe("Guild lifecycle", func() {
 		b.guildCreated(discord.GatewayGuild{RestGuild: discord.RestGuild{Guild: discord.Guild{ID: id, Name: name, MemberCount: 42}}})
 	}
 
-	guild := func(id string) *store.Guild {
-		g, err := b.Store.Guild(ctx, id)
-		Expect(err).NotTo(HaveOccurred())
+	guild := func(id string) store.Guild {
+		GinkgoHelper()
+		g, ok := b.Guilds.Guild(id)
+		Expect(ok).To(BeTrue())
 		return g
 	}
 
@@ -70,8 +71,8 @@ var _ = Describe("Guild lifecycle", func() {
 	It("ignores unavailable guilds", func() {
 		b.guildCreated(discord.GatewayGuild{RestGuild: discord.RestGuild{Guild: discord.Guild{ID: 1}}, Unavailable: true})
 
-		_, err := b.Store.Guild(ctx, "1")
-		Expect(err).To(MatchError(store.ErrGuildNotFound))
+		_, ok := b.Guilds.Guild("1")
+		Expect(ok).To(BeFalse())
 		Expect(rec.Messages(logChannel)).To(BeEmpty())
 	})
 
@@ -162,11 +163,13 @@ var _ = Describe("Guild lifecycle", func() {
 	It("purges only guilds past retention", func() {
 		created(1, "old")
 		created(2, "recent")
-		Expect(b.Store.LeaveGuild(ctx, "1", time.Now().Add(-store.GuildRetention-time.Hour))).To(Succeed())
-		Expect(b.Store.LeaveGuild(ctx, "2", time.Now())).To(Succeed())
+		Expect(b.Guilds.Leave(ctx, "1", time.Now().Add(-store.GuildRetention-time.Hour))).To(Succeed())
+		Expect(b.Guilds.Leave(ctx, "2", time.Now())).To(Succeed())
 
 		b.purge(ctx)
 
+		_, ok := b.Guilds.Guild("1")
+		Expect(ok).To(BeFalse())
 		_, err := b.Store.Guild(ctx, "1")
 		Expect(err).To(MatchError(store.ErrGuildNotFound))
 		Expect(guild("2").Active()).To(BeFalse())

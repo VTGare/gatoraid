@@ -75,6 +75,9 @@ func run() error {
 		slog.Int("kept_owner_edits", res.Kept),
 		slog.Int("returned_to_seed", res.Returned))
 
+	if err := b.Guilds.Reload(ctx); err != nil {
+		return fmt.Errorf("load guilds: %w", err)
+	}
 	if err := b.Subs.Reload(ctx); err != nil {
 		return fmt.Errorf("load subscriptions: %w", err)
 	}

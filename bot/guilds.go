@@ -29,7 +29,7 @@ func (b *Bot) onReady(r *events.Ready) {
 	ctx, cancel := context.WithTimeout(b.ctx, eventTimeout)
 	defer cancel()
 
-	left, err := b.Store.ReconcileGuilds(ctx, ids, time.Now())
+	left, err := b.Guilds.Reconcile(ctx, ids, time.Now())
 	if err != nil {
 		b.Log.Error("failed to reconcile guilds", slog.Any("error", err))
 		return
@@ -55,7 +55,7 @@ func (b *Bot) guildCreated(gg discord.GatewayGuild) {
 	ctx, cancel := context.WithTimeout(b.ctx, eventTimeout)
 	defer cancel()
 
-	_, kind, err := b.Store.JoinGuild(ctx, g.ID.String())
+	kind, err := b.Guilds.Join(ctx, g.ID.String())
 	if err != nil {
 		b.Log.Error("failed to record guild", slog.String("guild_id", g.ID.String()), slog.Any("error", err))
 		return
@@ -80,7 +80,7 @@ func (b *Bot) guildLeft(id, name string) {
 	ctx, cancel := context.WithTimeout(b.ctx, eventTimeout)
 	defer cancel()
 
-	if err := b.Store.LeaveGuild(ctx, id, time.Now()); err != nil {
+	if err := b.Guilds.Leave(ctx, id, time.Now()); err != nil {
 		b.Log.Error("failed to record leaving guild", slog.String("guild_id", id), slog.Any("error", err))
 		return
 	}

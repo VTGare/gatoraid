@@ -8,6 +8,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
@@ -22,7 +23,6 @@ const (
 )
 
 type LiveStore interface {
-	Guild(ctx context.Context, guildID string) (*store.Guild, error)
 	ClaimNotice(ctx context.Context, n store.Notice) (bool, error)
 }
 
@@ -30,6 +30,7 @@ type LiveConfig struct {
 	Streams  <-chan stream.Event
 	Registry *streamers.Registry
 	Subs     *subs.Service
+	Guilds   *guilds.State
 	Store    LiveStore
 	Sender   relay.Sender
 	// Streams that went live longer ago than this aren't announced. After
@@ -90,16 +91,16 @@ func (l *Live) announce(ctx context.Context, s stream.Stream) {
 }
 
 func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer, sub *store.Subscription) error {
-	ctx, cancel := context.WithTimeout(ctx, storeTimeout)
-	defer cancel()
-
-	g, err := l.cfg.Store.Guild(ctx, sub.GuildID)
-	if err != nil {
-		return err
+	g, ok := l.cfg.Guilds.Guild(sub.GuildID)
+	if !ok {
+		return store.ErrGuildNotFound
 	}
 	if s.MembersOnly && !g.Settings.NotifyMembersOnly {
 		return nil
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, storeTimeout)
+	defer cancel()
 
 	n := store.Notice{GuildID: sub.GuildID, VideoID: s.VideoID, Kind: store.NoticeLive, ChannelID: sub.ChannelID}
 	claimed, err := l.cfg.Store.ClaimNotice(ctx, n)

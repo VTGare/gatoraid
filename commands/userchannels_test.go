@@ -40,7 +40,7 @@ var _ = Describe("Channels outside the registry", func() {
 		seed, err := streamers.LoadSeed()
 		Expect(err).NotTo(HaveOccurred())
 		h = newHarness(seed)
-		_, _, err = h.b.Store.JoinGuild(context.Background(), testGuild)
+		_, err = h.b.Guilds.Join(context.Background(), testGuild)
 		Expect(err).NotTo(HaveOccurred())
 
 		pages := map[string]string{

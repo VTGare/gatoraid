@@ -16,6 +16,7 @@ import (
 	"github.com/disgoorg/disgo/gateway"
 
 	"github.com/VTGare/gatoraid/chat"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
@@ -53,6 +54,7 @@ type Bot struct {
 	Config    *config.Config
 	Log       *slog.Logger
 	Store     store.Store
+	Guilds    *guilds.State
 	Streamers *streamers.Registry
 	Subs      *subs.Service
 
@@ -121,6 +123,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		Config:    cfg,
 		Log:       log,
 		Store:     st,
+		Guilds:    guilds.New(st),
 		Streamers: streamers.New(st),
 		Client:    c,
 		ctx:       context.Background(),
@@ -203,6 +206,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 
 	b.Logs = tllog.NewWriter(tllog.Config{
 		Store:      st,
+		Guilds:     b.Guilds,
 		Sender:     b.Sender,
 		Moderation: b.Moderation.For,
 		Streamer:   b.Streamers.Streamer,
@@ -228,6 +232,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Streams:  b.liveStreams,
 			Registry: b.Streamers,
 			Subs:     b.Subs,
+			Guilds:   b.Guilds,
 			Store:    st,
 			Sender:   b.Sender,
 			Log:      log.With("component", "live"),
@@ -238,6 +243,7 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Chats:    b.Chats,
 			Registry: b.Streamers,
 			Subs:     b.Subs,
+			Guilds:   b.Guilds,
 			Store:    st,
 			Sender:   b.Sender,
 			Formatter: &relay.Formatter{
@@ -364,14 +370,6 @@ func (b *Bot) listeners() []disgobot.EventListener {
 	}
 }
 
-// SettingsChanged tells everything that caches guild settings to reload
-// them.
-func (b *Bot) SettingsChanged(guildID string) {
-	if b.Relay != nil {
-		b.Relay.SettingsChanged(guildID)
-	}
-}
-
 // The tracker has one events channel, and both the relay and the live
 // notifier need every event.
 func (b *Bot) fanOutStreams(ctx context.Context) {
@@ -431,7 +429,7 @@ func (b *Bot) purge(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
-	n, err := b.Store.PurgeGuilds(ctx, time.Now().Add(-store.GuildRetention))
+	n, err := b.Guilds.Purge(ctx, time.Now().Add(-store.GuildRetention))
 	switch {
 	case err != nil:
 		b.Log.Error("failed to purge left guilds", slog.Any("error", err))

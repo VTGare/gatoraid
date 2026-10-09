@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
@@ -54,6 +55,7 @@ var _ = Describe("Writer", func() {
 	var (
 		ctx   context.Context
 		db    *sqlite.Store
+		gs    *guilds.State
 		snd   *fakeSender
 		rules map[string]*relay.Moderation
 	)
@@ -67,8 +69,9 @@ var _ = Describe("Writer", func() {
 		Expect(err).NotTo(HaveOccurred())
 		DeferCleanup(db.Close)
 
+		gs = guilds.New(db)
 		for _, g := range []string{"g", "h"} {
-			_, _, err := db.JoinGuild(ctx, g)
+			_, err := gs.Join(ctx, g)
 			Expect(err).NotTo(HaveOccurred())
 		}
 		snd = &fakeSender{}
@@ -78,6 +81,7 @@ var _ = Describe("Writer", func() {
 	newWriter := func() *tllog.Writer {
 		w := tllog.NewWriter(tllog.Config{
 			Store:      db,
+			Guilds:     gs,
 			Sender:     snd,
 			Moderation: func(id string) *relay.Moderation { return rules[id] },
 			Delay:      time.Millisecond,
@@ -115,10 +119,7 @@ var _ = Describe("Writer", func() {
 	})
 
 	It("posts one log with every channel's lines to the log channel", func() {
-		g, err := db.Guild(ctx, "g")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.LogChannelID = "logs"
-		Expect(db.UpdateGuildSettings(ctx, "g", g.Settings)).To(Succeed())
+		Expect(gs.Update(ctx, "g", func(s *store.Settings) { s.LogChannelID = "logs" })).To(Succeed())
 
 		save("g", "c1", time.Second, "[EN] one")
 		save("g", "c2", 2*time.Second, "[EN] two")
@@ -146,7 +147,7 @@ var _ = Describe("Writer", func() {
 
 	It("skips guilds the bot left", func() {
 		save("g", "c1", time.Second, "[EN] one")
-		Expect(db.LeaveGuild(ctx, "g", time.Now())).To(Succeed())
+		Expect(gs.Leave(ctx, "g", time.Now())).To(Succeed())
 
 		newWriter().StreamEnded(ended)
 		Consistently(snd.all, 50*time.Millisecond).Should(BeEmpty())
@@ -154,7 +155,7 @@ var _ = Describe("Writer", func() {
 
 	It("drops logs still waiting when closed", func() {
 		save("g", "c1", time.Second, "[EN] one")
-		w := tllog.NewWriter(tllog.Config{Store: db, Sender: snd, Delay: time.Hour})
+		w := tllog.NewWriter(tllog.Config{Store: db, Guilds: gs, Sender: snd, Delay: time.Hour})
 		w.StreamEnded(ended)
 		w.Close()
 

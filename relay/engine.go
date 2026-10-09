@@ -14,6 +14,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 
 	"github.com/VTGare/gatoraid/chat"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
@@ -49,7 +50,6 @@ type Translator interface {
 }
 
 type Store interface {
-	Guild(ctx context.Context, guildID string) (*store.Guild, error)
 	store.NoticeStore
 	store.LineStore
 }
@@ -59,6 +59,7 @@ type Config struct {
 	Chats     Chats
 	Registry  *streamers.Registry
 	Subs      *subs.Service
+	Guilds    *guilds.State
 	Store     Store
 	Sender    Sender
 	Formatter *Formatter
@@ -89,10 +90,6 @@ type Engine struct {
 	stopped      map[string]stream.Status
 	notified     map[noticeKey]bool
 	streamerSaid map[streamerLine]said
-	// Guarded by settingsMu, since SettingsChanged runs on other goroutines.
-	settingsMu sync.Mutex
-	settings   map[string]*store.Settings
-	resync     chan struct{}
 }
 
 type streamerLine struct {
@@ -134,8 +131,6 @@ func NewEngine(cfg Config) *Engine {
 		stopped:      map[string]stream.Status{},
 		notified:     map[noticeKey]bool{},
 		streamerSaid: map[streamerLine]said{},
-		settings:     map[string]*store.Settings{},
-		resync:       make(chan struct{}, 1),
 	}
 	go e.saveLines()
 
@@ -165,7 +160,7 @@ func (e *Engine) Run(ctx context.Context) error {
 			e.onChat(ev)
 		case <-e.cfg.Subs.Changed():
 			e.updateAll(ctx)
-		case <-e.resync:
+		case <-e.cfg.Guilds.Changed():
 			e.updateAll(ctx)
 		}
 	}
@@ -513,40 +508,12 @@ func chatBackground(c *Comment) string {
 	return sb.String()
 }
 
-// SettingsChanged drops the guild's cached settings and rechecks which
-// chats to read, since prechat and free chat settings decide that.
-func (e *Engine) SettingsChanged(guildID string) {
-	e.settingsMu.Lock()
-	delete(e.settings, guildID)
-	e.settingsMu.Unlock()
-
-	select {
-	case e.resync <- struct{}{}:
-	default:
-	}
-}
-
-// Nil means the guild can't be loaded.
+// Nil means the guild isn't known.
 func (e *Engine) guildSettings(guildID string) *store.Settings {
-	e.settingsMu.Lock()
-	st, ok := e.settings[guildID]
-	e.settingsMu.Unlock()
-	if ok {
-		return st
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), storeTimeout)
-	defer cancel()
-
-	g, err := e.cfg.Store.Guild(ctx, guildID)
-	if err != nil {
-		e.cfg.Log.Error("failed to load guild settings", slog.String("guild_id", guildID), slog.Any("error", err))
+	g, ok := e.cfg.Guilds.Guild(guildID)
+	if !ok {
 		return nil
 	}
-
-	e.settingsMu.Lock()
-	e.settings[guildID] = &g.Settings
-	e.settingsMu.Unlock()
 	return &g.Settings
 }
 

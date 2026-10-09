@@ -14,6 +14,7 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/chat"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
@@ -153,6 +154,7 @@ var _ = Describe("Engine", func() {
 		db      *sqlite.Store
 		reg     *streamers.Registry
 		svc     *subs.Service
+		gs      *guilds.State
 		chats   *fakeChats
 		snd     *fakeSender
 		streams chan stream.Event
@@ -186,8 +188,9 @@ var _ = Describe("Engine", func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
+		gs = guilds.New(db)
 		for _, g := range []string{"g1", "g2"} {
-			_, _, err := db.JoinGuild(ctx, g)
+			_, err := gs.Join(ctx, g)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
@@ -206,6 +209,7 @@ var _ = Describe("Engine", func() {
 			Chats:      chats,
 			Registry:   reg,
 			Subs:       svc,
+			Guilds:     gs,
 			Store:      db,
 			Sender:     snd,
 			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
@@ -231,6 +235,11 @@ var _ = Describe("Engine", func() {
 		stop()
 		<-done
 		engine.Close()
+	}
+
+	update := func(guild string, edit func(*store.Settings)) {
+		GinkgoHelper()
+		Expect(gs.Update(ctx, guild, edit)).To(Succeed())
 	}
 
 	subscribe := func(guild string, feature store.Feature, kind store.TargetKind, target, channel, role string) {
@@ -313,10 +322,7 @@ var _ = Describe("Engine", func() {
 	})
 
 	It("reads prechat only for guilds that want it and notices again at live", func() {
-		g, err := db.Guild(ctx, "g2")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.Prechat = false
-		Expect(db.UpdateGuildSettings(ctx, "g2", g.Settings)).To(Succeed())
+		update("g2", func(s *store.Settings) { s.Prechat = false })
 
 		subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
 		start()
@@ -381,10 +387,7 @@ var _ = Describe("Engine", func() {
 	})
 
 	It("relays free chat rooms without a notice, even when they get near", func() {
-		g, err := db.Guild(ctx, "g1")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.RelayFreeChat = true
-		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
+		update("g1", func(s *store.Settings) { s.RelayFreeChat = true })
 
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		start()
@@ -500,10 +503,7 @@ var _ = Describe("Engine", func() {
 	})
 
 	It("picks up changed settings", func() {
-		g, err := db.Guild(ctx, "g1")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.Prechat = false
-		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
+		update("g1", func(s *store.Settings) { s.Prechat = false })
 
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		start()
@@ -512,17 +512,12 @@ var _ = Describe("Engine", func() {
 		}}
 		Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
 
-		g.Settings.Prechat = true
-		Expect(db.UpdateGuildSettings(ctx, "g1", g.Settings)).To(Succeed())
-		engine.SettingsChanged("g1")
+		update("g1", func(s *store.Settings) { s.Prechat = true })
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
 	})
 
 	It("translates VTuber lines once per language and only when it's another language", func() {
-		g, err := db.Guild(ctx, "g2")
-		Expect(err).NotTo(HaveOccurred())
-		g.Settings.TargetLanguage = "JA"
-		Expect(db.UpdateGuildSettings(ctx, "g2", g.Settings)).To(Succeed())
+		update("g2", func(s *store.Settings) { s.TargetLanguage = "JA" })
 
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c3", "")
@@ -615,10 +610,7 @@ var _ = Describe("Engine", func() {
 
 		setTwitch := func(guild string, on bool) {
 			GinkgoHelper()
-			g, err := db.Guild(ctx, guild)
-			Expect(err).NotTo(HaveOccurred())
-			g.Settings.RelayTwitch = on
-			Expect(db.UpdateGuildSettings(ctx, guild, g.Settings)).To(Succeed())
+			update(guild, func(s *store.Settings) { s.RelayTwitch = on })
 		}
 
 		It("reads the Twitch chat by username and links it", func() {
