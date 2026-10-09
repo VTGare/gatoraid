@@ -1,6 +1,4 @@
-// Package perms decides who may manage the bot in a guild: people with the
-// matching Discord permission, or with a role the guild gave that job.
-package perms
+package commands
 
 import (
 	"context"
@@ -13,27 +11,27 @@ import (
 	"github.com/VTGare/gatoraid/store"
 )
 
-type Level int
+type level int
 
 const (
 	// Subscriptions and settings.
-	Manager Level = iota
+	manager level = iota
 	// The blacklist and filters.
-	Blacklister
+	blacklister
 )
 
-// Allowed reports whether a member with these permissions and roles has
+// allowed reports whether a member with these permissions and roles has
 // the level. Administrators always do, and managers can blacklist too.
-func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Level, permissions discord.Permissions, roles []snowflake.ID) (bool, error) {
+func allowed(ctx context.Context, st store.RoleStore, guildID string, lvl level, permissions discord.Permissions, roles []snowflake.ID) (bool, error) {
 	if permissions.Has(discord.PermissionAdministrator) || permissions.Has(discord.PermissionManageGuild) {
 		return true, nil
 	}
-	if level == Blacklister && permissions.Has(discord.PermissionManageMessages) {
+	if lvl == blacklister && permissions.Has(discord.PermissionManageMessages) {
 		return true, nil
 	}
 
 	kinds := []store.RoleKind{store.RoleManager}
-	if level == Blacklister {
+	if lvl == blacklister {
 		kinds = append(kinds, store.RoleBlacklister)
 	}
 
@@ -50,7 +48,7 @@ func Allowed(ctx context.Context, st store.RoleStore, guildID string, level Leve
 	return false, nil
 }
 
-func Check(st store.RoleStore, level Level) gumi.Check {
+func permCheck(st store.RoleStore, lvl level) gumi.Check {
 	return func(ctx *gumi.Context) error {
 		if ctx.GuildID() == 0 {
 			return &gumi.CheckError{Check: "guild_only", Message: "This command can only be used in a server."}
@@ -66,19 +64,19 @@ func Check(st store.RoleStore, level Level) gumi.Check {
 			roles = m.RoleIDs
 		}
 
-		ok, err := Allowed(ctx.Context(), st, ctx.GuildID().String(), level, p, roles)
+		ok, err := allowed(ctx.Context(), st, ctx.GuildID().String(), lvl, p, roles)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return &gumi.CheckError{Check: "perms", Message: Denied(level)}
+			return &gumi.CheckError{Check: "perms", Message: denied(lvl)}
 		}
 		return nil
 	}
 }
 
-func Denied(level Level) string {
-	if level == Blacklister {
+func denied(lvl level) string {
+	if lvl == blacklister {
 		return "You need Manage Messages, or a Blacklister or Manager role from `/settings`, to do that."
 	}
 	return "You need Manage Server, or a Manager role from `/settings`, to do that."

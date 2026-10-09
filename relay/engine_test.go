@@ -161,7 +161,6 @@ var _ = Describe("Engine", func() {
 		stop    context.CancelFunc
 		done    chan struct{}
 		engine  *relay.Engine
-		rules   map[string]*relay.Moderation
 		ended   chan stream.Stream
 		tl      *fakeTranslator
 	)
@@ -198,7 +197,6 @@ var _ = Describe("Engine", func() {
 		chats = &fakeChats{running: map[string]bool{}, events: make(chan chat.Event, 16)}
 		snd = &fakeSender{}
 		streams = make(chan stream.Event, 16)
-		rules = map[string]*relay.Moderation{}
 		ended = make(chan stream.Stream, 4)
 		tl = &fakeTranslator{}
 	})
@@ -213,7 +211,6 @@ var _ = Describe("Engine", func() {
 			Store:      db,
 			Sender:     snd,
 			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
-			Moderation: func(guildID string) *relay.Moderation { return rules[guildID] },
 			OnEnded:    func(s stream.Stream) { ended <- s },
 			Translator: tl,
 		})
@@ -271,7 +268,7 @@ var _ = Describe("Engine", func() {
 		streams <- live("calli-live", calliID)
 		streams <- live("kiara-live", kiaraID)
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
-		Eventually(snd.lines).Should(Equal([]string{"c1: <@&42> **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here."}))
+		Eventually(snd.lines).Should(Equal([]string{"c1: <@&42> **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live)! Relaying chat here."}))
 
 		say("calli-live", "UCviewer", "@viewer", "lol")
 		say("calli-live", "UCviewer", "@viewer", "[EN] hello")
@@ -342,8 +339,8 @@ var _ = Describe("Engine", func() {
 
 		streams <- live("calli-live", calliID)
 		Eventually(snd.lines).Should(ContainElements(
-			"c1: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here.",
-			"c2: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here.",
+			"c1: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live)! Relaying chat here.",
+			"c2: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live)! Relaying chat here.",
 		))
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
@@ -460,7 +457,13 @@ var _ = Describe("Engine", func() {
 	})
 
 	It("applies each guild's blacklist and filters", func() {
-		rules["g1"] = &relay.Moderation{Blacklist: map[string]bool{"UCspam": true}, Banned: []string{"spoiler"}, Wanted: []string{"es:"}}
+		_, err := gs.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: "g1", ChannelID: "UCspam", AddedBy: "mod"})
+		Expect(err).NotTo(HaveOccurred())
+		for _, f := range []store.Filter{{Kind: store.FilterBanned, Pattern: "spoiler"}, {Kind: store.FilterWanted, Pattern: "es:"}} {
+			f.GuildID = "g1"
+			_, err := gs.AddFilter(ctx, f)
+			Expect(err).NotTo(HaveOccurred())
+		}
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		subscribe("g2", store.FeatureRelay, store.TargetChannel, calliID, "c2", "")
 		start()
@@ -620,7 +623,7 @@ var _ = Describe("Engine", func() {
 			streams <- twitchLive("twitch:1", calliID, "moricalliope")
 			Eventually(chats.Running).Should(Equal([]string{"twitch:1"}))
 			Expect(chats.targets).To(Equal([]chat.Target{{VideoID: "twitch:1", TwitchUsername: "moricalliope"}}))
-			Eventually(snd.lines).Should(Equal([]string{"c1: **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>). Relaying chat here."}))
+			Eventually(snd.lines).Should(Equal([]string{"c1: **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>)! Relaying chat here."}))
 
 			sayTwitch("twitch:1", "7", "moricalliope", "hi chat", true)
 			Eventually(snd.lines).Should(HaveLen(2))
@@ -702,6 +705,90 @@ var _ = Describe("Engine", func() {
 			Eventually(tl.callList).Should(Equal([]string{"EN-US:みんなこんにちは"}))
 			Expect(tl.backgroundList()[0]).To(ContainSubstring("Mori Calliope's Twitch stream"))
 			Eventually(snd.lines).Should(ContainElement(ContainSubstring("`<みんなこんにちは in EN-US>`")))
+		})
+	})
+
+	Describe("live notifications", func() {
+		now := time.Now()
+
+		startedAgo := func(ev stream.Event, d time.Duration) stream.Event {
+			ev.Stream.StartedAt = now.Add(-d)
+			return ev
+		}
+
+		It("announces live streams once, pinging the role", func() {
+			subscribe("g1", store.FeatureYouTube, store.TargetGroup, "holo-en", "c1", "42")
+			subscribe("g2", store.FeatureYouTube, store.TargetChannel, kiaraID, "c2", "")
+			start()
+
+			streams <- startedAgo(live("calli", calliID), time.Minute)
+			streams <- startedAgo(live("calli", calliID), time.Minute)
+			streams <- startedAgo(live("kiara", kiaraID), time.Minute)
+
+			Eventually(snd.lines).Should(ConsistOf(
+				"c1: <@&42> **Mori Calliope** is [live on YouTube](https://youtu.be/calli)!",
+				"c1: <@&42> **Takanashi Kiara** is [live on YouTube](https://youtu.be/kiara)!",
+				"c2: **Takanashi Kiara** is [live on YouTube](https://youtu.be/kiara)!",
+			))
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(3))
+			snd.mu.Lock()
+			defer snd.mu.Unlock()
+			Expect(snd.sent[0].msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{42}))
+		})
+
+		It("skips streams that went live a while ago", func() {
+			subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c1", "")
+			start()
+
+			streams <- startedAgo(live("old", calliID), 2*time.Hour)
+			Consistently(snd.lines, 50*time.Millisecond).Should(BeEmpty())
+		})
+
+		It("goes by the tracker's start time, not TLdex's", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
+			subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c2", "")
+			start()
+
+			streams <- stream.Event{Kind: stream.EventPrechat, Stream: stream.Stream{
+				VideoID: "calli-live", ChannelID: calliID, Status: stream.Upcoming, ScheduledAt: now,
+			}}
+			Eventually(chats.Running).Should(HaveLen(1))
+			chats.events <- chat.Event{Kind: chat.EventStarted, VideoID: "calli-live", StartedAt: now.Add(-time.Hour)}
+			streams <- live("calli-live", calliID)
+
+			Eventually(snd.lines).Should(ContainElement("c2: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live)!"))
+		})
+
+		It("announces members-only streams only when the guild wants them", func() {
+			update("g2", func(s *store.Settings) { s.NotifyMembersOnly = true })
+			subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c1", "")
+			subscribe("g2", store.FeatureYouTube, store.TargetChannel, calliID, "c2", "")
+			start()
+
+			members := startedAgo(live("members", calliID), time.Minute)
+			members.Stream.MembersOnly = true
+			streams <- members
+
+			Eventually(snd.lines).Should(ConsistOf("c2: **Mori Calliope** started a [members-only stream](https://youtu.be/members)!"))
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(1))
+		})
+
+		It("announces Twitch streams to Twitch subscriptions only", func() {
+			subscribe("g1", store.FeatureYouTube, store.TargetChannel, calliID, "c1", "")
+			subscribe("g2", store.FeatureTwitch, store.TargetGroup, "holo-en", "c2", "")
+			start()
+
+			tw := startedAgo(live("twitch:1", calliID), time.Minute)
+			tw.Stream.Platform = stream.Twitch
+			tw.Stream.TwitchUsername = "moricalliope"
+			streams <- tw
+			streams <- startedAgo(live("yt", calliID), time.Minute)
+
+			Eventually(snd.lines).Should(ConsistOf(
+				"c2: **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>)!",
+				"c1: **Mori Calliope** is [live on YouTube](https://youtu.be/yt)!",
+			))
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(2))
 		})
 	})
 })

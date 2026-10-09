@@ -58,7 +58,7 @@ var _ = Describe("/settings", func() {
 	}
 
 	It("opens an overview anyone can read", func() {
-		_, err := h.b.Moderation.AddFilter(ctx, store.Filter{GuildID: testGuild, Kind: store.FilterBanned, Pattern: "x"})
+		_, err := h.b.Guilds.AddFilter(ctx, store.Filter{GuildID: testGuild, Kind: store.FilterBanned, Pattern: "x"})
 		Expect(err).NotTo(HaveOccurred())
 
 		data := click(dt.Command(user, "settings"))

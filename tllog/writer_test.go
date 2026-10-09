@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/VTGare/gatoraid/guilds"
-	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
@@ -53,11 +52,10 @@ func (f *fakeSender) all() []posted {
 
 var _ = Describe("Writer", func() {
 	var (
-		ctx   context.Context
-		db    *sqlite.Store
-		gs    *guilds.State
-		snd   *fakeSender
-		rules map[string]*relay.Moderation
+		ctx context.Context
+		db  *sqlite.Store
+		gs  *guilds.State
+		snd *fakeSender
 	)
 
 	ended := stream.Stream{VideoID: "vid", Title: "Title", StartedAt: start}
@@ -75,17 +73,15 @@ var _ = Describe("Writer", func() {
 			Expect(err).NotTo(HaveOccurred())
 		}
 		snd = &fakeSender{}
-		rules = map[string]*relay.Moderation{}
 	})
 
 	newWriter := func() *tllog.Writer {
 		w := tllog.NewWriter(tllog.Config{
-			Store:      db,
-			Guilds:     gs,
-			Sender:     snd,
-			Moderation: func(id string) *relay.Moderation { return rules[id] },
-			Delay:      time.Millisecond,
-			Now:        func() time.Time { return start.Add(90 * time.Minute) },
+			Store:  db,
+			Guilds: gs,
+			Sender: snd,
+			Delay:  time.Millisecond,
+			Now:    func() time.Time { return start.Add(90 * time.Minute) },
 		})
 		DeferCleanup(w.Close)
 		return w
@@ -102,7 +98,8 @@ var _ = Describe("Writer", func() {
 		save("g", "c1", time.Second, "[EN] one")
 		save("g", "c2", 2*time.Second, "[EN] two")
 		save("h", "c3", 3*time.Second, "[EN] three")
-		rules["h"] = &relay.Moderation{Banned: []string{"three"}}
+		_, err := gs.AddFilter(ctx, store.Filter{GuildID: "h", Kind: store.FilterBanned, Pattern: "three"})
+		Expect(err).NotTo(HaveOccurred())
 
 		w := newWriter()
 		w.StreamEnded(ended)

@@ -101,7 +101,7 @@ var _ = Describe("Notice", func() {
 	It("pings only the role and links the YouTube stream for Discord's player", func() {
 		msg := f.Notice(store.NoticeRelay, calliStream(), calli, "123")
 
-		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on YouTube](https://youtu.be/vid). Relaying chat here."))
+		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on YouTube](https://youtu.be/vid)! Relaying chat here."))
 		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
 		Expect(msg.AllowedMentions.Parse).To(BeEmpty())
 		Expect(msg.Embeds).To(BeEmpty())
@@ -114,7 +114,7 @@ var _ = Describe("Notice", func() {
 
 		msg := f.Notice(store.NoticePrechat, s, nil, "")
 
-		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>. Relaying [pre-stream chat](https://youtu.be/vid) here."))
+		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>! Relaying [pre-stream chat](https://youtu.be/vid) here."))
 		Expect(msg.AllowedMentions.Roles).To(BeEmpty())
 	})
 
@@ -124,7 +124,7 @@ var _ = Describe("Notice", func() {
 
 		msg := f.Notice(store.NoticePrechat, s, calli, "")
 
-		Expect(msg.Content).To(Equal("**Mori Calliope** goes live soon. Relaying [pre-stream chat](https://youtu.be/vid) here."))
+		Expect(msg.Content).To(Equal("**Mori Calliope** goes live soon! Relaying [pre-stream chat](https://youtu.be/vid) here."))
 	})
 
 	It("puts Twitch streams in our embed and stops Discord's unfurl", func() {
@@ -137,7 +137,7 @@ var _ = Describe("Notice", func() {
 
 		msg := f.Notice(store.NoticeRelay, s, &host, "123")
 
-		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>). Relaying chat here."))
+		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>)! Relaying chat here."))
 		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
 		e := msg.Embeds[0]
 		Expect(e.Title).To(Equal("【MINECRAFT】dig"))

@@ -2,6 +2,7 @@ package relay_test
 
 import (
 	"github.com/VTGare/gatoraid/chat"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
@@ -65,7 +66,7 @@ var _ = Describe("Relay", func() {
 	settings := store.DefaultSettings()
 
 	DescribeTable("who gets relayed",
-		func(c *relay.Comment, m *relay.Moderation, want relay.Kind) {
+		func(c *relay.Comment, m *guilds.Moderation, want relay.Kind) {
 			kind, ok := relay.Relay(c, &settings, m)
 			Expect(ok).To(Equal(want != ""))
 			if ok {
@@ -81,15 +82,15 @@ var _ = Describe("Relay", func() {
 		}(), nil, relay.KindOwner),
 		Entry("the streamer hearting a super chat", fromCalli(comment("Mori Calliope hearted a Super Chat")), nil, relay.Kind("")),
 		Entry("the streamer, blacklisted anyway", fromCalli(comment("hi")),
-			&relay.Moderation{Blacklist: map[string]bool{"UCcalli": true}}, relay.KindOwner),
+			&guilds.Moderation{Blacklist: map[string]bool{"UCcalli": true}}, relay.KindOwner),
 		Entry("the streamer, filtered anyway", fromCalli(comment("bad word")),
-			&relay.Moderation{Banned: []string{"bad"}}, relay.KindOwner),
+			&guilds.Moderation{Banned: []string{"bad"}}, relay.KindOwner),
 		Entry("a translation", comment("[EN] hello"), nil, relay.KindTL),
 		Entry("a TLdex translation", func() *relay.Comment { c := comment("hello"); c.TL = true; return c }(), nil, relay.KindTL),
-		Entry("a wanted prefix", comment("ES: hola"), &relay.Moderation{Wanted: []string{"es:"}}, relay.KindTL),
+		Entry("a wanted prefix", comment("ES: hola"), &guilds.Moderation{Wanted: []string{"es:"}}, relay.KindTL),
 		Entry("a blacklisted translator", comment("[EN] hello"),
-			&relay.Moderation{Blacklist: map[string]bool{"UCviewer": true}}, relay.Kind("")),
-		Entry("a filtered translation", comment("[EN] Bad words"), &relay.Moderation{Banned: []string{"bad"}}, relay.Kind("")),
+			&guilds.Moderation{Blacklist: map[string]bool{"UCviewer": true}}, relay.Kind("")),
+		Entry("a filtered translation", comment("[EN] Bad words"), &guilds.Moderation{Banned: []string{"bad"}}, relay.Kind("")),
 		Entry("another VTuber", fromKiara(comment("hi calli")), nil, relay.KindVTuber),
 		Entry("a TLdex VTuber", func() *relay.Comment { c := comment("hi"); c.VTuber = true; return c }(), nil, relay.KindVTuber),
 		Entry("a user-added channel", func() *relay.Comment {
@@ -156,15 +157,15 @@ var _ = Describe("Cameo", func() {
 		c.VTuber = true
 		Expect(relay.Cameo(c, nil)).To(BeFalse())
 
-		Expect(relay.Cameo(fromKiara(comment("hi")), &relay.Moderation{Blacklist: map[string]bool{"UCkiara": true}})).To(BeFalse())
-		Expect(relay.Cameo(fromKiara(comment("Bad")), &relay.Moderation{Banned: []string{"bad"}})).To(BeFalse())
+		Expect(relay.Cameo(fromKiara(comment("hi")), &guilds.Moderation{Blacklist: map[string]bool{"UCkiara": true}})).To(BeFalse())
+		Expect(relay.Cameo(fromKiara(comment("Bad")), &guilds.Moderation{Banned: []string{"bad"}})).To(BeFalse())
 	})
 })
 
 var _ = Describe("Gossip", func() {
 	// In Calli's chat, about Kiara.
 	DescribeTable("lines about Kiara",
-		func(c *relay.Comment, m *relay.Moderation, want bool) {
+		func(c *relay.Comment, m *guilds.Moderation, want bool) {
 			Expect(relay.Gossip(c, kiara, m)).To(Equal(want))
 		},
 		Entry("a VTuber naming her", fromCalli(comment("Kiara is late")), nil, true),
@@ -173,7 +174,7 @@ var _ = Describe("Gossip", func() {
 		Entry("a VTuber not naming her", fromCalli(comment("hello")), nil, false),
 		Entry("only part of a word", fromCalli(comment("kiaras")), nil, false),
 		Entry("her full name", fromCalli(comment("TAKANASHI KIARA!")), nil, true),
-		Entry("blacklisted", comment("[EN] kiara"), &relay.Moderation{Blacklist: map[string]bool{"UCviewer": true}}, false),
+		Entry("blacklisted", comment("[EN] kiara"), &guilds.Moderation{Blacklist: map[string]bool{"UCviewer": true}}, false),
 	)
 
 	It("skips her own lines, her own chat and her collabs", func() {

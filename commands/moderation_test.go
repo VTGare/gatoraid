@@ -90,7 +90,7 @@ var _ = Describe("Moderation commands", func() {
 	It("blacklists a channel by handle and lists it", func() {
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "@spammer"), dt.String("reason", "ads"))).
 			To(Equal("Blacklisted **@spammer**. Their messages won't be relayed here.\n`/blacklist remove` undoes it."))
-		Expect(h.b.Moderation.Blacklisted(testGuild, "UCspamspamspamspamspamsp")).To(BeTrue())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "UCspamspamspamspamspamsp")).To(BeTrue())
 
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "https://youtube.com/channel/UCspamspamspamspamspamsp"))).
 			To(ContainSubstring("**@spammer** is already blacklisted."))
@@ -116,7 +116,7 @@ var _ = Describe("Moderation commands", func() {
 		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4001, 9)))
 		Expect(ephemeral(data)).To(BeTrue())
 		Expect(replyText(data)).To(Equal(`Blacklisted **@some\_author**. Their messages won't be relayed here.` + "\n`/blacklist remove` undoes it."))
-		Expect(h.b.Moderation.Blacklisted(testGuild, "UCauthorauthorauthorauth")).To(BeTrue())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "UCauthorauthorauthorauth")).To(BeTrue())
 
 		data = h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4002, 9)))
 		Expect(replyText(data)).To(ContainSubstring("That's not a line I relayed"))
@@ -130,9 +130,9 @@ var _ = Describe("Moderation commands", func() {
 
 		data := h.run(asMod(dt.MessageCommand(user, "Blacklist author", 4001, 9)))
 		Expect(replyText(data)).To(HavePrefix("Blacklisted **Some TLer**."))
-		Expect(h.b.Moderation.Blacklisted(testGuild, "mchad:Some TLer")).To(BeTrue())
-		Expect(h.b.Moderation.Blacklisted(testGuild, "mchad:Someone Else")).To(BeFalse())
-		Expect(h.b.Moderation.Blacklisted(testGuild, "")).To(BeFalse())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "mchad:Some TLer")).To(BeTrue())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "mchad:Someone Else")).To(BeFalse())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "")).To(BeFalse())
 	})
 
 	It("blacklists Twitch chatters picked from the suggestions", func() {
@@ -145,7 +145,7 @@ var _ = Describe("Moderation commands", func() {
 		Expect(suggested).To(Equal([]string{"Troll_TV · twitch:42"}))
 
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "twitch:42"))).To(HavePrefix(`Blacklisted **Troll\_TV**.`))
-		Expect(h.b.Moderation.Blacklisted(testGuild, "twitch:42")).To(BeTrue())
+		Expect(h.b.Guilds.Blacklisted(testGuild, "twitch:42")).To(BeTrue())
 
 		Expect(runDeferred("blacklist", "add", dt.String("channel", "twitch:999"))).To(ContainSubstring("haven't relayed anything by them"))
 	})
@@ -166,7 +166,7 @@ var _ = Describe("Moderation commands", func() {
 			{GuildID: testGuild, ChannelID: "UCb", Name: "@b", AddedBy: "mod"},
 			{GuildID: testGuild, ChannelID: "UCc", Name: "@c", AddedBy: "mod"},
 		} {
-			_, err := h.b.Moderation.AddToBlacklist(ctx, e)
+			_, err := h.b.Guilds.AddToBlacklist(ctx, e)
 			Expect(err).NotTo(HaveOccurred())
 			time.Sleep(2 * time.Millisecond)
 		}
@@ -199,7 +199,7 @@ var _ = Describe("Moderation commands", func() {
 		Expect(run("filter", "add", dt.String("type", "wanted"), dt.String("pattern", "es:"))).
 			To(ContainSubstring("`es:` is already a wanted filter."))
 
-		rules := h.b.Moderation.For(testGuild)
+		rules := h.b.Guilds.Moderation(testGuild)
 		Expect(rules.Banned).To(Equal([]string{"spoiler"}))
 		Expect(rules.Wanted).To(Equal([]string{"es:"}))
 

@@ -11,7 +11,6 @@ import (
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/chat"
-	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/youtube/channel"
@@ -24,7 +23,7 @@ const (
 )
 
 func moderatorChecks(b *bot.Bot) []gumi.Check {
-	return []gumi.Check{perms.Check(b.Store, perms.Blacklister)}
+	return []gumi.Check{permCheck(b.Store, blacklister)}
 }
 
 func blacklistCommand(b *bot.Bot) *gumi.Command {
@@ -158,11 +157,11 @@ func blacklistAdd(b *bot.Bot, ctx *gumi.Context) error {
 func addToBlacklist(b *bot.Bot, ctx *gumi.Context, e store.BlacklistEntry) (string, error) {
 	who := blacklistName(e)
 
-	if b.Moderation.Blacklisted(e.GuildID, e.ChannelID) {
+	if b.Guilds.Blacklisted(e.GuildID, e.ChannelID) {
 		return "", gumi.Errorf("%s is already blacklisted.", who)
 	}
 
-	if _, err := b.Moderation.AddToBlacklist(ctx.Context(), e); err != nil {
+	if _, err := b.Guilds.AddToBlacklist(ctx.Context(), e); err != nil {
 		if errors.Is(err, store.ErrGuildNotFound) {
 			return "", gumi.NewUserError("I haven't finished setting up this server yet. Try again in a minute.")
 		}
@@ -181,7 +180,7 @@ func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
 		}
 	}
 
-	e, err := b.Moderation.RemoveFromBlacklist(ctx.Context(), ctx.GuildID().String(), channelID)
+	e, err := b.Guilds.RemoveFromBlacklist(ctx.Context(), ctx.GuildID().String(), channelID)
 	switch {
 	case errors.Is(err, store.ErrNotBlacklisted) && channelID == "":
 		return gumi.NewUserError("The blacklist is empty.")
@@ -199,7 +198,7 @@ func blacklistRemove(b *bot.Bot, ctx *gumi.Context) error {
 func findBlacklisted(b *bot.Bot, ctx *gumi.Context) (string, error) {
 	input := strings.TrimSpace(ctx.Options.String("channel"))
 
-	for _, e := range b.Moderation.Blacklist(ctx.GuildID().String()) {
+	for _, e := range b.Guilds.Blacklist(ctx.GuildID().String()) {
 		if e.ChannelID == input || strings.EqualFold(e.Name, input) {
 			return e.ChannelID, nil
 		}
@@ -216,7 +215,7 @@ func findBlacklisted(b *bot.Bot, ctx *gumi.Context) (string, error) {
 }
 
 func blacklistList(b *bot.Bot, ctx *gumi.Context) error {
-	entries := b.Moderation.Blacklist(ctx.GuildID().String())
+	entries := b.Guilds.Blacklist(ctx.GuildID().String())
 	if len(entries) == 0 {
 		return ctx.ReplyText("The blacklist is empty.")
 	}
@@ -264,7 +263,7 @@ func blacklistedOption(b *bot.Bot, name, description string) *gumi.Option {
 		q := strings.ToLower(strings.TrimSpace(ctx.Value))
 
 		var choices []gumi.Choice
-		for _, e := range b.Moderation.Blacklist(ctx.GuildID().String()) {
+		for _, e := range b.Guilds.Blacklist(ctx.GuildID().String()) {
 			label := e.ChannelID
 			if e.Name != "" {
 				label = e.Name + " · " + e.ChannelID
@@ -337,7 +336,7 @@ func filterAdd(b *bot.Bot, ctx *gumi.Context) error {
 		return gumi.NewUserError("The pattern can't be blank.")
 	}
 
-	created, err := b.Moderation.AddFilter(ctx.Context(), f)
+	created, err := b.Guilds.AddFilter(ctx.Context(), f)
 	switch {
 	case errors.Is(err, store.ErrGuildNotFound):
 		return gumi.NewUserError("I haven't finished setting up this server yet. Try again in a minute.")
@@ -357,7 +356,7 @@ func filterRemove(b *bot.Bot, ctx *gumi.Context) error {
 	kind := store.FilterKind(ctx.Options.String("type"))
 	pattern := normalizePattern(ctx.Options.String("pattern"))
 
-	err := b.Moderation.RemoveFilter(ctx.Context(), ctx.GuildID().String(), kind, pattern)
+	err := b.Guilds.RemoveFilter(ctx.Context(), ctx.GuildID().String(), kind, pattern)
 	if errors.Is(err, store.ErrFilterNotFound) {
 		return gumi.Errorf("%s isn't a %s filter.", inlineCode(pattern), kind)
 	}
@@ -381,7 +380,7 @@ func filterList(b *bot.Bot, ctx *gumi.Context) error {
 	}
 
 	empty := true
-	for _, f := range b.Moderation.Filters(ctx.GuildID().String()) {
+	for _, f := range b.Guilds.Filters(ctx.GuildID().String()) {
 		for i := range sections {
 			if sections[i].kind == f.Kind {
 				sections[i].patterns = append(sections[i].patterns, f.Pattern)
@@ -430,7 +429,7 @@ func filterOption(b *bot.Bot, name, description string) *gumi.Option {
 		q := normalizePattern(ctx.Value)
 
 		var choices []gumi.Choice
-		for _, f := range b.Moderation.Filters(ctx.GuildID().String()) {
+		for _, f := range b.Guilds.Filters(ctx.GuildID().String()) {
 			if (kind != "" && f.Kind != kind) || !strings.Contains(f.Pattern, q) {
 				continue
 			}

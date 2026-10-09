@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/VTGare/gatoraid/chat"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/stream"
 )
@@ -101,51 +102,17 @@ func (c *Comment) translatable() string {
 	return strings.Join(kept, " ")
 }
 
-// Moderation is a guild's blacklist and filters.
-type Moderation struct {
-	// YouTube channel IDs.
-	Blacklist map[string]bool
-	// Lowercase. Lines containing one are dropped.
-	Banned []string
-	// Lowercase. Lines starting with one count as translations.
-	Wanted []string
+func (c *Comment) blockedBy(m *guilds.Moderation) bool {
+	return m.Blocks(c.AuthorChannelID, c.lowerText())
 }
 
-// Blocks reports whether the blacklist or a banned word drops a line.
-func (m *Moderation) Blocks(authorChannelID, text string) bool {
-	return m.blocksLower(authorChannelID, strings.ToLower(text))
-}
-
-func (m *Moderation) blocks(c *Comment) bool {
-	return m.blocksLower(c.AuthorChannelID, c.lowerText())
-}
-
-func (m *Moderation) blocksLower(authorChannelID, text string) bool {
-	if m == nil {
-		return false
-	}
-	if m.Blacklist[authorChannelID] {
-		return true
-	}
-	return slices.ContainsFunc(m.Banned, func(b string) bool { return strings.Contains(text, b) })
-}
-
-func (m *Moderation) wants(c *Comment) bool {
-	if m == nil {
-		return false
-	}
-
-	text := strings.TrimSpace(c.lowerText())
-	return slices.ContainsFunc(m.Wanted, func(w string) bool { return strings.HasPrefix(text, w) })
-}
-
-func (m *Moderation) isTL(c *Comment) bool {
-	return c.taggedTL() || m.wants(c)
+func (c *Comment) isTL(m *guilds.Moderation) bool {
+	return c.taggedTL() || m.Wants(c.lowerText())
 }
 
 // Relay decides whether a guild relaying the chat's streamer gets the
 // line. The streamer's own lines skip the blacklist and filters.
-func Relay(c *Comment, settings *store.Settings, m *Moderation) (Kind, bool) {
+func Relay(c *Comment, settings *store.Settings, m *guilds.Moderation) (Kind, bool) {
 	switch {
 	case strings.TrimSpace(c.Text) == "":
 		return "", false
@@ -153,9 +120,9 @@ func Relay(c *Comment, settings *store.Settings, m *Moderation) (Kind, bool) {
 		return "", false
 	case c.fromOwner():
 		return KindOwner, !c.heartLine()
-	case m.blocks(c):
+	case c.blockedBy(m):
 		return "", false
-	case m.isTL(c):
+	case c.isTL(m):
 		return KindTL, true
 	case c.fromVTuber():
 		return KindVTuber, true
@@ -168,22 +135,22 @@ func Relay(c *Comment, settings *store.Settings, m *Moderation) (Kind, bool) {
 
 // Cameo decides whether a guild following the author gets the line: what
 // a VTuber says in someone else's chat.
-func Cameo(c *Comment, m *Moderation) bool {
+func Cameo(c *Comment, m *guilds.Moderation) bool {
 	return c.Author != nil && c.Author.Curated() && !c.fromOwner() &&
-		strings.TrimSpace(c.Text) != "" && !m.blocks(c)
+		strings.TrimSpace(c.Text) != "" && !c.blockedBy(m)
 }
 
 // Gossip decides whether a guild following subject gets the line: a VTuber
 // or translator mentioning them in another chat. Collabs they're in don't
 // count, since that's not gossip.
-func Gossip(c *Comment, subject *store.Streamer, m *Moderation) bool {
+func Gossip(c *Comment, subject *store.Streamer, m *guilds.Moderation) bool {
 	switch {
 	case c.AuthorChannelID == subject.ChannelID,
 		c.Author != nil && c.Author.ChannelID == subject.ChannelID,
 		c.Stream.ChannelID == subject.ChannelID,
 		slices.Contains(c.Stream.Mentions, subject.ChannelID),
-		!c.fromVTuber() && !m.isTL(c),
-		m.blocks(c):
+		!c.fromVTuber() && !c.isTL(m),
+		c.blockedBy(m):
 		return false
 	}
 

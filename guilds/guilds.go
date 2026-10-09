@@ -1,6 +1,6 @@
 // Package guilds keeps every guild in memory, including guilds the bot has
-// left. Writes go to the store and swap in a new index, so readers never
-// lock or query.
+// left, with their blacklists and filters. Writes go to the store and swap
+// in a new index, so readers never lock or query.
 package guilds
 
 import (
@@ -13,15 +13,17 @@ import (
 )
 
 type State struct {
-	store   store.GuildStore
+	store   store.Store
 	idx     atomic.Pointer[map[string]store.Guild]
+	mods    atomic.Pointer[map[string]*moderation]
 	mu      sync.Mutex
 	changed chan struct{}
 }
 
-func New(st store.GuildStore) *State {
+func New(st store.Store) *State {
 	s := &State{store: st, changed: make(chan struct{}, 1)}
 	s.idx.Store(&map[string]store.Guild{})
+	s.mods.Store(&map[string]*moderation{})
 	return s
 }
 
@@ -32,7 +34,11 @@ func (s *State) Changed() <-chan struct{} { return s.changed }
 func (s *State) Reload(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.reload(ctx)
+
+	if err := s.reload(ctx); err != nil {
+		return err
+	}
+	return s.reloadModeration(ctx)
 }
 
 func (s *State) reload(ctx context.Context) error {
@@ -125,5 +131,10 @@ func (s *State) Purge(ctx context.Context, leftBefore time.Time) (int, error) {
 	if err != nil {
 		return n, err
 	}
-	return n, s.reload(ctx)
+
+	if err := s.reload(ctx); err != nil {
+		return n, err
+	}
+
+	return n, s.reloadModeration(ctx)
 }

@@ -3,7 +3,7 @@ package tllog_test
 import (
 	"time"
 
-	"github.com/VTGare/gatoraid/relay"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/tllog"
 
@@ -54,7 +54,7 @@ Started 2026-10-02 12:00 UTC
 	})
 
 	It("applies the blacklist and filters, except to the streamer", func() {
-		mod := &relay.Moderation{Blacklist: map[string]bool{"UCspam": true, "UCcalli": true}, Banned: []string{"spoiler"}}
+		mod := &guilds.Moderation{Blacklist: map[string]bool{"UCspam": true, "UCcalli": true}, Banned: []string{"spoiler"}}
 
 		text, n := tllog.Build(meta, []store.Line{
 			at(0, "spam", store.LineTL, "[EN] buy"),

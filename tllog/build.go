@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VTGare/gatoraid/relay"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/store"
 )
 
@@ -37,7 +37,7 @@ func (m Meta) URL() string {
 // blacklist and filters are applied as they are now, so authors blacklisted
 // after they spoke are left out too. The streamer's own lines skip them,
 // like in relays.
-func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, int) {
+func Build(meta Meta, lines []store.Line, m *guilds.Moderation) (string, int) {
 	type key struct {
 		author string
 		at     int64
@@ -51,7 +51,7 @@ func Build(meta Meta, lines []store.Line, m *relay.Moderation) (string, int) {
 		switch l.Kind {
 		case store.LineOwner:
 		case store.LineTL, store.LineVTuber, store.LineMod:
-			if m.Blocks(l.AuthorChannelID, l.Body) {
+			if m.Blocks(l.AuthorChannelID, strings.ToLower(l.Body)) {
 				continue
 			}
 		default:

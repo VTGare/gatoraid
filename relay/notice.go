@@ -22,9 +22,9 @@ func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.
 		if !s.ScheduledAt.IsZero() {
 			when = fmt.Sprintf("<t:%d:R>", s.ScheduledAt.Unix())
 		}
-		text = StreamerName(s, host) + " goes live " + when + ". Relaying " + StreamLink(s, "pre-stream chat") + " here."
+		text = StreamerName(s, host) + " goes live " + when + "! Relaying " + StreamLink(s, "pre-stream chat") + " here."
 	default:
-		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName()) + ". Relaying chat here."
+		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName()) + "! Relaying chat here."
 	}
 
 	return StreamMessage(s, host, roleID, text)

@@ -63,12 +63,11 @@ type Config struct {
 	Store     Store
 	Sender    Sender
 	Formatter *Formatter
-	// A guild's blacklist and filters. Optional.
-	Moderation func(guildID string) *Moderation
 	// Called when a stream that went live ends. Optional.
 	OnEnded func(stream.Stream)
 	// Translates VTuber lines for guilds with auto-translate on. Optional.
 	Translator Translator
+	Now        func() time.Time
 	Log        *slog.Logger
 }
 
@@ -117,8 +116,8 @@ func NewEngine(cfg Config) *Engine {
 	if cfg.Log == nil {
 		cfg.Log = slog.New(slog.DiscardHandler)
 	}
-	if cfg.Moderation == nil {
-		cfg.Moderation = func(string) *Moderation { return nil }
+	if cfg.Now == nil {
+		cfg.Now = time.Now
 	}
 
 	e := &Engine{
@@ -198,6 +197,10 @@ func (e *Engine) onStream(ctx context.Context, ev stream.Event) {
 			}
 		}
 		return
+	}
+
+	if ev.Kind == stream.EventLive {
+		e.announceLive(ctx, s)
 	}
 
 	// TLdex may already have said when it really started.
@@ -364,7 +367,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 			continue
 		}
 
-		kind, ok := Relay(c, st, e.cfg.Moderation(sub.GuildID))
+		kind, ok := Relay(c, st, e.cfg.Guilds.Moderation(sub.GuildID))
 		if !ok || (kind == KindOwner && e.saidElsewhere(c, sub.ChannelID)) {
 			continue
 		}
@@ -381,7 +384,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 
 	if c.Author != nil {
 		for _, sub := range e.cfg.Subs.Match(store.FeatureCameos, c.Author.ChannelID) {
-			if !sent[sub.ChannelID] && Cameo(c, e.cfg.Moderation(sub.GuildID)) {
+			if !sent[sub.ChannelID] && Cameo(c, e.cfg.Guilds.Moderation(sub.GuildID)) {
 				post(sub, KindCameo, e.cfg.Formatter.Cameo(c))
 			}
 		}
@@ -392,7 +395,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 			continue
 		}
 		subject, ok := e.cfg.Registry.Streamer(sub.Target.ID)
-		if ok && Gossip(c, subject, e.cfg.Moderation(sub.GuildID)) {
+		if ok && Gossip(c, subject, e.cfg.Guilds.Moderation(sub.GuildID)) {
 			post(sub, KindGossip, e.cfg.Formatter.Gossip(c))
 		}
 	}

@@ -177,19 +177,17 @@ cmd/chatwatch/        prints live chat as the bot reads it
 bot/                  Discord client, router wiring, guild lifecycle
 chat/                 one reader per stream: YouTube chat merged with TLdex, or Twitch chat
 commands/             slash commands and the /settings panel
-relay/                which chats to read and where their lines go: rules, formatting, engine
+relay/                which chats to read, where their lines go and live notices
 sender/               Discord send queue per channel
 subs/                 in-memory subscription index
 tllog/                stream logs from relayed lines, posted when streams end
 translate/            DeepL client with a cache and a monthly character budget
 holodex/              Holodex API client
 holodex/tldex/        Holodex's TLdex translation feed
-moderation/           in-memory blacklists and filters
-notify/               live stream and community post notifications
-perms/                who may manage the bot: Discord permissions or bot roles
+guilds/               in-memory guild settings, blacklists and filters
+notify/               community post notifications
 stream/               stream tracker: Holodex and Twitch polls into live/prechat/ended events
 internal/config/      env-first configuration
-internal/logging/     slog setup
 store/                persistence interfaces and models
 store/sqlite/         SQLite implementation and its migrations
 twitch/helix/         Twitch API client, for which channels are live

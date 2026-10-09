@@ -62,7 +62,7 @@ var _ = Describe("/log", func() {
 		save(testGuild, 0, "a", "[EN] one")
 		save(testGuild, time.Minute, "spam", "[EN] buy")
 		save("", 0, "archived", "[EN] archive only")
-		_, err := h.b.Moderation.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: testGuild, ChannelID: "UCspam", AddedBy: "mod"})
+		_, err := h.b.Guilds.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: testGuild, ChannelID: "UCspam", AddedBy: "mod"})
 		Expect(err).NotTo(HaveOccurred())
 
 		content, file := logFile("https://www.youtube.com/watch?v=" + videoID + "&t=10")

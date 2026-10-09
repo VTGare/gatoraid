@@ -15,7 +15,6 @@ import (
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/holodex"
-	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/twitch"
@@ -155,7 +154,7 @@ func managerCommand(b *bot.Bot, name, description string) *gumi.Command {
 		Name:        name,
 		Description: description,
 		Category:    CategoryRelay,
-		Checks:      []gumi.Check{perms.Check(b.Store, perms.Manager)},
+		Checks:      []gumi.Check{permCheck(b.Store, manager)},
 		Contexts:    []discord.InteractionContextType{discord.InteractionContextTypeGuild},
 	}
 }

@@ -65,7 +65,7 @@ func logCommand(b *bot.Bot) *gumi.Command {
 // The server's own relays come first. Without any, it's the archive of
 // every chat the bot read, which only goes back a day.
 func buildLog(b *bot.Bot, ctx *gumi.Context, meta tllog.Meta) (string, int, error) {
-	mod := b.Moderation.For(idString(ctx.GuildID()))
+	mod := b.Guilds.Moderation(idString(ctx.GuildID()))
 
 	var sources []string
 	if ctx.GuildID() != 0 {

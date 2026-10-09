@@ -1,11 +1,11 @@
-package moderation_test
+package guilds_test
 
 import (
 	"context"
 	"path/filepath"
 	"time"
 
-	"github.com/VTGare/gatoraid/moderation"
+	"github.com/VTGare/gatoraid/guilds"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
 
@@ -13,10 +13,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Service", func() {
+var _ = Describe("Moderation", func() {
 	var (
 		ctx context.Context
-		svc *moderation.Service
+		svc *guilds.State
 	)
 
 	BeforeEach(func() {
@@ -25,11 +25,11 @@ var _ = Describe("Service", func() {
 		Expect(err).NotTo(HaveOccurred())
 		DeferCleanup(db.Close)
 
+		svc = guilds.New(db)
 		for _, g := range []string{"g1", "g2"} {
-			_, _, err := db.JoinGuild(ctx, g)
+			_, err := svc.Join(ctx, g)
 			Expect(err).NotTo(HaveOccurred())
 		}
-		svc = moderation.New(db)
 	})
 
 	blacklist := func(guild, channel string) {
@@ -47,7 +47,7 @@ var _ = Describe("Service", func() {
 	}
 
 	It("has no rules for guilds without any", func() {
-		Expect(svc.For("g1")).To(BeNil())
+		Expect(svc.Moderation("g1")).To(BeNil())
 		Expect(svc.Blacklist("g1")).To(BeEmpty())
 		Expect(svc.Blacklisted("g1", "UCa")).To(BeFalse())
 	})
@@ -60,12 +60,12 @@ var _ = Describe("Service", func() {
 		filter("g1", store.FilterWanted, "es:")
 		filter("g2", store.FilterWanted, "fr:")
 
-		rules := svc.For("g1")
+		rules := svc.Moderation("g1")
 		Expect(rules.Blacklist).To(Equal(map[string]bool{"UCa": true, "UCb": true}))
 		Expect(rules.Banned).To(Equal([]string{"spoiler"}))
 		Expect(rules.Wanted).To(Equal([]string{"es:"}))
-		Expect(svc.For("g2").Blacklist).To(BeEmpty())
-		Expect(svc.For("g2").Wanted).To(Equal([]string{"fr:"}))
+		Expect(svc.Moderation("g2").Blacklist).To(BeEmpty())
+		Expect(svc.Moderation("g2").Wanted).To(Equal([]string{"fr:"}))
 
 		Expect(svc.Blacklist("g1")).To(HaveExactElements(HaveField("ChannelID", "UCb"), HaveField("ChannelID", "UCa")))
 		Expect(svc.Blacklisted("g1", "UCa")).To(BeTrue())
@@ -82,6 +82,6 @@ var _ = Describe("Service", func() {
 		Expect(svc.RemoveFilter(ctx, "g1", store.FilterBanned, "spoiler")).To(Succeed())
 
 		Expect(svc.Blacklisted("g1", "UCa")).To(BeFalse())
-		Expect(svc.For("g1")).To(BeNil())
+		Expect(svc.Moderation("g1")).To(BeNil())
 	})
 })

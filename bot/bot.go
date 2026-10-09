@@ -20,7 +20,6 @@ import (
 	"github.com/VTGare/gatoraid/holodex"
 	"github.com/VTGare/gatoraid/holodex/tldex"
 	"github.com/VTGare/gatoraid/internal/config"
-	"github.com/VTGare/gatoraid/moderation"
 	"github.com/VTGare/gatoraid/notify"
 	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
@@ -43,7 +42,6 @@ const (
 	commandTimeout  = 2 * time.Minute
 	pruneInterval   = time.Hour
 	purgeInterval   = 24 * time.Hour
-	streamBuffer    = 256
 	distantChatPoll = 15 * time.Second
 )
 
@@ -57,9 +55,6 @@ type Bot struct {
 	Guilds    *guilds.State
 	Streamers *streamers.Registry
 	Subs      *subs.Service
-
-	// Blacklists and filters.
-	Moderation *moderation.Service
 
 	// Looks up YouTube channels from links and handles.
 	Channels *channel.Client
@@ -87,12 +82,7 @@ type Bot struct {
 	Relay *relay.Engine
 	Logs  *tllog.Writer
 
-	// Nil without a Holodex API key.
-	Live  *notify.Live
 	Posts *notify.Posts
-
-	// The tracker's events, copied to the relay and the live notifier.
-	relayStreams, liveStreams chan stream.Event
 
 	// Start's context, so shutting down cancels commands and event handlers.
 	ctx context.Context
@@ -129,7 +119,6 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 		ctx:       context.Background(),
 	}
 	b.Subs = subs.New(st, b.Streamers)
-	b.Moderation = moderation.New(st)
 	b.Channels = channel.New()
 	if cfg.DeepL.APIKey != "" {
 		b.Translator = translate.NewService(translate.NewDeepL(cfg.DeepL.APIKey),
@@ -205,13 +194,12 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	b.Sender = sender.New(sender.Config{Poster: c.Rest, Log: log.With("component", "sender")})
 
 	b.Logs = tllog.NewWriter(tllog.Config{
-		Store:      st,
-		Guilds:     b.Guilds,
-		Sender:     b.Sender,
-		Moderation: b.Moderation.For,
-		Streamer:   b.Streamers.Streamer,
-		Color:      Color,
-		Log:        log.With("component", "tllog"),
+		Store:    st,
+		Guilds:   b.Guilds,
+		Sender:   b.Sender,
+		Streamer: b.Streamers.Streamer,
+		Color:    Color,
+		Log:      log.With("component", "tllog"),
 	})
 
 	b.Posts = notify.NewPosts(notify.PostsConfig{
@@ -225,21 +213,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 	})
 
 	if b.Streams != nil {
-		b.relayStreams = make(chan stream.Event, streamBuffer)
-		b.liveStreams = make(chan stream.Event, streamBuffer)
-
-		b.Live = notify.NewLive(notify.LiveConfig{
-			Streams:  b.liveStreams,
-			Registry: b.Streamers,
-			Subs:     b.Subs,
-			Guilds:   b.Guilds,
-			Store:    st,
-			Sender:   b.Sender,
-			Log:      log.With("component", "live"),
-		})
-
 		relayCfg := relay.Config{
-			Streams:  b.relayStreams,
+			Streams:  b.Streams.Events(),
 			Chats:    b.Chats,
 			Registry: b.Streamers,
 			Subs:     b.Subs,
@@ -250,9 +225,8 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 				Emoji:   cfg.Emoji,
 				Lineage: b.Streamers.Lineage,
 			},
-			Moderation: b.Moderation.For,
-			OnEnded:    b.Logs.StreamEnded,
-			Log:        log.With("component", "relay"),
+			OnEnded: b.Logs.StreamEnded,
+			Log:     log.With("component", "relay"),
 		}
 		// A nil *Service in the interface would look like translation is on.
 		if b.Translator != nil {
@@ -331,8 +305,6 @@ func (b *Bot) Start(ctx context.Context) error {
 	relayDone := make(chan struct{})
 	if b.Streams != nil {
 		go func() { _ = b.Streams.Run(ctx) }()
-		go b.fanOutStreams(ctx)
-		go func() { _ = b.Live.Run(ctx) }()
 		go func() {
 			defer close(relayDone)
 			_ = b.Relay.Run(ctx)
@@ -367,25 +339,6 @@ func (b *Bot) listeners() []disgobot.EventListener {
 		}),
 		disgobot.NewListenerFunc(func(e *events.GuildLeave) { b.guildLeft(e.GuildID.String(), e.Guild.Name) }),
 		b.Router,
-	}
-}
-
-// The tracker has one events channel, and both the relay and the live
-// notifier need every event.
-func (b *Bot) fanOutStreams(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case e := <-b.Streams.Events():
-			for _, out := range []chan stream.Event{b.relayStreams, b.liveStreams} {
-				select {
-				case out <- e:
-				case <-ctx.Done():
-					return
-				}
-			}
-		}
 	}
 }
 

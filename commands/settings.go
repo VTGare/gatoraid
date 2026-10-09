@@ -12,7 +12,6 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/bot"
-	"github.com/VTGare/gatoraid/perms"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/translate"
 )
@@ -108,12 +107,12 @@ func (p *settingsPanel) handle(ctx *gumi.ComponentContext) error {
 		if m := ctx.Member(); m != nil {
 			roles = m.RoleIDs
 		}
-		ok, err := perms.Allowed(reqCtx, p.b.Store, ctx.GuildID().String(), perms.Manager, ctx.Permissions(), roles)
+		ok, err := allowed(reqCtx, p.b.Store, ctx.GuildID().String(), manager, ctx.Permissions(), roles)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return ctx.Reply(gumi.Text(perms.Denied(perms.Manager)).Private())
+			return ctx.Reply(gumi.Text(denied(manager)).Private())
 		}
 
 		if action == "otherlang" {
@@ -222,8 +221,8 @@ func (p *settingsPanel) view(ctx context.Context, guild snowflake.ID, owner stri
 		return nil, err
 	}
 	v.outside = len(added)
-	v.blacklisted = len(p.b.Moderation.Blacklist(guildID))
-	v.filters = len(p.b.Moderation.Filters(guildID))
+	v.blacklisted = len(p.b.Guilds.Blacklist(guildID))
+	v.filters = len(p.b.Guilds.Filters(guildID))
 
 	if v.managers, err = p.b.Store.GuildRoles(ctx, guildID, store.RoleManager); err != nil {
 		return nil, err

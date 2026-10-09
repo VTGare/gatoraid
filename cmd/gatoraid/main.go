@@ -4,16 +4,17 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/VTGare/gatoraid/bot"
 	"github.com/VTGare/gatoraid/commands"
 	"github.com/VTGare/gatoraid/internal/config"
-	"github.com/VTGare/gatoraid/internal/logging"
 	"github.com/VTGare/gatoraid/store/sqlite"
 	"github.com/VTGare/gatoraid/streamers"
 )
@@ -35,7 +36,7 @@ func run() error {
 		return err
 	}
 
-	log := logging.New(os.Stderr, cfg.Log)
+	log := newLogger(os.Stderr, cfg.Log)
 	slog.SetDefault(log)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -81,9 +82,6 @@ func run() error {
 	if err := b.Subs.Reload(ctx); err != nil {
 		return fmt.Errorf("load subscriptions: %w", err)
 	}
-	if err := b.Moderation.Reload(ctx); err != nil {
-		return fmt.Errorf("load blacklists and filters: %w", err)
-	}
 
 	if err := commands.Register(b); err != nil {
 		return err
@@ -91,4 +89,17 @@ func run() error {
 
 	log.Info("starting GatorAid", slog.String("database", cfg.Database.Path))
 	return b.Start(ctx)
+}
+
+func newLogger(w io.Writer, cfg config.Log) *slog.Logger {
+	var level slog.Level
+	if err := level.UnmarshalText([]byte(strings.ToUpper(cfg.Level))); err != nil {
+		level = slog.LevelInfo
+	}
+	opts := &slog.HandlerOptions{Level: level}
+
+	if cfg.Format == "text" {
+		return slog.New(slog.NewTextHandler(w, opts))
+	}
+	return slog.New(slog.NewJSONHandler(w, opts))
 }

@@ -32,8 +32,6 @@ type Config struct {
 	Store  Store
 	Guilds *guilds.State
 	Sender relay.Sender
-	// A guild's blacklist and filters. Optional.
-	Moderation func(guildID string) *relay.Moderation
 	// How long after a stream ends its logs are posted.
 	Delay time.Duration
 	// Looks up the streamer for the message. Optional.
@@ -55,9 +53,6 @@ type Writer struct {
 func NewWriter(cfg Config) *Writer {
 	if cfg.Log == nil {
 		cfg.Log = slog.New(slog.DiscardHandler)
-	}
-	if cfg.Moderation == nil {
-		cfg.Moderation = func(string) *relay.Moderation { return nil }
 	}
 	if cfg.Delay <= 0 {
 		cfg.Delay = defaultDelay
@@ -145,7 +140,7 @@ func (w *Writer) postGuild(ctx context.Context, meta Meta, guildID string, relay
 	if err != nil {
 		return err
 	}
-	mod := w.cfg.Moderation(guildID)
+	mod := w.cfg.Guilds.Moderation(guildID)
 
 	if logChannel := g.Settings.LogChannelID; logChannel != "" {
 		return w.send(ctx, meta, guildID, logChannel, lines, mod)
@@ -166,7 +161,7 @@ func (w *Writer) postGuild(ctx context.Context, meta Meta, guildID string, relay
 	return nil
 }
 
-func (w *Writer) send(ctx context.Context, meta Meta, guildID, channelID string, lines []store.Line, mod *relay.Moderation) error {
+func (w *Writer) send(ctx context.Context, meta Meta, guildID, channelID string, lines []store.Line, mod *guilds.Moderation) error {
 	text, n := Build(meta, lines, mod)
 	if n == 0 {
 		return nil
