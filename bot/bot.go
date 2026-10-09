@@ -230,7 +230,6 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Subs:     b.Subs,
 			Store:    st,
 			Sender:   b.Sender,
-			Color:    Color,
 			Log:      log.With("component", "live"),
 		})
 
@@ -244,7 +243,6 @@ func New(cfg *config.Config, log *slog.Logger, st store.Store) (*Bot, error) {
 			Formatter: &relay.Formatter{
 				Emoji:   cfg.Emoji,
 				Lineage: b.Streamers.Lineage,
-				Color:   Color,
 			},
 			Moderation: b.Moderation.For,
 			OnEnded:    b.Logs.StreamEnded,

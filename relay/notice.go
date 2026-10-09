@@ -10,30 +10,67 @@ import (
 	"github.com/VTGare/gatoraid/stream"
 )
 
+// Twitch's brand purple.
+const TwitchColor = 0x9146ff
+
 // Notice builds the message that tells a channel a relay started.
 func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string) discord.MessageCreate {
-	e := StreamEmbed(s, host, f.Color)
-
+	var text string
 	switch kind {
 	case store.NoticePrechat:
-		e.Description = "Relaying the waiting room chat here."
+		when := "soon"
 		if !s.ScheduledAt.IsZero() {
-			e.Description += fmt.Sprintf(" The stream starts <t:%d:R>.", s.ScheduledAt.Unix())
+			when = fmt.Sprintf("<t:%d:R>", s.ScheduledAt.Unix())
 		}
+		text = StreamerName(s, host) + " goes live " + when + ". Relaying " + StreamLink(s, "pre-stream chat") + " here."
 	default:
-		e.Description = "Relaying the " + s.PlatformName() + " live chat here."
+		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName()) + ". Relaying chat here."
 	}
 
-	return RoleMessage(e, roleID)
+	return StreamMessage(s, host, roleID, text)
 }
 
-// StreamEmbed links the stream with its thumbnail. host, if known, puts
-// the registry's name and avatar on it.
-func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) discord.Embed {
+// StreamerName is the registry's name if host is known, in bold.
+func StreamerName(s *stream.Stream, host *store.Streamer) string {
+	name := s.ChannelName
+	if host != nil {
+		name = host.Name
+	}
+	return "**" + EscapeMarkdown(name) + "**"
+}
+
+// StreamLink masks the stream's URL with text.
+func StreamLink(s *stream.Stream, text string) string {
+	if s.Twitch() {
+		return "[" + text + "](<" + s.URL() + ">)"
+	}
+
+	return "[" + text + "](" + s.URL() + ")"
+}
+
+// StreamMessage pings roleID before text, which should have a StreamLink.
+func StreamMessage(s *stream.Stream, host *store.Streamer, roleID, text string) discord.MessageCreate {
+	msg := roleMessage(roleID)
+	if msg.Content != "" {
+		text = msg.Content + " " + text
+	}
+
+	msg.Content = text
+
+	if s.Twitch() {
+		msg.Embeds = []discord.Embed{TwitchEmbed(s, host)}
+	}
+
+	return msg
+}
+
+// TwitchEmbed links the stream with its preview. host, if known, puts the
+// registry's name and avatar on it.
+func TwitchEmbed(s *stream.Stream, host *store.Streamer) discord.Embed {
 	e := discord.Embed{
 		Title: s.Title,
 		URL:   s.URL(),
-		Color: color,
+		Color: TwitchColor,
 		Image: &discord.EmbedResource{URL: s.ThumbnailURL()},
 		Author: &discord.EmbedAuthor{
 			Name: s.ChannelName,
@@ -46,20 +83,26 @@ func StreamEmbed(s *stream.Stream, host *store.Streamer, color int) discord.Embe
 		e.Author.IconURL = host.AvatarURL
 	}
 
+	if s.Game != "" {
+		e.Fields = []discord.EmbedField{{Name: "Category", Value: s.Game}}
+	}
+
 	return e
 }
 
-// RoleMessage pings roleID if set, and nobody else. The role has to be in
-// the message text to notify anyone.
+// RoleMessage pings roleID if set, and nobody else.
 func RoleMessage(e discord.Embed, roleID string) discord.MessageCreate {
-	msg := discord.MessageCreate{
-		Embeds:          []discord.Embed{e},
-		AllowedMentions: &discord.AllowedMentions{},
-	}
+	msg := roleMessage(roleID)
+	msg.Embeds = []discord.Embed{e}
+	return msg
+}
+
+// The role has to be in the message text to notify anyone.
+func roleMessage(roleID string) discord.MessageCreate {
+	msg := discord.MessageCreate{AllowedMentions: &discord.AllowedMentions{}}
 	if id, err := snowflake.Parse(roleID); err == nil && id != 0 {
 		msg.Content = discord.RoleMention(id)
 		msg.AllowedMentions.Roles = []snowflake.ID{id}
 	}
-
 	return msg
 }

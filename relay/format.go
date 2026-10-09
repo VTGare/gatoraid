@@ -34,8 +34,6 @@ type Formatter struct {
 	Emoji func(key, fallback string) string
 	// A group and its parents, nearest first.
 	Lineage func(groupID string) []*store.Group
-	// For notice embeds.
-	Color int
 }
 
 // Relay formats a relayed line. translation adds a DeepL line, and showChat

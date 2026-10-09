@@ -47,6 +47,7 @@ type Stream struct {
 	// Only set for Twitch streams.
 	TwitchUsername string
 	Thumbnail      string
+	Game           string
 }
 
 func (s *Stream) Twitch() bool { return s.Platform == Twitch }

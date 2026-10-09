@@ -11,6 +11,7 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/notify"
+	"github.com/VTGare/gatoraid/relay"
 	"github.com/VTGare/gatoraid/sender"
 	"github.com/VTGare/gatoraid/store"
 	"github.com/VTGare/gatoraid/store/sqlite"
@@ -49,14 +50,14 @@ func (f *fakeSender) messages() []sender.Message {
 	return append([]sender.Message(nil), f.sent...)
 }
 
-// Messages as "channel: content | author: title (description)".
+// Messages as "channel: content | author: title".
 func (f *fakeSender) contents() []string {
 	var out []string
 	for _, m := range f.messages() {
 		line := m.ChannelID + ": " + m.Send.Content
 		if len(m.Send.Embeds) > 0 {
 			e := m.Send.Embeds[0]
-			line += " | " + e.Author.Name + ": " + e.Title + " (" + e.Description + ")"
+			line += " | " + e.Author.Name + ": " + e.Title
 		}
 		out = append(out, line)
 	}
@@ -144,9 +145,9 @@ var _ = Describe("Live", func() {
 		streams <- live("kiara", kiaraID, time.Minute)
 
 		Eventually(w.snd.contents).Should(ConsistOf(
-			"c1: <@&42> | Mori Calliope: Karaoke_time (Live now on YouTube)",
-			"c1: <@&42> | Takanashi Kiara: Karaoke_time (Live now on YouTube)",
-			"c2:  | Takanashi Kiara: Karaoke_time (Live now on YouTube)",
+			"c1: <@&42> **Mori Calliope** is [live on YouTube](https://youtu.be/calli)",
+			"c1: <@&42> **Takanashi Kiara** is [live on YouTube](https://youtu.be/kiara)",
+			"c2: **Takanashi Kiara** is [live on YouTube](https://youtu.be/kiara)",
 		))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(3))
 		Expect(w.snd.messages()[0].Send.AllowedMentions.Roles).To(Equal([]snowflake.ID{42}))
@@ -174,7 +175,7 @@ var _ = Describe("Live", func() {
 		members.Stream.MembersOnly = true
 		streams <- members
 
-		Eventually(w.snd.contents).Should(ConsistOf("c2:  | Mori Calliope: Karaoke_time (Members-only stream)"))
+		Eventually(w.snd.contents).Should(ConsistOf("c2: **Mori Calliope** started a [members-only stream](https://youtu.be/members)"))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(1))
 	})
 
@@ -190,8 +191,8 @@ var _ = Describe("Live", func() {
 		streams <- live("yt", calliID, time.Minute)
 
 		Eventually(w.snd.contents).Should(ConsistOf(
-			"c2:  | Mori Calliope: Karaoke_time (Live now on Twitch)",
-			"c1:  | Mori Calliope: Karaoke_time (Live now on YouTube)",
+			"c2: **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>) | Mori Calliope: Karaoke_time",
+			"c1: **Mori Calliope** is [live on YouTube](https://youtu.be/yt)",
 		))
 		Consistently(w.snd.contents, 50*time.Millisecond).Should(HaveLen(2))
 	})
@@ -292,37 +293,37 @@ func (c *countingSource) Posts(ctx context.Context, channelID string) ([]posts.P
 }
 
 var _ = Describe("LiveMessage", func() {
-	It("is an embed with the stream's link, thumbnail and start", func() {
-		started := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
+	It("names the streamer and links the YouTube stream for Discord's player", func() {
+		host := &store.Streamer{ChannelID: calliID, Name: "Mori_Calliope", AvatarURL: "calli.png"}
+
+		msg := notify.LiveMessage(stream.Stream{
+			VideoID: "vid", ChannelID: calliID, ChannelName: "Calli Ch.", Title: "Karaoke", StartedAt: time.Now(),
+		}, host, "42")
+
+		Expect(msg.Content).To(Equal("<@&42> **Mori\\_Calliope** is [live on YouTube](https://youtu.be/vid)"))
+		Expect(msg.Embeds).To(BeEmpty())
+	})
+
+	It("puts Twitch streams in our embed with the preview and category", func() {
 		host := &store.Streamer{ChannelID: calliID, Name: "Mori Calliope", AvatarURL: "calli.png"}
 
 		msg := notify.LiveMessage(stream.Stream{
-			VideoID: "vid", ChannelID: calliID, ChannelName: "Calli Ch.", Title: "Karaoke", StartedAt: started,
-		}, host, "42", 7)
+			VideoID: "twitch:1", Platform: stream.Twitch, ChannelID: calliID, TwitchUsername: "moricalliope",
+			Title: "Karaoke", Game: "Music", StartedAt: time.Now(),
+			Thumbnail: "https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1",
+		}, host, "")
 
-		Expect(msg.Content).To(Equal("<@&42>"))
+		Expect(msg.Content).To(Equal("**Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>)"))
 		e := msg.Embeds[0]
 		Expect(e.Title).To(Equal("Karaoke"))
-		Expect(e.URL).To(Equal("https://youtu.be/vid"))
+		Expect(e.URL).To(Equal("https://www.twitch.tv/moricalliope"))
 		Expect(e.Author.Name).To(Equal("Mori Calliope"))
 		Expect(e.Author.IconURL).To(Equal("calli.png"))
-		Expect(e.Author.URL).To(Equal("https://www.youtube.com/channel/UCcalli"))
-		Expect(e.Image.URL).To(Equal("https://i.ytimg.com/vi/vid/hqdefault.jpg"))
-		Expect(e.Timestamp.UTC().Format(time.RFC3339)).To(Equal("2026-10-02T12:00:00Z"))
-		Expect(e.Color).To(Equal(7))
-	})
-
-	It("links Twitch streams to Twitch", func() {
-		msg := notify.LiveMessage(stream.Stream{
-			VideoID: "twitch:1", Platform: stream.Twitch, ChannelID: calliID, TwitchUsername: "moricalliope",
-			Title: "Karaoke", Thumbnail: "https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1",
-		}, nil, "", 7)
-
-		e := msg.Embeds[0]
-		Expect(e.Description).To(Equal("Live now on Twitch"))
-		Expect(e.URL).To(Equal("https://www.twitch.tv/moricalliope"))
 		Expect(e.Author.URL).To(Equal("https://www.twitch.tv/moricalliope"))
 		Expect(e.Image.URL).To(Equal("https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1"))
+		Expect(e.Fields).To(Equal([]discord.EmbedField{{Name: "Category", Value: "Music"}}))
+		Expect(e.Color).To(Equal(relay.TwitchColor))
+		Expect(e.Timestamp).To(BeNil())
 	})
 })
 

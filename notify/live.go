@@ -35,7 +35,6 @@ type LiveConfig struct {
 	// Streams that went live longer ago than this aren't announced. After
 	// downtime, the tracker reports everything that's live at once.
 	MaxAge time.Duration
-	Color  int
 	Now    func() time.Time
 	Log    *slog.Logger
 }
@@ -110,21 +109,17 @@ func (l *Live) notify(ctx context.Context, s stream.Stream, host *store.Streamer
 
 	l.cfg.Sender.Send(sender.Message{
 		ChannelID: sub.ChannelID,
-		Send:      LiveMessage(s, host, sub.RoleID, l.cfg.Color),
+		Send:      LiveMessage(s, host, sub.RoleID),
 	})
 	return nil
 }
 
-func LiveMessage(s stream.Stream, host *store.Streamer, roleID string, color int) discord.MessageCreate {
-	e := relay.StreamEmbed(&s, host, color)
-	e.Description = "Live now on " + s.PlatformName()
-	if s.MembersOnly {
-		e.Description = "Members-only stream"
-	}
-	if !s.StartedAt.IsZero() {
-		started := s.StartedAt
-		e.Timestamp = &started
-	}
+func LiveMessage(s stream.Stream, host *store.Streamer, roleID string) discord.MessageCreate {
+	name := relay.StreamerName(&s, host)
 
-	return relay.RoleMessage(e, roleID)
+	text := name + " is " + relay.StreamLink(&s, "live on "+s.PlatformName())
+	if s.MembersOnly {
+		text = name + " started a " + relay.StreamLink(&s, "members-only stream")
+	}
+	return relay.StreamMessage(&s, host, roleID, text)
 }

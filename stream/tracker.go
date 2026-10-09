@@ -277,6 +277,7 @@ func (t *Tracker) PollTwitch(ctx context.Context) error {
 			ScheduledAt:    ts.StartedAt,
 			StartedAt:      ts.StartedAt,
 			TwitchUsername: username,
+			Game:           ts.GameName,
 			Thumbnail:      helix.Thumbnail(ts.ThumbnailURL, twitchThumbWidth, twitchThumbHeight),
 		}
 		// Discord caches embed images by URL, and Twitch keeps one preview

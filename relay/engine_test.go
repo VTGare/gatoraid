@@ -129,18 +129,14 @@ func (f *fakeSender) Send(m sender.Message) bool {
 	return true
 }
 
-// Lines as "channel: content", notices as "channel: notice <description>".
+// Lines as "channel: content".
 func (f *fakeSender) lines() []string {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
 	var out []string
 	for _, s := range f.sent {
-		if len(s.msg.Embeds) > 0 {
-			out = append(out, s.channel+": notice "+s.msg.Content+" "+s.msg.Embeds[0].Description)
-		} else {
-			out = append(out, s.channel+": "+s.msg.Content)
-		}
+		out = append(out, s.channel+": "+s.msg.Content)
 	}
 	return out
 }
@@ -266,13 +262,13 @@ var _ = Describe("Engine", func() {
 		streams <- live("calli-live", calliID)
 		streams <- live("kiara-live", kiaraID)
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
-		Eventually(snd.lines).Should(Equal([]string{"c1: notice <@&42> Relaying the YouTube live chat here."}))
+		Eventually(snd.lines).Should(Equal([]string{"c1: <@&42> **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here."}))
 
 		say("calli-live", "UCviewer", "@viewer", "lol")
 		say("calli-live", "UCviewer", "@viewer", "[EN] hello")
 		say("calli-live", calliID, "@calli", "hi")
 		Eventually(snd.lines).Should(HaveExactElements(
-			ContainSubstring("notice"),
+			ContainSubstring("Relaying"),
 			"c1: 💬 ||@viewer:|| `[EN] hello`",
 			"c1: 🎙️ **@calli:** `hi`",
 		))
@@ -333,15 +329,15 @@ var _ = Describe("Engine", func() {
 
 		subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "")
 		Eventually(chats.Running).Should(Equal([]string{"calli-live"}))
-		Eventually(snd.lines).Should(ConsistOf(ContainSubstring("c1: notice  Relaying the waiting room chat here.")))
+		Eventually(snd.lines).Should(ConsistOf(ContainSubstring("Relaying [pre-stream chat](https://youtu.be/calli-live) here.")))
 
 		say("calli-live", calliID, "@calli", "soon")
 		Eventually(snd.lines).Should(ContainElement("c1: ⏳ 🎙️ **@calli:** `soon`"))
 
 		streams <- live("calli-live", calliID)
 		Eventually(snd.lines).Should(ContainElements(
-			"c1: notice  Relaying the YouTube live chat here.",
-			"c2: notice  Relaying the YouTube live chat here.",
+			"c1: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here.",
+			"c2: **Mori Calliope** is [live on YouTube](https://youtu.be/calli-live). Relaying chat here.",
 		))
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
@@ -362,7 +358,7 @@ var _ = Describe("Engine", func() {
 
 		room.ScheduledAt, room.Distant = time.Now().Add(time.Hour), false
 		streams <- stream.Event{Kind: stream.EventPrechat, Stream: room}
-		Eventually(snd.lines).Should(ContainElement(ContainSubstring("c1: notice  Relaying the waiting room chat here.")))
+		Eventually(snd.lines).Should(ContainElement(ContainSubstring("Relaying [pre-stream chat](https://youtu.be/calli-room) here.")))
 		Expect(chats.Starts()).To(HaveLen(1))
 	})
 
@@ -632,7 +628,7 @@ var _ = Describe("Engine", func() {
 			streams <- twitchLive("twitch:1", calliID, "moricalliope")
 			Eventually(chats.Running).Should(Equal([]string{"twitch:1"}))
 			Expect(chats.targets).To(Equal([]chat.Target{{VideoID: "twitch:1", TwitchUsername: "moricalliope"}}))
-			Eventually(snd.lines).Should(Equal([]string{"c1: notice  Relaying the Twitch live chat here."}))
+			Eventually(snd.lines).Should(Equal([]string{"c1: **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>). Relaying chat here."}))
 
 			sayTwitch("twitch:1", "7", "moricalliope", "hi chat", true)
 			Eventually(snd.lines).Should(HaveLen(2))

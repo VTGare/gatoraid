@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/VTGare/gatoraid/relay"
@@ -95,27 +96,15 @@ var _ = Describe("Formatter", func() {
 })
 
 var _ = Describe("Notice", func() {
-	f := &relay.Formatter{Color: 1}
+	f := &relay.Formatter{}
 
-	It("pings only the role for a live relay", func() {
-		host := *calli
-		host.AvatarURL = "calli.png"
-		s := calliStream()
-		s.Title = "【MINECRAFT】dig"
+	It("pings only the role and links the YouTube stream for Discord's player", func() {
+		msg := f.Notice(store.NoticeRelay, calliStream(), calli, "123")
 
-		msg := f.Notice(store.NoticeRelay, s, &host, "123")
-
-		Expect(msg.Content).To(Equal("<@&123>"))
+		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on YouTube](https://youtu.be/vid). Relaying chat here."))
 		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
 		Expect(msg.AllowedMentions.Parse).To(BeEmpty())
-		e := msg.Embeds[0]
-		Expect(e.Title).To(Equal("【MINECRAFT】dig"))
-		Expect(e.URL).To(Equal("https://youtu.be/vid"))
-		Expect(e.Author.Name).To(Equal("Mori Calliope"))
-		Expect(e.Author.IconURL).To(Equal("calli.png"))
-		Expect(e.Description).To(Equal("Relaying the YouTube live chat here."))
-		Expect(e.Image.URL).To(Equal("https://i.ytimg.com/vi/vid/hqdefault.jpg"))
-		Expect(e.Thumbnail).To(BeNil())
+		Expect(msg.Embeds).To(BeEmpty())
 	})
 
 	It("says when a prechat's stream starts and pings nobody without a role", func() {
@@ -125,9 +114,38 @@ var _ = Describe("Notice", func() {
 
 		msg := f.Notice(store.NoticePrechat, s, nil, "")
 
-		Expect(msg.Content).To(BeEmpty())
+		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>. Relaying [pre-stream chat](https://youtu.be/vid) here."))
 		Expect(msg.AllowedMentions.Roles).To(BeEmpty())
-		Expect(msg.Embeds[0].Author.Name).To(Equal("Mori Calliope Ch."))
-		Expect(msg.Embeds[0].Description).To(Equal("Relaying the waiting room chat here. The stream starts <t:1790000000:R>."))
+	})
+
+	It("says soon when a prechat has no scheduled time", func() {
+		s := calliStream()
+		s.Status = stream.Upcoming
+
+		msg := f.Notice(store.NoticePrechat, s, calli, "")
+
+		Expect(msg.Content).To(Equal("**Mori Calliope** goes live soon. Relaying [pre-stream chat](https://youtu.be/vid) here."))
+	})
+
+	It("puts Twitch streams in our embed and stops Discord's unfurl", func() {
+		host := *calli
+		host.AvatarURL = "calli.png"
+		s := &stream.Stream{
+			VideoID: "twitch:1", Platform: stream.Twitch, ChannelID: "UCcalli", TwitchUsername: "moricalliope",
+			Title: "【MINECRAFT】dig", Game: "Minecraft", Thumbnail: "https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1",
+		}
+
+		msg := f.Notice(store.NoticeRelay, s, &host, "123")
+
+		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>). Relaying chat here."))
+		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
+		e := msg.Embeds[0]
+		Expect(e.Title).To(Equal("【MINECRAFT】dig"))
+		Expect(e.URL).To(Equal("https://www.twitch.tv/moricalliope"))
+		Expect(e.Author.Name).To(Equal("Mori Calliope"))
+		Expect(e.Author.IconURL).To(Equal("calli.png"))
+		Expect(e.Color).To(Equal(relay.TwitchColor))
+		Expect(e.Fields).To(Equal([]discord.EmbedField{{Name: "Category", Value: "Minecraft"}}))
+		Expect(e.Image.URL).To(Equal("https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1"))
 	})
 })
