@@ -27,7 +27,7 @@ var _ = Describe("Seed", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(seed.Groups).To(HaveLen(15))
-		Expect(seed.Streamers).To(HaveLen(690))
+		Expect(seed.Streamers).To(HaveLen(691))
 	})
 
 	It("orders groups as a tree, subgroups by order then name", func() {
@@ -125,7 +125,7 @@ var _ = Describe("Registry", func() {
 		reg = streamers.New(db)
 		res, err := reg.Sync(ctx, seed)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(res.Added).To(Equal(690))
+		Expect(res.Added).To(Equal(691))
 	})
 
 	resolve := func(q string) string {

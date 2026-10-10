@@ -1834,6 +1834,13 @@ twitter = "amsrntk3"
 twitch = "nacho_dayo"
 aliases = ["Nacho"]
 
+[[streamer]]
+name = "Shachi"
+channel_id = "UCuBEdI-24bquMoP_dACignQ"
+channel_name = "shachi too"
+twitter = "shachimu"
+twitch = "shachimu"
+
 
 # Underscore Talent
 
