@@ -114,7 +114,7 @@ var _ = Describe("Notice", func() {
 
 		msg := f.Notice(store.NoticePrechat, s, nil, "")
 
-		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>! Relaying [pre-stream chat](https://youtu.be/vid) here."))
+		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>! Relaying [pre-stream chat](https://youtu.be/vid) here.\n-# <t:1790000000:F>"))
 		Expect(msg.AllowedMentions.Roles).To(BeEmpty())
 	})
 

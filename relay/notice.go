@@ -18,11 +18,12 @@ func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.
 	var text string
 	switch kind {
 	case store.NoticePrechat:
-		when := "soon"
+		when, date := "soon", ""
 		if !s.ScheduledAt.IsZero() {
 			when = fmt.Sprintf("<t:%d:R>", s.ScheduledAt.Unix())
+			date = fmt.Sprintf("\n-# <t:%d:F>", s.ScheduledAt.Unix())
 		}
-		text = StreamerName(s, host) + " goes live " + when + "! Relaying " + StreamLink(s, "pre-stream chat") + " here."
+		text = StreamerName(s, host) + " goes live " + when + "! Relaying " + StreamLink(s, "pre-stream chat") + " here." + date
 	default:
 		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName()) + "! Relaying chat here."
 	}
