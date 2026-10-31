@@ -259,6 +259,40 @@ var _ = Describe("Manager", func() {
 		Expect(opened).To(Equal(3))
 	})
 
+	It("retries opening a page with no chat data", func() {
+		opens = []error{livechat.ErrNoChatData, nil}
+		reader.polls = []step{{msgs: []livechat.Message{msg("a", "UC1", "hi")}}}
+
+		manager.Start(ctx, Target{VideoID: "v"})
+
+		Expect(comments(1)).To(Equal([]string{"a"}))
+		Expect(opened).To(Equal(2))
+	})
+
+	It("keeps reading when reopening gets a page with no chat data", func() {
+		reader.polls = []step{{err: errors.New("503")}, {msgs: []livechat.Message{msg("a", "UC1", "hi")}}}
+		reader.reopens = []step{{err: livechat.ErrNoChatData}}
+
+		manager.Start(ctx, Target{VideoID: "v"})
+
+		Expect(comments(1)).To(Equal([]string{"a"}))
+	})
+
+	It("stops a chat whose page never has chat data", func() {
+		manager.cfg.GiveUpAfter = 20 * time.Millisecond
+		failures := make([]step, 1000)
+		for i := range failures {
+			failures[i] = step{err: livechat.ErrNoChatData}
+		}
+		reader.polls, reader.reopens = failures, failures
+
+		manager.Start(ctx, Target{VideoID: "v"})
+
+		e := nextEvent()
+		Expect(e.Kind).To(Equal(EventStopped))
+		Expect(e.Err).To(MatchError(livechat.ErrNoChatData))
+	})
+
 	It("reopens after a failed poll and delivers what was missed", func() {
 		reader.polls = []step{{err: errors.New("connection reset")}}
 		reader.reopens = []step{{msgs: []livechat.Message{msg("missed", "UC1", "hi")}}}

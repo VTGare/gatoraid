@@ -104,6 +104,12 @@ var _ = Describe("Live YouTube chat", Ordered, func() {
 		GinkgoWriter.Printf("prechat %s opened, wait %s\n", v.ID, chat.Wait())
 	})
 
+	It("reports a video that doesn't exist as having no chat data", func() {
+		_, err := client.Open(ctx, "aaaaaaaaaaa")
+		Expect(err).To(MatchError(livechat.ErrNoChatData))
+		GinkgoWriter.Printf("missing video: %v\n", err)
+	})
+
 	It("reports members-only chats as unavailable", func() {
 		v := pick(func(v holodex.Video) bool { return v.TopicID == "membersonly" })
 		if v == nil {

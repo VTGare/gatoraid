@@ -75,10 +75,12 @@ var _ = Describe("Chat", func() {
 		ctx = context.Background()
 		yt = &fakeYouTube{
 			pages: map[string][]byte{
-				"live":        fixture("page_live.html"),
-				"members":     fixture("page_unavailable.html"),
-				"disabled":    fixture("page_disabled.html"),
-				"not-a-video": fixture("page_not_found.html"),
+				"live":     fixture("page_live.html"),
+				"members":  fixture("page_unavailable.html"),
+				"disabled": fixture("page_disabled.html"),
+				"oops":     fixture("page_oops.html"),
+				"no-renderer": []byte(`<script>ytcfg.set({"INNERTUBE_CONTEXT":{"client":{"clientName":"WEB"}}});</script>` +
+					`<script>window["ytInitialData"] = {"contents":{}};</script>`),
 			},
 			chats: map[string][]byte{
 				"live-chat-token": fixture("reload.json"),
@@ -193,7 +195,8 @@ var _ = Describe("Chat", func() {
 		},
 		Entry("members-only", "members", livechat.ErrUnavailable, "Sorry, live chat is currently unavailable."),
 		Entry("disabled or ended", "disabled", livechat.ErrDisabled, "Chat is disabled for this live stream."),
-		Entry("no chat data", "not-a-video", livechat.ErrNotFound, "not found"),
+		Entry("an error page", "oops", livechat.ErrNoChatData, `title "Oops"`),
+		Entry("a page without a chat", "no-renderer", livechat.ErrNoChatData, "no chat data"),
 		Entry("404", "missing", livechat.ErrNotFound, "not found"),
 	)
 

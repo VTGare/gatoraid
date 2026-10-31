@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -23,6 +24,9 @@ const userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, li
 
 var (
 	ErrNotFound = errors.New("livechat: video not found")
+	// A 200 page without chat data. YouTube sends an "Oops" page for videos
+	// that don't exist, and existing videos seem to get one during its outages.
+	ErrNoChatData = errors.New("livechat: no chat data in the page")
 	// Members-only streams look the same as private ones from outside.
 	ErrUnavailable = errors.New("livechat: chat unavailable")
 	// Ended streams report their chat as disabled too.
@@ -188,7 +192,7 @@ func (c *Client) chatPage(ctx context.Context, videoID string) (*chatPage, error
 
 	var initial initialData
 	if !decodeAfter(body, &initial, `window["ytInitialData"] = `, `var ytInitialData = `) || cfg.Context == nil {
-		return nil, ErrNotFound
+		return nil, noChatData(body)
 	}
 
 	if m := initial.Contents.Message; m != nil {
@@ -201,7 +205,7 @@ func (c *Client) chatPage(ctx context.Context, videoID string) (*chatPage, error
 
 	renderer := initial.Contents.LiveChat
 	if renderer == nil {
-		return nil, ErrNotFound
+		return nil, noChatData(body)
 	}
 
 	cont := renderer.allMessages()
@@ -210,6 +214,18 @@ func (c *Client) chatPage(ctx context.Context, videoID string) (*chatPage, error
 	}
 
 	return &chatPage{context: cfg.Context, clientVersion: cfg.ClientVersion, continuation: cont}, nil
+}
+
+var pageTitle = regexp.MustCompile(`<title[^>]*>([^<]+)</title>`)
+
+// The size and title identify the page. Its body holds the caller's IP, so
+// it stays out of the logs.
+func noChatData(body []byte) error {
+	title := ""
+	if m := pageTitle.FindSubmatch(body); m != nil {
+		title = string(m[1])
+	}
+	return fmt.Errorf("%w: %d bytes, title %q", ErrNoChatData, len(body), title)
 }
 
 func (c *Client) getLiveChat(ctx context.Context, apiContext json.RawMessage, clientVersion, continuation string) (*liveChatContinuation, error) {
