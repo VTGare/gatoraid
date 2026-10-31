@@ -122,6 +122,24 @@ func (s *Service) Match(feature store.Feature, channelID string) []*store.Subscr
 	return out
 }
 
+// Mentioned returns the feature's subscriptions to the curated streamers in
+// mentions, in that order. Unlike Match, it leaves out groups and all, since
+// following a group doesn't say whose collabs a Discord channel wants.
+func (s *Service) Mentioned(feature store.Feature, mentions []string) []*store.Subscription {
+	t := (*s.idx.Load())[feature]
+	if t == nil {
+		return nil
+	}
+
+	var out []*store.Subscription
+	for _, id := range mentions {
+		if st, ok := s.reg.Streamer(id); ok && st.Curated() {
+			out = append(out, t.channel[id]...)
+		}
+	}
+	return out
+}
+
 // All returns every subscription to the feature. Gossip matches by what
 // people say rather than by channel, so it needs the whole list.
 func (s *Service) All(feature store.Feature) []*store.Subscription {

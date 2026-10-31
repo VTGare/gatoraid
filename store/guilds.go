@@ -36,6 +36,10 @@ type Settings struct {
 
 	// Relays of a streamer include their Twitch chat.
 	RelayTwitch bool `json:"relay_twitch"`
+
+	// Relays of a streamer include live YouTube streams that Holodex lists
+	// them in.
+	CollabRelays bool `json:"collab_relays"`
 }
 
 func (s *Settings) ModMessages(twitch bool) bool {

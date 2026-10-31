@@ -275,13 +275,23 @@ func subscriptionRemove(b *bot.Bot, f feature, ctx *gumi.Context) error {
 	doing := fmt.Sprintf(f.doing, describeTarget(b, target))
 	err = b.Subs.Remove(ctx.Context(), ctx.GuildID().String(), f.Feature, target, channelID)
 	if errors.Is(err, store.ErrSubscriptionNotFound) {
-		return gumi.Errorf("I'm not %s in <#%s>.", doing, channelID)
+		return gumi.Errorf("I'm not %s in <#%s>.%s", doing, channelID, collabHint(b, f, ctx.GuildID().String(), target))
 	}
 	if err != nil {
 		return err
 	}
 
 	return success(ctx, "Stopped "+doing+" in <#"+channelID+">.")
+}
+
+// It doesn't check that a collab is running, so it can't disagree with the
+// relay engine.
+func collabHint(b *bot.Bot, f feature, guildID string, target store.Target) string {
+	g, ok := b.Guilds.Guild(guildID)
+	if !ok || !g.Settings.CollabRelays || f.Feature != store.FeatureRelay || target.Kind != store.TargetChannel {
+		return ""
+	}
+	return " If you're seeing relays from their stream, they come from \"Auto-relay collabs\" in `/settings`."
 }
 
 func subscriptionClear(b *bot.Bot, f feature, ctx *gumi.Context) error {

@@ -2,6 +2,8 @@ package relay
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
@@ -13,8 +15,9 @@ import (
 // Twitch's brand purple.
 const TwitchColor = 0x9146ff
 
-// Notice builds the message that tells a channel a relay started.
-func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string) discord.MessageCreate {
+// Notice builds the message that tells a channel a relay started. with names
+// the others in a collab, and is empty for other relays.
+func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string, with []string) discord.MessageCreate {
 	var text string
 	switch kind {
 	case store.NoticePrechat:
@@ -25,10 +28,36 @@ func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.
 		}
 		text = StreamerName(s, host) + " goes live " + when + "! Relaying " + StreamLink(s, "pre-stream chat") + " here." + date
 	default:
-		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName()) + "! Relaying chat here."
+		text = StreamerName(s, host) + " is " + StreamLink(s, "live on "+s.PlatformName())
+		if len(with) > 0 {
+			text += " with " + nameList(with)
+		}
+		text += "! Relaying chat here."
 	}
 
 	return StreamMessage(s, host, roleID, text)
+}
+
+// Discord rejects messages over 2000 characters, and big events list dozens
+// of channels.
+const maxNameList = 1500
+
+func nameList(names []string) string {
+	var parts []string
+	size := 0
+	for i, name := range names {
+		part := "**" + EscapeMarkdown(name) + "**"
+		size += len(part) + len(", ")
+		if size > maxNameList {
+			return strings.Join(parts, ", ") + " and " + strconv.Itoa(len(names)-i) + " more"
+		}
+		parts = append(parts, part)
+	}
+
+	if last := len(parts) - 1; last > 0 {
+		return strings.Join(parts[:last], ", ") + " and " + parts[last]
+	}
+	return parts[0]
 }
 
 // StreamerName is the registry's name if host is known, in bold.

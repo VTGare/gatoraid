@@ -207,10 +207,18 @@ var _ = Describe("Settings", func() {
 		Expect(s).To(Equal(want))
 	})
 
+	It("leaves collab relays off for settings saved without the key", func() {
+		s, err := store.DecodeSettings([]byte(`{"relay_twitch":true}`))
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(s.CollabRelays).To(BeFalse())
+	})
+
 	It("round-trips", func() {
 		in := store.DefaultSettings()
 		in.TargetLanguage = "JA"
 		in.NotifyMembersOnly = true
+		in.CollabRelays = true
 
 		data, err := store.EncodeSettings(in)
 		Expect(err).NotTo(HaveOccurred())

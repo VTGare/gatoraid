@@ -278,6 +278,52 @@ var _ = Describe("Tracker", func() {
 		Expect(poll()).To(BeEmpty())
 	})
 
+	Describe("mentions", func() {
+		withMentions := func(status holodex.Status, ids ...string) holodex.Video {
+			v := video("collab", "UCa", status, now)
+			for _, id := range ids {
+				v.Mentions = append(v.Mentions, holodex.Channel{ID: id})
+			}
+			return v
+		}
+
+		It("reports a change on a live stream once, with the new list", func() {
+			src.live = []holodex.Video{withMentions(holodex.StatusLive)}
+			Expect(kinds(poll())).To(Equal(map[string]stream.EventKind{"collab": stream.EventLive}))
+
+			src.live = []holodex.Video{withMentions(holodex.StatusLive, "UCb")}
+			events := poll()
+			Expect(kinds(events)).To(Equal(map[string]stream.EventKind{"collab": stream.EventMentions}))
+			Expect(events[0].Stream.Mentions).To(Equal([]string{"UCb"}))
+
+			Expect(poll()).To(BeEmpty())
+		})
+
+		It("reports a removal", func() {
+			src.live = []holodex.Video{withMentions(holodex.StatusLive, "UCb")}
+			poll()
+
+			src.live = []holodex.Video{withMentions(holodex.StatusLive)}
+			Expect(kinds(poll())).To(Equal(map[string]stream.EventKind{"collab": stream.EventMentions}))
+		})
+
+		It("ignores a change on an upcoming stream", func() {
+			src.live = []holodex.Video{withMentions(holodex.StatusUpcoming)}
+			poll()
+
+			src.live = []holodex.Video{withMentions(holodex.StatusUpcoming, "UCb")}
+			Expect(poll()).To(BeEmpty())
+		})
+
+		It("sends only the live event when a stream goes live with new mentions", func() {
+			src.live = []holodex.Video{withMentions(holodex.StatusUpcoming)}
+			poll()
+
+			src.live = []holodex.Video{withMentions(holodex.StatusLive, "UCb")}
+			Expect(kinds(poll())).To(Equal(map[string]stream.EventKind{"collab": stream.EventLive}))
+		})
+	})
+
 	It("changes nothing when a poll fails", func() {
 		src.live = []holodex.Video{video("live", "UCa", holodex.StatusLive, now)}
 		poll()
@@ -357,16 +403,22 @@ var _ = Describe("Classifier", func() {
 		Entry("normal stream", "Minecraft", "", holodex.StatusUpcoming, "UCa", false),
 	)
 
+	It("marks Holodex's endurance topic, ignoring case", func() {
+		Expect(exempt.Classify(holodex.Video{TopicID: "Endurance", Status: holodex.StatusLive}).Endurance).To(BeTrue())
+		Expect(exempt.Classify(holodex.Video{TopicID: "singing", Status: holodex.StatusLive}).Endurance).To(BeFalse())
+	})
+
 	It("copies the basics and mentions", func() {
 		s := exempt.Classify(holodex.Video{
 			ID: "abc", Title: "t", Status: holodex.StatusLive, AvailableAt: now, StartScheduled: now.Add(-time.Minute),
-			Channel: holodex.Channel{ID: "UCa", Name: "A ch"}, Mentions: []holodex.Channel{{ID: "UCb"}},
+			Channel: holodex.Channel{ID: "UCa", Name: "A ch"}, Mentions: []holodex.Channel{{ID: "UCb", Name: "B ch"}},
 		})
 
 		Expect(s.Status).To(Equal(stream.Live))
 		Expect(s.StartedAt).To(Equal(now))
 		Expect(s.ScheduledAt).To(Equal(now.Add(-time.Minute)))
 		Expect(s.Mentions).To(Equal([]string{"UCb"}))
+		Expect(s.MentionNames).To(Equal(map[string]string{"UCb": "B ch"}))
 		Expect(s.URL()).To(Equal("https://youtu.be/abc"))
 	})
 })

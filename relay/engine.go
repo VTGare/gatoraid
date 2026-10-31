@@ -251,7 +251,46 @@ func (e *Engine) relays(s *stream.Stream) []*store.Subscription {
 			out = append(out, sub)
 		}
 	}
+	return append(out, e.collabs(s, out)...)
+}
+
+// collabs are the guilds' streamer subscriptions that want the stream because
+// Holodex lists the streamer in it. matched are the stream's other relays, and
+// a Discord channel only gets one.
+func (e *Engine) collabs(s *stream.Stream, matched []*store.Subscription) []*store.Subscription {
+	if s.Status != stream.Live || s.Endurance || len(s.Mentions) == 0 {
+		return nil
+	}
+
+	// The daily purge hides user channels nobody subscribes to, including a
+	// partner a manager added for one collab. They still count as known.
+	host, ok := e.cfg.Registry.Lookup(s.ChannelID)
+	if !ok || (host.Removed() && host.Curated()) {
+		return nil
+	}
+
+	taken := make(map[string]bool, len(matched))
+	for _, sub := range matched {
+		taken[sub.ChannelID] = true
+	}
+
+	var out []*store.Subscription
+	for _, sub := range e.cfg.Subs.Mentioned(store.FeatureRelay, s.Mentions) {
+		st := e.guildSettings(sub.GuildID)
+		if taken[sub.ChannelID] || !collabMatch(sub, s) || st == nil || !st.CollabRelays ||
+			!relayable(s, st) || e.cfg.Guilds.Blacklisted(sub.GuildID, s.ChannelID) {
+			continue
+		}
+		taken[sub.ChannelID] = true
+		out = append(out, sub)
+	}
 	return out
+}
+
+// A relay of a stream only targets another streamer if it's there for a
+// collab, because Match's channel subscriptions all target the host.
+func collabMatch(sub *store.Subscription, s *stream.Stream) bool {
+	return sub.Target.Kind == store.TargetChannel && sub.Target.ID != s.ChannelID
 }
 
 func relayable(s *stream.Stream, st *store.Settings) bool {
@@ -310,11 +349,48 @@ func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Sub
 			continue
 		}
 
+		var with []string
+		roleID := sub.RoleID
+		if collabMatch(sub, s) {
+			with = e.collabNames(s, sub.Target.ID)
+			roleID = ""
+			e.cfg.Log.Info("relaying a collab",
+				slog.String("video_id", s.VideoID),
+				slog.String("host_channel_id", s.ChannelID),
+				slog.String("followed_channel_id", sub.Target.ID),
+				slog.String("guild_id", sub.GuildID),
+				slog.String("channel_id", sub.ChannelID))
+		}
+
 		e.cfg.Sender.Send(sender.Message{
 			ChannelID: sub.ChannelID,
-			Send:      e.cfg.Formatter.Notice(kind, s, host, sub.RoleID),
+			Send:      e.cfg.Formatter.Notice(kind, s, host, roleID, with),
 		})
 	}
+}
+
+// collabNames lists everyone Holodex has in the stream but the host, with
+// the followed streamer first, since they're why the channel gets it.
+func (e *Engine) collabNames(s *stream.Stream, followedID string) []string {
+	ids := append([]string{followedID}, s.Mentions...)
+
+	var names []string
+	seen := map[string]bool{s.ChannelID: true}
+	for _, id := range ids {
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+
+		name := s.MentionNames[id]
+		if st, ok := e.cfg.Registry.Streamer(id); ok {
+			name = st.Name
+		}
+		if name != "" {
+			names = append(names, name)
+		}
+	}
+	return names
 }
 
 func (e *Engine) onChat(ev chat.Event) {
@@ -373,7 +449,7 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 			continue
 		}
 
-		showChat := st.ShowChat && (severalChats ||
+		showChat := st.ShowChat && (severalChats || collabMatch(sub, s) ||
 			sub.Target.Kind != store.TargetChannel || e.cfg.Subs.Count(store.FeatureRelay, sub.ChannelID) > 1)
 		if e.translates(c, kind, st) {
 			sent[sub.ChannelID] = true

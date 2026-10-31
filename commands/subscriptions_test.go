@@ -48,6 +48,40 @@ var _ = Describe("Subscription commands", func() {
 		return list
 	}
 
+	Describe("removing with collab relays", func() {
+		const hint = "If you're seeing relays from their stream"
+
+		setCollabs := func(on bool) {
+			GinkgoHelper()
+			Expect(h.b.Guilds.Update(context.Background(), testGuild, func(s *store.Settings) { s.CollabRelays = on })).To(Succeed())
+		}
+
+		It("points to the setting when the streamer isn't subscribed", func() {
+			setCollabs(true)
+
+			Expect(content(run("relay", "remove", dt.String("target", "calli")))).To(ContainSubstring(
+				"I'm not relaying **Mori Calliope** in <#3000>. If you're seeing relays from their stream, they come from \"Auto-relay collabs\" in `/settings`."))
+		})
+
+		It("leaves it out with the setting off", func() {
+			Expect(content(run("relay", "remove", dt.String("target", "calli")))).NotTo(ContainSubstring(hint))
+		})
+
+		It("leaves it out when the removal works", func() {
+			setCollabs(true)
+			run("relay", "add", dt.String("target", "calli"))
+
+			Expect(content(run("relay", "remove", dt.String("target", "calli")))).To(Equal("Stopped relaying **Mori Calliope** in <#3000>."))
+		})
+
+		It("leaves it out for all and for other features", func() {
+			setCollabs(true)
+
+			Expect(content(run("relay", "remove", dt.String("target", "all")))).NotTo(ContainSubstring(hint))
+			Expect(content(run("cameos", "remove", dt.String("target", "calli")))).NotTo(ContainSubstring(hint))
+		})
+	})
+
 	It("needs Manage Server", func() {
 		data := h.run(dt.Command(user, "relay", dt.Sub("add", dt.String("target", "calli"))))
 

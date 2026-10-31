@@ -38,6 +38,9 @@ const (
 	EventPrechat EventKind = iota
 	EventLive
 	EventEnded
+	// A live stream's mentions changed. Holodex can list a collab partner
+	// after the stream starts.
+	EventMentions
 )
 
 type Event struct {
@@ -199,6 +202,8 @@ func (t *Tracker) Poll(ctx context.Context) error {
 		switch {
 		case s.Status == Live && (prev == nil || prev.Status != Live):
 			events = append(events, Event{Kind: EventLive, Stream: s})
+		case s.Status == Live && !slices.Equal(prev.Mentions, s.Mentions):
+			events = append(events, Event{Kind: EventMentions, Stream: s})
 		case s.Status == Upcoming && !tr.prechatSent && !overdue(&s, now):
 			tr.prechatSent = true
 			tr.nearSent = !s.Distant

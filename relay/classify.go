@@ -110,8 +110,8 @@ func (c *Comment) isTL(m *guilds.Moderation) bool {
 	return c.taggedTL() || m.Wants(c.lowerText())
 }
 
-// Relay decides whether a guild relaying the chat's streamer gets the
-// line. The streamer's own lines skip the blacklist and filters.
+// Relay decides whether a guild relaying the chat gets the line. The
+// streamer's own lines skip the blacklist and filters.
 func Relay(c *Comment, settings *store.Settings, m *guilds.Moderation) (Kind, bool) {
 	switch {
 	case strings.TrimSpace(c.Text) == "":

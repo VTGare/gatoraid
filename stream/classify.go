@@ -44,6 +44,12 @@ type Stream struct {
 	Distant bool
 	// Channels Holodex detected in the stream, for collabs.
 	Mentions []string
+	// Holodex's names for Mentions, by channel ID. Not every one is in the
+	// registry.
+	MentionNames map[string]string
+	// Holodex's topic for 24/7 station streams, which list their members
+	// whether or not they're appearing.
+	Endurance bool
 	// Only set for Twitch streams.
 	TwitchUsername string
 	Thumbnail      string
@@ -141,7 +147,13 @@ func (c Classifier) Classify(v holodex.Video) Stream {
 
 	for _, m := range v.Mentions {
 		s.Mentions = append(s.Mentions, m.ID)
+		if s.MentionNames == nil {
+			s.MentionNames = make(map[string]string, len(v.Mentions))
+		}
+		s.MentionNames[m.ID] = cmp.Or(m.EnglishName, m.Name)
 	}
+
+	s.Endurance = strings.EqualFold(v.TopicID, "endurance")
 
 	title := strings.ToLower(v.Title)
 	s.MembersOnly = strings.EqualFold(v.TopicID, "membersonly") || containsAny(title, membersOnlyPhrases)

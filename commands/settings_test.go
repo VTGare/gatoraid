@@ -111,6 +111,20 @@ var _ = Describe("/settings", func() {
 		Expect(settings().RelayTwitch).To(BeFalse())
 	})
 
+	It("turns collab relays on and off", func() {
+		Expect(settings().CollabRelays).To(BeFalse())
+		Expect(fmt.Sprint(embed(click(dt.Command(user, "settings")))["fields"])).To(ContainSubstring("Auto-relay collabs **Off**"))
+
+		data := click(asManager(dt.Button(user, id("toggle", "collabs"))))
+		Expect(embed(data)["title"]).To(Equal("Streams"))
+		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Auto-relay collabs: On"))
+		Expect(settings().CollabRelays).To(BeTrue())
+
+		data = click(asManager(dt.Button(user, id("toggle", "collabs"))))
+		Expect(fmt.Sprint(data["components"])).To(ContainSubstring("Auto-relay collabs: Off"))
+		Expect(settings().CollabRelays).To(BeFalse())
+	})
+
 	It("lets Manager roles change settings", func() {
 		Expect(h.b.Store.SetGuildRoles(ctx, testGuild, store.RoleManager, []string{"11"})).To(Succeed())
 

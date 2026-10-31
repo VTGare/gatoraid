@@ -69,6 +69,40 @@ var _ = Describe("Service", func() {
 		svc = subs.New(db, reg)
 	})
 
+	Describe("Mentioned", func() {
+		It("returns streamer subscriptions in mentions order", func() {
+			add("g1", store.FeatureRelay, store.TargetChannel, "UCcalli", "calli")
+			add("g1", store.FeatureRelay, store.TargetChannel, "UCelira", "elira")
+
+			Expect(channels(svc.Mentioned(store.FeatureRelay, []string{"UCelira", "UCcalli"}))).To(Equal([]string{"elira", "calli"}))
+		})
+
+		It("ignores group and all subscriptions", func() {
+			add("g1", store.FeatureRelay, store.TargetGroup, "holo-en", "en")
+			add("g1", store.FeatureRelay, store.TargetAll, "", "all")
+
+			Expect(svc.Mentioned(store.FeatureRelay, []string{"UCcalli"})).To(BeEmpty())
+		})
+
+		It("ignores hidden streamers and user channels", func() {
+			add("g1", store.FeatureRelay, store.TargetChannel, "UCcalli", "calli")
+			add("g1", store.FeatureRelay, store.TargetChannel, "UCuser", "user")
+			Expect(reg.Remove(ctx, "UCcalli")).To(Succeed())
+
+			Expect(svc.Mentioned(store.FeatureRelay, []string{"UCcalli", "UCuser"})).To(BeEmpty())
+		})
+
+		It("returns nothing for a feature with no subscriptions", func() {
+			Expect(svc.Mentioned(store.FeatureGossip, []string{"UCcalli"})).To(BeNil())
+		})
+
+		It("leaves Match alone", func() {
+			add("g1", store.FeatureRelay, store.TargetChannel, "UCcalli", "calli")
+
+			Expect(svc.Match(store.FeatureRelay, "UCkiara")).To(BeEmpty())
+		})
+	})
+
 	It("matches by channel, group, parent group and all", func() {
 		add("g1", store.FeatureRelay, store.TargetChannel, "UCcalli", "calli")
 		add("g1", store.FeatureRelay, store.TargetGroup, "holo-en", "en")

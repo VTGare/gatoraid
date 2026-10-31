@@ -1,8 +1,10 @@
 package relay_test
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"log/slog"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -142,6 +144,23 @@ func (f *fakeSender) lines() []string {
 	return out
 }
 
+type syncBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *syncBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Write(p)
+}
+
+func (b *syncBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.String()
+}
+
 var _ = Describe("Engine", func() {
 	const (
 		calliID = "UCcalli"
@@ -163,6 +182,7 @@ var _ = Describe("Engine", func() {
 		engine  *relay.Engine
 		ended   chan stream.Stream
 		tl      *fakeTranslator
+		logs    *syncBuffer
 	)
 
 	BeforeEach(func() {
@@ -199,6 +219,7 @@ var _ = Describe("Engine", func() {
 		streams = make(chan stream.Event, 16)
 		ended = make(chan stream.Stream, 4)
 		tl = &fakeTranslator{}
+		logs = &syncBuffer{}
 	})
 
 	start := func() {
@@ -213,6 +234,7 @@ var _ = Describe("Engine", func() {
 			Formatter:  &relay.Formatter{Emoji: func(_, fallback string) string { return fallback }, Lineage: reg.Lineage},
 			OnEnded:    func(s stream.Stream) { ended <- s },
 			Translator: tl,
+			Log:        slog.New(slog.NewTextHandler(logs, nil)),
 		})
 
 		var runCtx context.Context
@@ -593,6 +615,256 @@ var _ = Describe("Engine", func() {
 		Eventually(chats.Running).Should(HaveLen(1))
 		say("calli-live", calliID, "@calli", "hi")
 		Eventually(snd.lines).Should(ContainElement("c1: 🎙️ **@calli:** `hi`\n-# [Mori Calliope](<https://youtu.be/calli-live>) · stream"))
+	})
+
+	Describe("collabs", func() {
+		const notice = "c1: **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab) with **Mori Calliope**! Relaying chat here."
+
+		collab := func(host string, mentions ...string) stream.Event {
+			e := live("collab", host)
+			e.Stream.Mentions = mentions
+			return e
+		}
+
+		BeforeEach(func() {
+			update("g1", func(s *store.Settings) { s.CollabRelays = true })
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, calliID, "c1", "42")
+		})
+
+		It("relays nothing with the setting off", func() {
+			update("g1", func(s *store.Settings) { s.CollabRelays = false })
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+			Expect(snd.lines()).To(BeEmpty())
+		})
+
+		It("sends a notice with no ping and lines that link the chat", func() {
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(chats.Running).Should(Equal([]string{"collab"}))
+			Eventually(snd.lines).Should(Equal([]string{notice}))
+
+			say("collab", "UCviewer", "@viewer", "[EN] hello")
+			Eventually(snd.lines).Should(HaveExactElements(
+				notice,
+				"c1: 💬 ||@viewer:|| `[EN] hello`\n-# [Takanashi Kiara](<https://youtu.be/collab>) · stream",
+			))
+		})
+
+		It("leaves the chat link out with ShowChat off", func() {
+			update("g1", func(s *store.Settings) { s.ShowChat = false })
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(snd.lines).Should(HaveLen(1))
+			say("collab", "UCviewer", "@viewer", "[EN] hello")
+			Eventually(snd.lines).Should(ContainElement("c1: 💬 ||@viewer:|| `[EN] hello`"))
+		})
+
+		It("logs one line for a notice", func() {
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(snd.lines).Should(HaveLen(1))
+			streams <- collab(kiaraID, calliID)
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(1))
+
+			Expect(strings.Count(logs.String(), "relaying a collab")).To(Equal(1))
+			Expect(logs.String()).To(And(
+				ContainSubstring("video_id=collab"), ContainSubstring("host_channel_id="+kiaraID),
+				ContainSubstring("followed_channel_id="+calliID), ContainSubstring("guild_id=g1"), ContainSubstring("channel_id=c1"),
+			))
+		})
+
+		DescribeTable("streams that don't match",
+			func(edit func(*stream.Stream)) {
+				update("g1", func(s *store.Settings) { s.RelayFreeChat = true })
+				start()
+
+				e := collab(kiaraID, calliID)
+				edit(&e.Stream)
+				streams <- e
+				Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+				Expect(snd.lines()).To(BeEmpty())
+			},
+			Entry("upcoming and near", func(s *stream.Stream) {
+				s.Status = stream.Upcoming
+				s.ScheduledAt = time.Now().Add(time.Hour)
+			}),
+			Entry("a free chat room", func(s *stream.Stream) {
+				s.Status = stream.Upcoming
+				s.FreeChat = true
+			}),
+			Entry("members-only", func(s *stream.Stream) { s.MembersOnly = true }),
+			Entry("24/7 station", func(s *stream.Stream) { s.Endurance = true }),
+			Entry("no mentions", func(s *stream.Stream) { s.Mentions = nil }),
+			Entry("Twitch", func(s *stream.Stream) {
+				s.Platform = stream.Twitch
+				s.Mentions = nil
+			}),
+		)
+
+		It("still relays a 24/7 station to its own subscribers", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, kiaraID, "c2", "")
+			start()
+
+			e := collab(kiaraID, calliID)
+			e.Stream.Endurance = true
+			streams <- e
+			Eventually(snd.lines).Should(Equal([]string{"c2: **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+		})
+
+		It("skips a blacklisted host", func() {
+			_, err := gs.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: "g1", ChannelID: kiaraID, AddedBy: "mod"})
+			Expect(err).NotTo(HaveOccurred())
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+		})
+
+		It("skips a host outside the registry", func() {
+			start()
+
+			streams <- collab("UCstranger", calliID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+		})
+
+		It("skips a hidden curated host", func() {
+			Expect(reg.Remove(ctx, kiaraID)).To(Succeed())
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+		})
+
+		It("accepts a user channel the purge hid", func() {
+			Expect(reg.Save(ctx, store.Streamer{ChannelID: "UCindie", Name: "Indie", Source: store.SourceUser})).To(Succeed())
+			_, err := reg.HideUnused(ctx)
+			Expect(err).NotTo(HaveOccurred())
+			start()
+
+			streams <- collab("UCindie", calliID)
+			Eventually(snd.lines).Should(ConsistOf(ContainSubstring("with **Mori Calliope**")))
+		})
+
+		It("treats a host in its own mentions as an ordinary relay", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, kiaraID, "c2", "7")
+			start()
+
+			streams <- collab(kiaraID, kiaraID)
+			Eventually(snd.lines).Should(Equal([]string{"c2: <@&7> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+		})
+
+		It("doesn't count group or all subscriptions", func() {
+			update("g2", func(s *store.Settings) { s.CollabRelays = true })
+			subscribe("g2", store.FeatureRelay, store.TargetGroup, "holo-en", "c2", "")
+			subscribe("g2", store.FeatureRelay, store.TargetAll, "", "c3", "")
+			Expect(reg.Save(ctx, store.Streamer{ChannelID: "UCindie", Name: "Indie", Source: store.SourceUser})).To(Succeed())
+			start()
+
+			streams <- collab("UCindie", calliID)
+			Eventually(snd.lines).Should(ConsistOf(HavePrefix("c1: ")))
+		})
+
+		It("gives a Discord channel that follows the host an ordinary relay", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, kiaraID, "c1", "7")
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(snd.lines).Should(Equal([]string{"c1: <@&7> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+
+			say("collab", "UCviewer", "@viewer", "[EN] hello")
+			Eventually(snd.lines).Should(HaveLen(2))
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(2))
+		})
+
+		It("gives a Discord channel that covers the host through a group an ordinary relay", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetGroup, "holo-en", "c1", "9")
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(snd.lines).Should(Equal([]string{"c1: <@&9> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+		})
+
+		It("names everyone listed, starting with the followed streamer, and leaves out the host", func() {
+			start()
+
+			e := collab(kiaraID, "UCguest", kiaraID, eliraID, calliID)
+			e.Stream.MentionNames = map[string]string{"UCguest": "Guest", eliraID: "Holodex Elira"}
+			streams <- e
+			Eventually(snd.lines).Should(Equal([]string{
+				"c1: **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab) with **Mori Calliope**, **Guest** and **Elira Pendora**! Relaying chat here.",
+			}))
+		})
+
+		It("names two followed streamers and posts once", func() {
+			subscribe("g1", store.FeatureRelay, store.TargetChannel, eliraID, "c1", "")
+			start()
+
+			streams <- collab(kiaraID, eliraID, calliID)
+			Eventually(snd.lines).Should(ConsistOf(ContainSubstring("with **Elira Pendora** and **Mori Calliope**")))
+
+			say("collab", "UCviewer", "@viewer", "[EN] hello")
+			Eventually(snd.lines).Should(HaveLen(2))
+			Consistently(snd.lines, 50*time.Millisecond).Should(HaveLen(2))
+		})
+
+		It("posts the followed streamer as a VTuber and the host as the owner", func() {
+			update("g1", func(s *store.Settings) { s.AutoTranslate = false })
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Eventually(snd.lines).Should(HaveLen(1))
+			say("collab", calliID, "@calli", "hi")
+			say("collab", kiaraID, "@kiara", "hello")
+			Eventually(snd.lines).Should(HaveLen(3))
+
+			finish()
+			lines, err := db.VideoLines(ctx, "collab", "g1")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(lines).To(HaveExactElements(HaveField("Kind", store.LineVTuber), HaveField("Kind", store.LineOwner)))
+		})
+
+		It("starts and stops the chat with the setting", func() {
+			update("g1", func(s *store.Settings) { s.CollabRelays = false })
+			start()
+
+			streams <- collab(kiaraID, calliID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+
+			update("g1", func(s *store.Settings) { s.CollabRelays = true })
+			Eventually(chats.Running).Should(Equal([]string{"collab"}))
+
+			update("g1", func(s *store.Settings) { s.CollabRelays = false })
+			Eventually(chats.Running).Should(BeEmpty())
+		})
+
+		It("follows mentions that change during the stream, with one notice", func() {
+			start()
+			mentions := func(ids ...string) stream.Event {
+				e := collab(kiaraID, ids...)
+				e.Kind = stream.EventMentions
+				return e
+			}
+
+			streams <- collab(kiaraID)
+			Consistently(chats.Running, 50*time.Millisecond).Should(BeEmpty())
+
+			streams <- mentions(calliID)
+			Eventually(chats.Running).Should(Equal([]string{"collab"}))
+			Eventually(snd.lines).Should(Equal([]string{notice}))
+
+			streams <- mentions()
+			Eventually(chats.Running).Should(BeEmpty())
+
+			streams <- mentions(calliID)
+			Eventually(chats.Running).Should(Equal([]string{"collab"}))
+			Consistently(snd.lines, 50*time.Millisecond).Should(Equal([]string{notice}))
+		})
 	})
 
 	Describe("Twitch", func() {

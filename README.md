@@ -9,6 +9,10 @@ community posts.
   in the list are relayed from Twitch too, unless a server turns that off in `/settings`. When
   they stream on both at once, their own lines are only posted once. Well-known Twitch chat bots
   like StreamElements and Nightbot are moderators in most channels, so their lines are skipped.
+  With "Auto-relay collabs" on in `/settings`, off by default, a relay of one streamer also covers
+  live YouTube streams on other channels in the list where Holodex names that streamer. It relies
+  on Holodex's listings, which can be missing or wrong, doesn't ping roles, and doesn't cover
+  Twitch. Unlike cameos, which post only what the streamer says, it relays the stream like any other.
 - **Cameos** post what a VTuber says in other streamers' chats. **Gossip** posts lines elsewhere
   that mention them.
 - **Translation**: streamer and VTuber lines get a DeepL translation into the server's language.
@@ -27,7 +31,7 @@ curated streamer list. See [Channels outside the streamer list](#channels-outsid
 |---|---|---|
 | `/relay`, `/cameos`, `/gossip` | Managers | `add`, `remove`, `clear`, `list` |
 | `/notify youtube`, `/notify twitch`, `/notify posts` | Managers | YouTube and Twitch live notifications, and community post notifications, same subcommands |
-| `/settings` | Anyone can look, Managers change | Relay options, translation language, log channel, members-only, free chat and Twitch handling, bot roles |
+| `/settings` | Anyone can look, Managers change | Relay options, translation language, log channel, members-only, free chat, Twitch and collab handling, bot roles |
 | `/blacklist`, "Blacklist author" (message menu) | Blacklisters | Stop relaying someone in this server |
 | `/filter` | Blacklisters | Banned words and wanted translation prefixes |
 | `/log <video>` | Everyone | A stream's relayed lines as a file |

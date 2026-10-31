@@ -41,6 +41,8 @@ var toggles = []toggle{
 		func(s *store.Settings) *bool { return &s.RelayFreeChat }},
 	{"relaytwitch", "streams", "Relay Twitch chats", "Relays of a streamer include their Twitch streams",
 		func(s *store.Settings) *bool { return &s.RelayTwitch }},
+	{"collabs", "streams", "Auto-relay collabs", "Relays also include live YouTube streams where Holodex lists a followed streamer",
+		func(s *store.Settings) *bool { return &s.CollabRelays }},
 }
 
 type section struct {
@@ -51,7 +53,7 @@ var sections = []section{
 	{"relay", "Relay", "Mod messages, waiting rooms, chat link, auto-translate"},
 	{"translation", "Translation", "Which language VTuber lines are translated into"},
 	{"logs", "Logs", "Where stream logs go"},
-	{"streams", "Streams", "Members-only streams, free chat rooms and Twitch"},
+	{"streams", "Streams", "Members-only streams, free chat rooms, Twitch and collabs"},
 	{"permissions", "Permissions", "Roles that can manage the bot"},
 }
 
@@ -343,8 +345,8 @@ func (v *panelView) renderHome(e *discord.Embed) {
 			onOff(s.YouTubeModMessages), onOff(s.TwitchModMessages), onOff(s.Prechat), onOff(s.ShowChat), onOff(s.AutoTranslate))},
 		{Name: "Translation", Value: "Into **" + translate.Name(s.TargetLanguage) + "**"},
 		{Name: "Logs", Value: v.logChannel()},
-		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s** · Relay Twitch **%s**",
-			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat), onOff(s.RelayTwitch))},
+		{Name: "Streams", Value: fmt.Sprintf("Notify members-only **%s** · Relay free chat **%s** · Relay Twitch **%s** · Auto-relay collabs **%s**",
+			onOff(s.NotifyMembersOnly), onOff(s.RelayFreeChat), onOff(s.RelayTwitch), onOff(s.CollabRelays))},
 		{Name: "Permissions", Value: "Managers " + roleList(v.managers) + " · Blacklisters " + roleList(v.blacklisters)},
 	}
 	e.Footer = &discord.EmbedFooter{Text: "Changing settings needs Manage Server or a Manager role"}

@@ -99,7 +99,7 @@ var _ = Describe("Notice", func() {
 	f := &relay.Formatter{}
 
 	It("pings only the role and links the YouTube stream for Discord's player", func() {
-		msg := f.Notice(store.NoticeRelay, calliStream(), calli, "123")
+		msg := f.Notice(store.NoticeRelay, calliStream(), calli, "123", nil)
 
 		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on YouTube](https://youtu.be/vid)! Relaying chat here."))
 		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
@@ -107,12 +107,47 @@ var _ = Describe("Notice", func() {
 		Expect(msg.Embeds).To(BeEmpty())
 	})
 
+	Describe("a collab's live notice", func() {
+		notice := func(with ...string) string {
+			return f.Notice(store.NoticeRelay, calliStream(), calli, "", with).Content
+		}
+		const start = "**Mori Calliope** is [live on YouTube](https://youtu.be/vid) with "
+
+		It("names one person", func() {
+			msg := f.Notice(store.NoticeRelay, calliStream(), calli, "", []string{"Takanashi_Kiara"})
+
+			Expect(msg.Content).To(Equal(start + `**Takanashi\_Kiara**! Relaying chat here.`))
+			Expect(msg.AllowedMentions.Roles).To(BeEmpty())
+		})
+
+		It("names two people", func() {
+			Expect(notice("Kiara", "Ina")).To(Equal(start + "**Kiara** and **Ina**! Relaying chat here."))
+		})
+
+		It("names everyone in a bigger collab", func() {
+			Expect(notice("Kiara", "Ina", "Gura", "Ame", "Irys")).
+				To(Equal(start + "**Kiara**, **Ina**, **Gura**, **Ame** and **Irys**! Relaying chat here."))
+		})
+
+		It("counts the rest once the names would make the message too long", func() {
+			names := make([]string, 200)
+			for i := range names {
+				names[i] = "Streamer With A Long Name"
+			}
+
+			content := notice(names...)
+
+			Expect(len(content)).To(BeNumerically("<", 2000))
+			Expect(content).To(MatchRegexp(`\*\* and \d+ more! Relaying chat here\.$`))
+		})
+	})
+
 	It("says when a prechat's stream starts and pings nobody without a role", func() {
 		s := calliStream()
 		s.Status = stream.Upcoming
 		s.ScheduledAt = time.Unix(1790000000, 0)
 
-		msg := f.Notice(store.NoticePrechat, s, nil, "")
+		msg := f.Notice(store.NoticePrechat, s, nil, "", nil)
 
 		Expect(msg.Content).To(Equal("**Mori Calliope Ch.** goes live <t:1790000000:R>! Relaying [pre-stream chat](https://youtu.be/vid) here.\n-# <t:1790000000:F>"))
 		Expect(msg.AllowedMentions.Roles).To(BeEmpty())
@@ -122,7 +157,7 @@ var _ = Describe("Notice", func() {
 		s := calliStream()
 		s.Status = stream.Upcoming
 
-		msg := f.Notice(store.NoticePrechat, s, calli, "")
+		msg := f.Notice(store.NoticePrechat, s, calli, "", nil)
 
 		Expect(msg.Content).To(Equal("**Mori Calliope** goes live soon! Relaying [pre-stream chat](https://youtu.be/vid) here."))
 	})
@@ -135,7 +170,7 @@ var _ = Describe("Notice", func() {
 			Title: "【MINECRAFT】dig", Game: "Minecraft", Thumbnail: "https://static-cdn.jtvnw.net/previews-ttv/live_user_moricalliope-1280x720.jpg?s=1",
 		}
 
-		msg := f.Notice(store.NoticeRelay, s, &host, "123")
+		msg := f.Notice(store.NoticeRelay, s, &host, "123", nil)
 
 		Expect(msg.Content).To(Equal("<@&123> **Mori Calliope** is [live on Twitch](<https://www.twitch.tv/moricalliope>)! Relaying chat here."))
 		Expect(msg.AllowedMentions.Roles).To(Equal([]snowflake.ID{123}))
