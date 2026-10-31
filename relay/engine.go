@@ -361,9 +361,10 @@ func (e *Engine) dispatch(s *stream.Stream, cc *chat.Comment) {
 	// only the link says which one a line came from.
 	severalChats := e.openChats(s.ChannelID) > 1
 
-	for _, sub := range e.cfg.Subs.Match(store.FeatureRelay, s.ChannelID) {
+	for _, sub := range e.relays(s) {
+		// The guild can be purged after relays checks it.
 		st := e.guildSettings(sub.GuildID)
-		if st == nil || !relayable(s, st) {
+		if st == nil {
 			continue
 		}
 
