@@ -63,7 +63,7 @@ channel_id = "UC9ruVYPv7yJmV0Rh0NKA-Lw"
 channel_name = "kson ONAIR"
 twitter = "ksonONAIR"
 twitch = "ksonsouchou"
-aliases = ["kson ONAIR"]
+aliases = ["kson ONAIR", "総長"]
 free_chat_streams = true
 
 [[streamer]]
@@ -215,6 +215,7 @@ name = "Sameko Saba"
 channel_id = "UCxsZ6NCzjU_t4YSxQLBcM5A"
 channel_name = "saba"
 twitter = "samekosaba"
+aliases = ["Saba", "Sameko"]
 
 [[streamer]]
 name = "Harris Caine"
@@ -289,6 +290,7 @@ name = "Nimi Nightmare"
 channel_id = "UCIfAvpeIWGHb0duCkMkmm2Q"
 channel_name = "Nimi Nightmare"
 twitter = "niminightmare"
+aliases = ["Nimi"]
 
 [[streamer]]
 name = "Mikazuki Arion"
@@ -520,12 +522,14 @@ channel_id = "UCWCc8tO-uUl_7SJXIKJACMw"
 channel_name = "神楽めあ / KaguraMea"
 twitter = "KaguraMea_VoV"
 twitch = "kagura0mea"
+aliases = ["Mea"]
 
 [[streamer]]
 name = "Natori Sana"
 channel_id = "UCIdEIHpS0TdkqRkHL5OkLtA"
 channel_name = "さなちゃんねる"
 twitter = "sana_natori"
+aliases = ["Sana"]
 
 [[streamer]]
 name = "Omega Sisters"
@@ -806,6 +810,7 @@ name = "Azuma Lim"
 channel_id = "UCARI2g7r-PHaxrIcAYsMfmA"
 channel_name = "アズマリム Azumalim"
 twitter = "azuma_lim"
+aliases = ["Lim"]
 
 [[streamer]]
 name = "YuuRi"
@@ -1680,6 +1685,7 @@ name = "Silvervale"
 channel_id = "UCm8Dj7dQ0oRHXNUXF31kjEw"
 twitter = "_Silvervale_"
 twitch = "silvervale"
+aliases = ["Vale"]
 
 
 # REJECT
@@ -1749,7 +1755,7 @@ name = "Dokibird"
 channel_id = "UComInW10MkHJs-_vi4rHQCQ"
 twitter = "Dokibird"
 twitch = "dokibird"
-aliases = ["jkterjter"]
+aliases = ["jkterjter", "Doki"]
 
 [[streamer]]
 name = "Rin Penrose"
@@ -1783,7 +1789,7 @@ channel_id = "UCtNeQ8cUwvAAhBbVbwfGWpg"
 channel_name = "Apricot the Lich"
 twitter = "LichVtuber"
 twitch = "apricot"
-aliases = ["Apricot the Lich"]
+aliases = ["Apricot the Lich", "Apricot"]
 
 [[streamer]]
 name = "GEEGA"
@@ -1875,3 +1881,4 @@ name = "Shoto"
 channel_id = "UCgwJ4ReZqFOw_Y6eTEIunDQ"
 twitter = "shxtou"
 twitch = "shxtou"
+aliases = ["Shxtou"]

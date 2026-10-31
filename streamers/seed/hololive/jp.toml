@@ -83,7 +83,7 @@ channel_id = "UCFTLzh12_nrtzqBPsTCqenA"
 channel_name = "アキロゼCh。Vtuber/ホロライブ所属"
 twitter = "akirosenthal"
 twitch = "akirosenthal_hololive"
-aliases = ["aki", "アキ"]
+aliases = ["aki", "アキ", "Akirose", "アキロゼ"]
 
 [[streamer]]
 name = "Natsuiro Matsuri"
@@ -114,7 +114,7 @@ channel_id = "UC7fk0CB07ly8oSl0aqKkqFg"
 channel_name = "Nakiri Ayame Ch. 百鬼あやめ"
 twitter = "nakiriayame"
 twitch = "nakiriayame_hololive"
-aliases = ["ayame", "nakiri", "あやめ"]
+aliases = ["ayame", "nakiri", "あやめ", "Ojou", "お嬢"]
 
 [[streamer]]
 name = "Oozora Subaru"
@@ -136,21 +136,21 @@ name = "Inugami Korone"
 channel_id = "UChAnqc_AY5_I3Px5dig3X1Q"
 channel_name = "Korone Ch. 戌神ころね"
 twitter = "inugamikorone"
-aliases = ["korone", "korosan", "ころね", "ころさん"]
+aliases = ["korone", "korosan", "ころね", "ころさん", "Doog", "Koro-san"]
 
 [[streamer]]
 name = "Ookami Mio"
 channel_id = "UCp-5t9SrOQwXMU7iIjQfARg"
 channel_name = "Mio Channel 大神ミオ"
 twitter = "ookamimio"
-aliases = ["mio", "みお"]
+aliases = ["mio", "みお", "ミオ"]
 
 [[streamer]]
 name = "Nekomata Okayu"
 channel_id = "UCvaTdHTWBGv3MKj3KVqJVCw"
 channel_name = "Okayu Ch. 猫又おかゆ"
 twitter = "nekomataokayu"
-aliases = ["okayu", "おかゆ"]
+aliases = ["okayu", "おかゆ", "Okayun"]
 
 
 # 3rd Generation (Fantasy)
@@ -161,7 +161,7 @@ channel_id = "UC1DCedRgGHBdm81E1llLhOQ"
 channel_name = "Pekora Ch. 兎田ぺこら"
 twitter = "usadapekora"
 twitch = "usadapekora_hololive"
-aliases = ["peko", "ペコ", "ぺこ"]
+aliases = ["peko", "ペコ", "ぺこ", "Pekora", "Usada"]
 
 [[streamer]]
 name = "Houshou Marine"
@@ -184,7 +184,7 @@ channel_id = "UCvInZx9h3jC2JzsIzoOebWg"
 channel_name = "Flare Ch. 不知火フレア"
 twitter = "shiranuiflare"
 twitch = "shiranuiflare_hololive"
-aliases = ["flare", "フレア"]
+aliases = ["flare", "フレア", "Fuutan"]
 
 
 # 4th Generation (holoForce)
@@ -195,7 +195,7 @@ channel_id = "UC1uv2Oq6kNxgATlCiez59hw"
 channel_name = "Towa Ch. 常闇トワ"
 twitter = "tokoyamitowa"
 twitch = "tokoyamitowa_holo"
-aliases = ["towa", "トワ"]
+aliases = ["towa", "トワ", "TMT"]
 
 [[streamer]]
 name = "Himemori Luna"
@@ -203,7 +203,7 @@ channel_id = "UCa9Y57gfeY0Zro_noHRVrnw"
 channel_name = "Luna Ch. 姫森ルーナ"
 twitter = "himemoriluna"
 twitch = "himemoriluna_hololive"
-aliases = ["ルーナ", "luna"]
+aliases = ["ルーナ", "luna", "Lunatan"]
 free_chat_streams = true
 
 [[streamer]]
@@ -259,7 +259,7 @@ channel_id = "UCENwRMx5Yh42zWpzURebzTw"
 channel_name = "Laplus ch. ラプラス・ダークネス - holoX -"
 twitter = "LaplusDarknesss"
 twitch = "laplusdarknesss_hololive"
-aliases = ["Laplus"]
+aliases = ["Laplus", "La+", "ラプラス"]
 
 [[streamer]]
 name = "Takane Lui"
@@ -267,7 +267,7 @@ channel_id = "UCs9_O1tRPMQTHQ-N_L6FU2g"
 channel_name = "Lui ch. 鷹嶺ルイ - holoX -"
 twitter = "takanelui"
 twitch = "takanelui_hololive"
-aliases = ["Lui"]
+aliases = ["Lui", "ルイ姉"]
 
 [[streamer]]
 name = "Hakui Koyori"
@@ -275,7 +275,7 @@ channel_id = "UC6eWCld0KwmyHFbAqK3V-Rw"
 channel_name = "Koyori ch. 博衣こより - holoX -"
 twitter = "hakuikoyori"
 twitch = "hakuikoyori_hololive"
-aliases = ["Koyori"]
+aliases = ["Koyori", "Koyo"]
 
 [[streamer]]
 name = "Kazama Iroha"
@@ -341,7 +341,7 @@ name = "Todoroki Hajime"
 channel_id = "UC1iA6_NT4mtAcIII6ygrvCw"
 channel_name = "Hajime Ch. 轟はじめ ‐ ReGLOSS"
 twitter = "todoroki_hajime"
-aliases = ["Todoroki", "Hajime"]
+aliases = ["Todoroki", "Hajime", "Banchou"]
 
 
 # DEV_IS FLOW GLOW
@@ -351,12 +351,14 @@ name = "Isaki Riona"
 channel_id = "UC9LSiN9hXI55svYEBrrK-tw"
 channel_name = "Riona Ch. 響咲リオナ - FLOW GLOW"
 twitter = "isakiriona"
+aliases = ["Riona"]
 
 [[streamer]]
 name = "Kikirara Vivi"
 channel_id = "UCGzTVXqMQHa4AgJVJIVvtDQ"
 channel_name = "Vivi Ch. 綺々羅々ヴィヴィ - FLOW GLOW"
 twitter = "kikiraravivi"
+aliases = ["Vivi"]
 
 [[streamer]]
 name = "Mizumiya Su"
@@ -369,12 +371,14 @@ name = "Rindo Chihaya"
 channel_id = "UCKMWFR6lAstLa7Vbf5dH7ig"
 channel_name = "Chihaya Ch. 輪堂 千速 - FLOW GLOW"
 twitter = "rindochihaya"
+aliases = ["Chihaya"]
 
 [[streamer]]
 name = "Koganei Niko"
 channel_id = "UCuI_opAVX6qbxZY-a-AxFuQ"
 channel_name = "Niko Ch. 虎金妃笑虎 - FLOW GLOW"
 twitter = "koganeiniko"
+aliases = ["Niko"]
 
 
 # mekPark

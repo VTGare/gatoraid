@@ -12,7 +12,7 @@ name = "Tsukino Mito"
 channel_id = "UCD-miitqNY3nyukJ4Fnf4_A"
 channel_name = "月ノ美兎"
 twitter = "MitoTsukino"
-aliases = ["Tsukino", "Mito", "月ノ美兎"]
+aliases = ["Tsukino", "Mito", "月ノ美兎", "Iinchou"]
 
 [[streamer]]
 name = "Shibuya Hajime"
@@ -73,7 +73,7 @@ name = "Kenmochi Toya"
 channel_id = "UCv1fFr156jc65EMiLbaLImw"
 channel_name = "剣持刀也"
 twitter = "rei_Toya_rei"
-aliases = ["Kenmochi", "Toya", "剣持", "刀也", "剣持刀也"]
+aliases = ["Kenmochi", "Toya", "剣持", "刀也", "剣持刀也", "もちさん"]
 
 [[streamer]]
 name = "Morinaka Kazaki"
@@ -166,7 +166,7 @@ name = "Kuzuha"
 channel_id = "UCSFCh5NL4qXrAy9u-u2lX3g"
 channel_name = "Kuzuha Channel"
 twitter = "Vamp_Kuzu"
-aliases = ["Vamp_Kuzu"]
+aliases = ["Vamp_Kuzu", "Kuzu", "葛葉"]
 
 [[streamer]]
 name = "Shiina Yuika"
@@ -430,6 +430,7 @@ name = "Suzuhara Lulu"
 channel_id = "UC_a1ZYZ8ZTXpjg9xUY9sj8w"
 channel_name = "鈴原るる【にじさんじ所属】"
 twitter = "lulu_suzuhara"
+aliases = ["Lulu"]
 
 
 # LvEx
@@ -624,7 +625,7 @@ channel_id = "UC6wvdADTJ88OfIbJYIpAaDA"
 channel_name = "不破 湊 / Fuwa Minato【にじさんじ】"
 twitter = "Fuwa_Minato"
 twitch = "fuwaminato2434"
-aliases = ["Fuwa", "Minato", "不破 湊", "湊", "不破"]
+aliases = ["Fuwa", "Minato", "不破 湊", "湊", "不破", "ふわっち"]
 
 
 # Mananatsu

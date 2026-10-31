@@ -22,7 +22,7 @@ name = "Airani Iofifteen"
 channel_id = "UCAoy6rzhSf4ydcYjJw3WoVg"
 channel_name = "Airani Iofifteen Channel hololive-ID"
 twitter = "airaniiofifteen"
-aliases = ["iofi", "イオフィ"]
+aliases = ["iofi", "イオフィ", "Yopi"]
 
 [[streamer]]
 name = "Ayunda Risu"
@@ -55,6 +55,7 @@ channel_id = "UCYz_5n-uDuChHtLo7My1HnQ"
 channel_name = "Kureiji Ollie Ch. hololive-ID"
 twitter = "kureijiollie"
 twitch = "kureijiollie"
+aliases = ["Ollie", "Kureiji"]
 
 [[streamer]]
 name = "Pavolia Reine"

@@ -86,7 +86,7 @@ channel_id = "UCyxtGMdWlURZ30WSnEjDOQw"
 channel_name = "Regis Altare Ch. HOLOSTARS-EN"
 twitter = "regisaltare"
 twitch = "regisaltare_holostars_en"
-aliases = ["Regis"]
+aliases = ["Regis", "Altare"]
 
 [[streamer]]
 name = "Axel Syrios"
@@ -94,7 +94,7 @@ channel_id = "UC2hx0xVkMoHGWijwr_lA01w"
 channel_name = "Axel Syrios Ch. HOLOSTARS-EN"
 twitter = "axelsyrios"
 twitch = "axelsyrios"
-aliases = ["Axel"]
+aliases = ["Axel", "Syrios"]
 
 
 # HOLOSTARS English -TEMPUS- Vanguard
@@ -105,7 +105,7 @@ channel_id = "UCMqGG8BRAiI1lJfKOpETM_w"
 channel_name = "Josuiji Shinri Ch. HOLOSTARS-EN"
 twitter = "josuijishinri"
 twitch = "josuijishinri"
-aliases = ["Josuiji"]
+aliases = ["Josuiji", "Shinri"]
 
 [[streamer]]
 name = "Banzoin Hakka"
@@ -113,7 +113,7 @@ channel_id = "UC7gxU6NXjKF1LrgOddPzgTw"
 channel_name = "Banzoin Hakka Ch. HOLOSTARS-EN"
 twitter = "banzoinhakka"
 twitch = "banzoinhakka"
-aliases = ["Banzoin"]
+aliases = ["Banzoin", "Hakka"]
 
 [[streamer]]
 name = "Machina X Flayon"
@@ -129,7 +129,7 @@ channel_id = "UCHP4f7G2dWD4qib7BMatGAw"
 channel_name = "Gavis Bettel Ch. HOLOSTARS-EN"
 twitter = "gavisbettel"
 twitch = "gavisbettel"
-aliases = ["Gavis"]
+aliases = ["Gavis", "Bettel"]
 
 
 # HOLOSTARS English -ARMIS-
