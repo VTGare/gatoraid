@@ -717,6 +717,16 @@ var _ = Describe("Engine", func() {
 			Eventually(snd.lines).Should(Equal([]string{"c2: **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
 		})
 
+		It("lists who's in the stream on a host relay with the setting off", func() {
+			update("g2", func(s *store.Settings) { s.CollabRelays = false })
+			subscribe("g2", store.FeatureRelay, store.TargetChannel, kiaraID, "c2", "7")
+			start()
+
+			streams <- collab(kiaraID, eliraID, calliID)
+			Eventually(snd.lines).Should(ContainElement(
+				"c2: <@&7> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab) with **Elira Pendora** and **Mori Calliope**! Relaying chat here."))
+		})
+
 		It("skips a blacklisted host", func() {
 			_, err := gs.AddToBlacklist(ctx, store.BlacklistEntry{GuildID: "g1", ChannelID: kiaraID, AddedBy: "mod"})
 			Expect(err).NotTo(HaveOccurred())
@@ -775,7 +785,7 @@ var _ = Describe("Engine", func() {
 			start()
 
 			streams <- collab(kiaraID, calliID)
-			Eventually(snd.lines).Should(Equal([]string{"c1: <@&7> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+			Eventually(snd.lines).Should(Equal([]string{"c1: <@&7> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab) with **Mori Calliope**! Relaying chat here."}))
 
 			say("collab", "UCviewer", "@viewer", "[EN] hello")
 			Eventually(snd.lines).Should(HaveLen(2))
@@ -787,7 +797,7 @@ var _ = Describe("Engine", func() {
 			start()
 
 			streams <- collab(kiaraID, calliID)
-			Eventually(snd.lines).Should(Equal([]string{"c1: <@&9> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab)! Relaying chat here."}))
+			Eventually(snd.lines).Should(Equal([]string{"c1: <@&9> **Takanashi Kiara** is [live on YouTube](https://youtu.be/collab) with **Mori Calliope**! Relaying chat here."}))
 		})
 
 		It("names everyone listed, starting with the followed streamer, and leaves out the host", func() {

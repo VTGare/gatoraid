@@ -349,10 +349,10 @@ func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Sub
 			continue
 		}
 
-		var with []string
+		var followedID string
 		roleID := sub.RoleID
 		if collabMatch(sub, s) {
-			with = e.collabNames(s, sub.Target.ID)
+			followedID = sub.Target.ID
 			roleID = ""
 			e.cfg.Log.Info("relaying a collab",
 				slog.String("video_id", s.VideoID),
@@ -364,14 +364,19 @@ func (e *Engine) notify(ctx context.Context, s *stream.Stream, subs []*store.Sub
 
 		e.cfg.Sender.Send(sender.Message{
 			ChannelID: sub.ChannelID,
-			Send:      e.cfg.Formatter.Notice(kind, s, host, roleID, with),
+			Send:      e.cfg.Formatter.Notice(kind, s, host, roleID, e.collabNames(s, followedID)),
 		})
 	}
 }
 
-// collabNames lists everyone Holodex has in the stream but the host, with
-// the followed streamer first, since they're why the channel gets it.
+// collabNames lists everyone Holodex has in the stream but the host. A collab
+// match's followed streamer comes first, since they're why the channel gets
+// it. 24/7 stations list their members whether or not they're appearing.
 func (e *Engine) collabNames(s *stream.Stream, followedID string) []string {
+	if s.Endurance {
+		return nil
+	}
+
 	ids := append([]string{followedID}, s.Mentions...)
 
 	var names []string

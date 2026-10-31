@@ -16,7 +16,7 @@ import (
 const TwitchColor = 0x9146ff
 
 // Notice builds the message that tells a channel a relay started. with names
-// the others in a collab, and is empty for other relays.
+// the others in the stream, and only appears once it's live.
 func (f *Formatter) Notice(kind store.NoticeKind, s *stream.Stream, host *store.Streamer, roleID string, with []string) discord.MessageCreate {
 	var text string
 	switch kind {
